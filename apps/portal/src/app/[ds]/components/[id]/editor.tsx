@@ -3,6 +3,7 @@
 // styles, or switch the panel to JSON. Contract tab: the contract as a form, or as code. Every edit
 // re-renders from the modified contract; Save validates the whole system on the server before the draft changes.
 import { useMemo, useState, useTransition, type MouseEvent } from "react";
+import { useRouter } from "next/navigation";
 import { StyleKey, type Catalog, type Contract, type Part } from "@elos/contracts";
 import { emitComponentCss, partClass } from "@elos/core/css";
 import { ElosProvider, Render } from "@elos/react";
@@ -53,6 +54,8 @@ function Rows({ label, bindings, onChange, keyList }: { label: string; bindings:
 
 export function ComponentEditor({ ds, contract, catalog, usageHtml }: { ds: string; contract: Contract; catalog: Catalog; usageHtml: string }) {
   const [draft, setDraft] = useState<Contract>(contract);
+  const [baseline, setBaseline] = useState<Contract>(contract); // what the draft holds, updated on save
+  const router = useRouter();
   const [selected, setSelected] = useState<string | null>(null);
   const [example, setExample] = useState(0);
   const [selectMode, setSelectMode] = useState(true);
@@ -72,7 +75,7 @@ export function ComponentEditor({ ds, contract, catalog, usageHtml }: { ds: stri
     }
   }, [draft, selected]);
   const tokenPaths = useMemo(() => catalog.tokens.base.map((t) => t.path), [catalog]);
-  const dirty = JSON.stringify(draft) !== JSON.stringify(contract);
+  const dirty = JSON.stringify(draft) !== JSON.stringify(baseline);
   const tree = draft.examples[example]?.tree;
   const previewTree = tree && draft.id === "ds.dialog" ? { ...tree, props: { ...tree.props, open: true } } : tree;
   const part = selected ? findPart(draft.anatomy, selected) : undefined;
@@ -96,7 +99,9 @@ export function ComponentEditor({ ds, contract, catalog, usageHtml }: { ds: stri
       setError(null);
       const r = await saveContract(ds, draft);
       if (!r.ok) return setError(r.error);
+      setBaseline(draft);
       setSaved(true);
+      router.refresh();
     });
 
   const previewPanel = (
@@ -176,7 +181,7 @@ export function ComponentEditor({ ds, contract, catalog, usageHtml }: { ds: stri
       {contractView === "form" ? (
         <ContractForm draft={draft} onChange={change} />
       ) : (
-        <textarea className="field panel" rows={40} style={{ width: "100%", fontFamily: "ui-monospace, monospace", fontSize: 12 }} key={JSON.stringify(contract)} defaultValue={JSON.stringify(draft, null, 2)}
+        <textarea className="field panel" rows={40} style={{ width: "100%", fontFamily: "ui-monospace, monospace", fontSize: 12 }} key={JSON.stringify(baseline)} defaultValue={JSON.stringify(draft, null, 2)}
           onBlur={(e) => { try { change(JSON.parse(e.target.value)); setError(null); } catch (err) { setError(`Invalid JSON: ${(err as Error).message}`); } }} />
       )}
       {error && <div className="error" style={{ marginTop: 8 }}>{error}</div>}
@@ -199,7 +204,7 @@ export function ComponentEditor({ ds, contract, catalog, usageHtml }: { ds: stri
           {error && <span className="error">{error.split("\n")[0]}</span>}
           {saved && !dirty && <span className="muted" style={{ fontSize: 13 }}>Saved.</span>}
           {dirty && (
-            <button type="button" className="ds-button__root" data-variant="ghost" data-size="md" onClick={() => change(contract)}>
+            <button type="button" className="ds-button__root" data-variant="ghost" data-size="md" onClick={() => change(baseline)}>
               <span className="ds-button__label">Discard</span>
             </button>
           )}

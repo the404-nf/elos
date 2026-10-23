@@ -2,6 +2,7 @@
 // Edit a token and see it applied, in every theme at once, in the components that bind to it.
 // Each theme's preview overrides one CSS variable; aliases are emitted as var() so dependents follow.
 import { useState, useTransition, type CSSProperties } from "react";
+import { useRouter } from "next/navigation";
 import type { Catalog, CompositionNode } from "@elos/contracts";
 import { cssVar } from "@elos/core/css";
 import { Render } from "@/components/elos-client.tsx";
@@ -19,10 +20,13 @@ export function TokenEditor({ ds, path, type, themes, dependents, previews, cata
   previews: { id: string; name: string; tree: CompositionNode }[];
   catalog: Catalog;
 }) {
-  const [values, setValues] = useState(Object.fromEntries(themes.map((t) => [t.theme, t.raw])));
+  const initial = Object.fromEntries(themes.map((t) => [t.theme, t.raw]));
+  const [values, setValues] = useState(initial);
+  const [baseline, setBaseline] = useState(initial); // what the draft holds, updated on save so "dirty" stays truthful
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [pending, start] = useTransition();
+  const router = useRouter();
 
   // What the user typed, resolved against the catalog of that theme, so the override is a real CSS value.
   const resolve = (theme: string, input: string): string => {
@@ -32,18 +36,24 @@ export function TokenEditor({ ds, path, type, themes, dependents, previews, cata
     return pool.find((t) => t.path === m[1])?.value ?? "";
   };
   const tokenPaths = catalog.tokens.base.filter((t) => t.path !== path).map((t) => t.path);
-  const dirty = themes.some((t) => values[t.theme] !== t.raw);
+  const dirty = themes.some((t) => (values[t.theme] ?? "").trim() !== baseline[t.theme]);
   const hasDialog = previews.some((p) => p.id === "ds.dialog");
 
   const save = () =>
     start(async () => {
       setError(null);
+      const next = { ...baseline };
       for (const t of themes) {
-        if (values[t.theme] === t.raw) continue;
-        const r = await saveToken(ds, t.theme, path, values[t.theme]!);
+        const v = (values[t.theme] ?? "").trim();
+        if (v === baseline[t.theme]) continue;
+        const r = await saveToken(ds, t.theme, path, v);
         if (!r.ok) return setError(r.error);
+        next[t.theme] = v;
       }
+      setBaseline(next);
+      setValues(next);
       setSaved(true);
+      router.refresh(); // pull the new draft into the server-rendered parts of the page
     });
 
   return (
@@ -121,7 +131,7 @@ export function TokenEditor({ ds, path, type, themes, dependents, previews, cata
             <span className="ds-button__label">{pending ? "Saving…" : "Save to draft"}</span>
           </button>
           {dirty && !pending && (
-            <button type="button" className="ds-button__root" data-variant="ghost" data-size="md" onClick={() => setValues(Object.fromEntries(themes.map((t) => [t.theme, t.raw])))}>
+            <button type="button" className="ds-button__root" data-variant="ghost" data-size="md" onClick={() => setValues(baseline)}>
               <span className="ds-button__label">Discard</span>
             </button>
           )}
