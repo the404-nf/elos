@@ -24,10 +24,11 @@ test("broken references are reported, not guessed", () => {
   const errors = validateContracts(
     [
       {
-        id: "ds.x", name: "X", version: "0.0.1", status: "draft", description: "", semantics: { element: "div" },
+        id: "ds.x", name: "X", version: "0.0.1", status: "draft", category: "action", description: "", semantics: { element: "div" },
         props: [{ name: "tone", description: "", type: { enum: ["a", "b"] }, required: false }],
         states: [], anatomy: { root: { tokens: { color: "{color.{tone}.fg}" } } },
-        a11y: { focusVisible: false, contrast: "AA" }, usage: { when: [], whenNot: [], intents: [] },
+        a11y: { focusVisible: false, contrast: "AA", keyboard: [], aria: [] },
+        usage: { when: [], whenNot: [], intents: [], alternatives: [] }, guidelines: { do: [], dont: [] }, resources: [],
         relationships: { pairsWith: [], excludes: [], contains: ["ds.missing"], within: [] }, channels: {}, examples: [],
       },
     ],

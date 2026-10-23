@@ -2,11 +2,10 @@
 // No component has hand-written markup; the contract is the component.
 import { createContext, createElement as h, useContext, type ReactNode } from "react";
 import type { Catalog, Contract, Part } from "@elos/contracts";
-import { partClass } from "@elos/core";
+import { checkSlots, isNode, partClass, resolveProps, type Node, type Scalar } from "@elos/core";
 
-export type Scalar = string | number | boolean;
+export type { Node, Scalar };
 export type SlotItem = Node | string | ReactNode;
-export type Node = { component: string; props?: Record<string, Scalar>; slots?: Record<string, SlotItem[]> };
 
 /** Behavior seam (logic layer): a hook that maps a contract's behavior name to per-part DOM props.
  *  Zag.js machines plug in here (e.g. dialog -> { trigger: api.getTriggerProps(), content: ... }). */
@@ -32,28 +31,12 @@ export function useContract(id: string): Contract {
   return c;
 }
 
-const isNode = (x: unknown): x is Node => typeof x === "object" && x !== null && "component" in x;
-
-function withDefaults(contract: Contract, given: Record<string, Scalar> = {}): Record<string, Scalar> {
-  const props: Record<string, Scalar> = {};
-  for (const p of contract.props) {
-    const v = given[p.name] ?? p.default;
-    if (v === undefined) {
-      if (p.required) throw new Error(`${contract.id}: prop "${p.name}" is required`);
-      continue;
-    }
-    if (typeof p.type === "object" && !p.type.enum.includes(String(v)))
-      throw new Error(`${contract.id}: prop "${p.name}" must be one of ${p.type.enum.join(", ")}, got "${v}"`);
-    props[p.name] = v;
-  }
-  for (const k of Object.keys(given)) if (!contract.props.some((p) => p.name === k)) throw new Error(`${contract.id}: unknown prop "${k}"`);
-  return props;
-}
-
 export function Render({ tree }: { tree: Node }) {
   const { behaviors } = useElos();
   const contract = useContract(tree.component);
-  const props = withDefaults(contract, tree.props);
+  const { props, errors } = resolveProps(contract, tree.props);
+  errors.push(...checkSlots(contract, tree));
+  if (errors.length) throw new Error(errors.join("\n"));
   const partProps = contract.behavior ? resolveBehavior(behaviors, contract, props) : {};
   const [rootName, root] = Object.entries(contract.anatomy)[0]!;
   return renderPart(contract, rootName, root, props, tree, partProps, true);
@@ -85,15 +68,7 @@ function renderPart(
   if (part.slot) {
     const items = tree.slots?.[name] ?? [];
     if (items.length === 0 && part.optional) return null;
-    const { accepts, acceptsMode, max } = part.slot;
-    if (max !== undefined && items.length > max) throw new Error(`${contract.id}: slot "${name}" accepts at most ${max} items`);
-    items.forEach((item, i) => {
-      if (isNode(item)) {
-        if (acceptsMode === "restrict" && accepts && !accepts.includes(item.component))
-          throw new Error(`${contract.id}: slot "${name}" accepts only ${accepts.join(", ")}, got ${item.component}`);
-        children.push(h(Render, { key: i, tree: item }));
-      } else children.push(item as ReactNode);
-    });
+    items.forEach((item, i) => children.push(isNode(item) ? h(Render, { key: i, tree: item }) : (item as ReactNode)));
   }
   if (part.component) children.push(h(Render, { key: "ref", tree: { component: part.component.id, props: part.component.props } }));
   for (const [childName, child] of Object.entries(part.parts ?? {}))
@@ -121,7 +96,7 @@ export function createComponent<P extends Record<string, unknown>>(id: string) {
     const contract = useContract(id);
     const firstSlot = findFirstSlot(contract.anatomy);
     const props: Record<string, Scalar> = {};
-    const slots: Record<string, SlotItem[]> = {};
+    const slots: Record<string, unknown[]> = {};
     for (const [k, v] of Object.entries(p)) {
       if (v === undefined) continue;
       if (k === "children") slots[firstSlot ?? "children"] = toArray(v);

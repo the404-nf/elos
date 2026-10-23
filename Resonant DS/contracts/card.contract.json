@@ -3,6 +3,7 @@
   "name": "Card",
   "version": "0.1.0",
   "status": "draft",
+  "category": "layout",
   "description": "Groups related content and actions on a raised surface.",
   "semantics": { "element": "article" },
   "props": [
@@ -12,6 +13,7 @@
   "states": [],
   "anatomy": {
     "root": {
+      "description": "Raised surface with border and padding; stacks header, body and actions.",
       "element": "article",
       "layout": { "display": "flex", "direction": "column", "gap": "{space.stack.md}" },
       "tokens": {
@@ -25,17 +27,20 @@
       },
       "parts": {
         "header": {
+          "description": "Title of the group. Omit when the surrounding context already names it.",
           "element": "h3",
           "optional": true,
           "content": { "prop": "title" },
           "tokens": { "font-size": "{font.size.lg}", "font-weight": "{font.weight.semibold}" }
         },
         "body": {
+          "description": "Main content. Any component or text.",
           "element": "div",
           "slot": { "acceptsMode": "open" },
           "tokens": { "font-size": "{font.size.md}", "color": "{color.text.secondary}" }
         },
         "actions": {
+          "description": "Up to three buttons, trailing-aligned. One primary at most.",
           "element": "footer",
           "optional": true,
           "layout": { "display": "flex", "direction": "row", "gap": "{space.inset.sm}", "justify": "end" },
@@ -44,12 +49,20 @@
       }
     }
   },
-  "a11y": { "focusVisible": false, "contrast": "AA" },
+  "a11y": { "focusVisible": false, "contrast": "AA", "keyboard": [], "aria": ["use a heading element for the title so screen readers can navigate between cards"] },
   "usage": {
     "when": ["grouping a summary with its actions", "showing one item of a collection", "a report section"],
-    "whenNot": ["wrapping an entire page", "nesting cards inside cards"],
-    "intents": ["summarize", "report", "list-item", "detail"]
+    "whenNot": ["wrapping an entire page", "nesting cards inside cards", "a single sentence that needs no grouping"],
+    "intents": ["summarize", "report", "list-item", "detail", "group"],
+    "alternatives": []
   },
+  "guidelines": {
+    "do": ["keep one topic per card", "put the primary action last in the actions slot", "use the title to name the content, not the component"],
+    "dont": ["nest cards", "put more than three actions in a card", "make the whole card clickable when it also contains buttons"]
+  },
+  "resources": [
+    { "title": "UX Patterns for Devs: Card Grid", "url": "https://uxpatterns.dev/patterns/data-display/card-grid" }
+  ],
   "relationships": {
     "pairsWith": [],
     "excludes": ["ds.card"],

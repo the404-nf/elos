@@ -3,6 +3,7 @@
   "name": "Button",
   "version": "0.1.0",
   "status": "draft",
+  "category": "action",
   "description": "Triggers an action. One primary button per context.",
   "semantics": { "element": "button", "role": "button" },
   "props": [
@@ -14,6 +15,7 @@
   "states": ["hover", "focus-visible", "disabled"],
   "anatomy": {
     "root": {
+      "description": "Handles click, keyboard, focus and ARIA; carries variant and size.",
       "element": "button",
       "layout": { "display": "inline-flex", "align": "center", "justify": "center", "gap": "{space.inset.sm}" },
       "tokens": {
@@ -32,16 +34,34 @@
         "disabled": { "opacity": "{opacity.disabled}" }
       },
       "parts": {
-        "label": { "element": "span", "content": { "prop": "label" } }
+        "label": { "description": "Concise action verb in sentence case.", "element": "span", "content": { "prop": "label" } }
       }
     }
   },
-  "a11y": { "focusVisible": true, "minHitArea": 44, "contrast": "AA" },
-  "usage": {
-    "when": ["user must trigger an action", "submitting a form", "confirming or cancelling"],
-    "whenNot": ["navigating to another page (use ds.link)", "more than one primary action in a view"],
-    "intents": ["submit", "confirm", "cancel", "create", "delete", "retry"]
+  "a11y": {
+    "focusVisible": true,
+    "minHitArea": 44,
+    "contrast": "AA",
+    "keyboard": [
+      { "key": "Enter", "action": "activate" },
+      { "key": "Space", "action": "activate" }
+    ],
+    "aria": ["aria-pressed when used as a toggle", "aria-expanded when it opens an overlay", "aria-disabled rather than disabled when focus must stay reachable"]
   },
+  "usage": {
+    "when": ["user must trigger an action", "submitting a form", "confirming or cancelling", "opening or closing an overlay"],
+    "whenNot": ["navigating to another page", "more than one primary action in a view", "a binary setting that takes effect at once"],
+    "intents": ["submit", "confirm", "cancel", "create", "delete", "retry", "open", "close"],
+    "alternatives": []
+  },
+  "guidelines": {
+    "do": ["start the label with an action verb", "keep one primary button per view", "keep hit area at least 44px", "show a visible state for hover, focus and disabled"],
+    "dont": ["use vague labels like OK or Click here", "remove focus styles", "use a button for navigation", "auto-focus a danger button"]
+  },
+  "resources": [
+    { "title": "UX Patterns for Devs: Button", "url": "https://uxpatterns.dev/patterns/forms/button" },
+    { "title": "MDN: button element", "url": "https://developer.mozilla.org/docs/Web/HTML/Element/button" }
+  ],
   "relationships": {
     "pairsWith": [],
     "excludes": [],

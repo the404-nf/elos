@@ -14,6 +14,7 @@ import {
 } from "@elos/contracts";
 import { cssVar, emitComponentCss } from "./css.ts";
 export { cssVar, emitComponentCss, partClass } from "./css.ts";
+export * from "./composition.ts";
 
 type Raw = { type?: string; raw: unknown };
 type Flat = Map<string, Raw>;

@@ -16,6 +16,8 @@ Elos is closed source and offered to clients as a base, the way Radix is offered
 | Logic | Headless behavior and adaptation: state machines, composition evaluation, prompt generation, channel degradation | TypeScript runtime over the catalog | Elos, stack-agnostic |
 | Render | Tokens as CSS variables and components per target | React renderer first, more targets later | Per target |
 
+Beyond structure, a contract carries the guidance a pattern library would: category, when and when not to use, intents, alternatives ("choose this vs that"), do and don't guidelines, part descriptions, keyboard and ARIA notes, and resources. [UX Patterns for Devs](https://uxpatterns.dev) is the reference for which guidance a component should carry. Everything is short and enumerable so an agent can match on it deterministically.
+
 The contracts are the only source of truth. The logic layer derives everything else from them. The render layer is a set of emitters that consume the built catalog. Nothing is inferred from component source code.
 
 ## The catalog
@@ -55,13 +57,17 @@ Each contract declares, per channel, whether support is native, degraded or unsu
 
 ## Portal
 
-Next.js with the App Router, Postgres through Drizzle, Better Auth, and the official TypeScript MCP SDK over stateless Streamable HTTP, all in one deploy. The portal is the Storybook: it renders tokens and components from the draft catalog at runtime, so edits preview without a rebuild. Editing works on contracts through forms, not on component source code.
+Next.js with the App Router, Postgres through Drizzle, Better Auth, and the official TypeScript MCP SDK over stateless Streamable HTTP, all in one deploy. The portal is the Storybook: it renders tokens and components from the draft catalog at runtime, so edits preview without a rebuild. Editing works on contracts through forms, not on component source code. Two editing modes are planned: a visual canvas where the user adjusts a component directly, and an advanced mode with inputs and sliders for padding, radius, color, stroke and similar values. Both write token bindings and contract fields, never raw values, so relationships and themes stay intact. Resonant itself will be tuned this way in the portal.
 
 Self-hosting is a requirement, so the portal depends on Postgres only. No vendor-specific storage, queues or functions.
 
 ## Data model
 
 Organization, design system, draft, version. Tenancy exists from the first migration. A version is an immutable full snapshot of the directory format. Diffs between versions are computed on demand. Publishing can happen per change or as a bundle; both only decide when a snapshot is cut. Rolling back a component copies its contract from an older snapshot into the draft. Rolling back the system republishes an older snapshot as a new version. History is never rewritten and clients pin versions.
+
+## MCP
+
+`packages/mcp` serves a catalog over MCP with five read-only tools: list components (the menu), get component, find component by intent, list tokens, validate composition. Ranking is deterministic keyword matching over the contract's enumerable guidance; no model runs on the server. The server instructions tell agents the workflow: find, get, compose, validate, and never invent. The stdio entry point serves Claude Code and Codex today; the portal will mount the same server over Streamable HTTP.
 
 ## Access
 
@@ -70,8 +76,8 @@ API keys for the MVP. OAuth for the remote MCP server once ChatGPT and Claude De
 ## Milestones
 
 1. Foundation: contracts, tokens, catalog build. Done.
-2. React renderer on Zag.js behind Resonant's own API, Button and Card first.
-3. MCP server and REST read endpoints over the catalog.
+2. React renderer, data-driven from the catalog, Button and Card first. Done.
+3. MCP server over the catalog (stdio). Done. REST and HTTP transport arrive with the portal.
 4. Portal skeleton: editing, multi-channel preview, versions.
 5. Slack and Markdown emitters, HTML widget bundle.
 6. Composition language adapters (OpenUI Lang, A2UI), OAuth, client onboarding.

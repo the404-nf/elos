@@ -57,6 +57,7 @@ export type State = z.infer<typeof State>;
 const TokenBindings = z.record(z.string(), TokenRef); // css-property -> token ref
 
 export type Part = {
+  description?: string;
   element?: string;
   tokens?: Record<string, string>;
   states?: Partial<Record<State, Record<string, string>>>;
@@ -70,6 +71,7 @@ export type Part = {
 };
 export const Part: z.ZodType<Part> = z.lazy(() =>
   z.object({
+    description: z.string().optional(),
     element: z.string().optional(),
     tokens: TokenBindings.optional(),
     states: z.partialRecord(State, TokenBindings).optional(),
@@ -104,11 +106,15 @@ export const ChannelSupport = z.object({
   note: z.string().optional(),
 });
 
+export const Category = z.enum(["action", "form", "navigation", "data-display", "layout", "overlay", "feedback", "media", "ai"]);
+export type Category = z.infer<typeof Category>;
+
 export const Contract = z.object({
   id: ContractId,
   name: z.string(),
   version: Semver,
   status: z.enum(["draft", "stable", "deprecated"]),
+  category: Category,
   description: z.string(),
   semantics: z.object({ element: z.string(), role: z.string().optional() }),
   // Logic layer hook: the headless behavior machine this component binds to. Absent for static components.
@@ -120,13 +126,19 @@ export const Contract = z.object({
     focusVisible: z.boolean(),
     minHitArea: z.number().optional(),
     contrast: z.enum(["AA", "AAA"]),
+    keyboard: z.array(z.object({ key: z.string(), action: z.string() })).default([]),
+    aria: z.array(z.string()).default([]), // e.g. "aria-pressed when used as a toggle"
   }),
   // AI-facing guidance. Short enumerable statements, never prose, so lookup stays deterministic.
   usage: z.object({
     when: z.array(z.string()),
     whenNot: z.array(z.string()),
     intents: z.array(z.string()),
+    // "Choose this vs that": the component to use instead, and when.
+    alternatives: z.array(z.object({ component: ContractId, when: z.string() })).default([]),
   }),
+  guidelines: z.object({ do: z.array(z.string()), dont: z.array(z.string()) }).default({ do: [], dont: [] }),
+  resources: z.array(z.object({ title: z.string(), url: z.string().url() })).default([]),
   relationships: z.object({
     pairsWith: z.array(ContractId).default([]),
     excludes: z.array(ContractId).default([]),

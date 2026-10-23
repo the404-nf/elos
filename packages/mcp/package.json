@@ -1,0 +1,14 @@
+{
+  "name": "@elos/mcp",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "bin": { "elos-mcp": "./src/server.ts" },
+  "dependencies": {
+    "@elos/contracts": "workspace:*",
+    "@elos/core": "workspace:*",
+    "@modelcontextprotocol/sdk": "^1.20.0",
+    "zod": "^4.1.0"
+  }
+}

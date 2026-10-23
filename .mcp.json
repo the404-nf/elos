@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "resonant": {
+      "command": "node",
+      "args": ["packages/mcp/src/server.ts", "Resonant DS"]
+    }
+  }
+}
