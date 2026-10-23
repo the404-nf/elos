@@ -19,3 +19,4 @@ Format: Status, Context, Decision, Consequences. Keep each under a page.
 | [0011](0011-portal-is-the-storybook.md) | The portal is the Storybook | Accepted |
 | [0012](0012-deferred-with-room-left.md) | Deferred: Figma, import, multiplayer, structured governance docs | Accepted |
 | [0013](0013-platform-areas.md) | Platform areas: Design Systems, Marketplace, Canvas, Serve | Accepted |
+| [0014](0014-portal-chrome-from-contracts.md) | The portal chrome is composed from Resonant contracts | Accepted |
