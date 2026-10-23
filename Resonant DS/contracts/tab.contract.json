@@ -28,6 +28,10 @@
         "border-bottom-width": "{border.width}",
         "border-bottom-color": "{color.transparent}"
       },
+      "motion": {
+        "color": { "duration": "{motion.duration.fast}", "easing": "{motion.easing.standard}" },
+        "border-bottom-color": { "duration": "{motion.duration.fast}", "easing": "{motion.easing.standard}" }
+      },
       "states": {
         "hover": { "color": "{color.text.primary}" },
         "focus-visible": { "outline-color": "{color.border.focus}" },

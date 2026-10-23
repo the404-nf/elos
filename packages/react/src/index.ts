@@ -101,6 +101,7 @@ function renderPart(ctx: PartCtx, name: string, part: Part, isRoot: boolean): Re
         if (p.type !== "boolean") attrs[p.attribute] = v;
         else if (v === true) attrs[p.attribute] = p.attribute.startsWith("aria-") ? "true" : true;
       }
+      if (p.cssVar) attrs.style = { ...(attrs.style as object | undefined), [p.cssVar]: v };
     }
     if (contract.semantics.role && contract.semantics.role !== part.element) attrs.role = contract.semantics.role;
   }

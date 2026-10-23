@@ -25,6 +25,7 @@ const STATE_SELECTORS: Record<State, string[]> = {
   checked: [":checked", '[data-state="checked"]'],
   open: ['[data-state="open"]'],
   invalid: ['[aria-invalid="true"]', "[data-invalid]"],
+  highlighted: ["[data-highlighted]"],
 };
 
 const LAYOUT_PROPS: Record<string, string> = { display: "display", direction: "flex-direction", align: "align-items", justify: "justify-content" };
@@ -68,6 +69,10 @@ function baseDecls(part: Part): Decls {
     if (m) d[`${m[1]}-style`] = "solid";
   }
   if (part.states && "focus-visible" in part.states) Object.assign(d, { outline: "2px solid transparent", "outline-offset": "2px" });
+  if (part.motion && Object.keys(part.motion).length)
+    d.transition = Object.entries(part.motion)
+      .map(([prop, m]) => `${prop} var(${cssVar(m.duration.slice(1, -1))}) var(${cssVar(m.easing.slice(1, -1))})`)
+      .join(", ");
   Object.assign(d, part.styles ?? {});
   return d;
 }

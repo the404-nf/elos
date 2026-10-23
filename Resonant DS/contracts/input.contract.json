@@ -30,6 +30,7 @@
         "font-size": "{font.size.{size}}",
         "font-family": "{font.family.sans}"
       },
+      "motion": { "border-color": { "duration": "{motion.duration.fast}", "easing": "{motion.easing.standard}" } },
       "states": {
         "focus-visible": { "border-color": "{color.border.focus}", "outline-color": "{color.border.focus}" },
         "invalid": { "border-color": "{color.border.danger}" },

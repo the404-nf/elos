@@ -33,7 +33,8 @@
             "border-radius": "{radius.pill}"
           },
           "states": { "checked": { "background-color": "{color.action.primary.background}" } },
-          "styles": { "position": "relative", "display": "inline-block", "transition": "background-color 150ms" },
+          "motion": { "background-color": { "duration": "{motion.duration.fast}", "easing": "{motion.easing.standard}" } },
+          "styles": { "position": "relative", "display": "inline-block" },
           "parts": {
             "thumb": {
               "description": "Slides along the track.",
@@ -46,7 +47,8 @@
                 "background-color": "{color.white}",
                 "border-radius": "{radius.pill}"
               },
-              "styles": { "position": "absolute", "display": "block", "transition": "transform 150ms" },
+              "motion": { "transform": { "duration": "{motion.duration.fast}", "easing": "{motion.easing.standard}" } },
+              "styles": { "position": "absolute", "display": "block" },
               "stylesByState": { "checked": { "transform": "translateX(var(--switch-thumb-travel))" } }
             }
           }

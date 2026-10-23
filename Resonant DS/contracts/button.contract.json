@@ -28,12 +28,17 @@
         "font-size": "{font.size.{size}}",
         "font-weight": "{font.weight.medium}"
       },
+      "motion": {
+        "background-color": { "duration": "{motion.duration.fast}", "easing": "{motion.easing.standard}" },
+        "color": { "duration": "{motion.duration.fast}", "easing": "{motion.easing.standard}" }
+      },
       "states": {
         "hover": { "background-color": "{color.action.{variant}.background-hover}" },
         "focus-visible": { "outline-color": "{color.border.focus}" },
         "disabled": { "opacity": "{opacity.disabled}" }
       },
       "parts": {
+        "icon": { "description": "Optional leading visual, sized to the text.", "element": "span", "optional": true, "slot": { "acceptsMode": "open", "max": 1 }, "layout": { "display": "inline-flex", "align": "center" } },
         "label": { "description": "Concise action verb in sentence case.", "element": "span", "content": { "prop": "label" } }
       }
     }

@@ -46,6 +46,7 @@ export function resolveTokens(flat: Flat): ResolvedToken[] {
     }
     if (typeof raw === "number") return String(raw);
     if (typeof raw === "object" && raw && "value" in raw && "unit" in raw) return `${(raw as any).value}${(raw as any).unit}`;
+    if (Array.isArray(raw) && raw.length === 4 && raw.every((n) => typeof n === "number")) return `cubic-bezier(${raw.join(", ")})`;
     return JSON.stringify(raw);
   };
   return [...flat].map(([path, { type, raw, description }]) => ({
@@ -61,6 +62,7 @@ export function resolveTokens(flat: Flat): ResolvedToken[] {
 function* partRefs(part: Part): Generator<string> {
   const byProp = Object.values(part.tokensByProp ?? {}).flatMap((m) => Object.values(m));
   for (const b of [part.tokens, ...Object.values(part.states ?? {}), ...byProp]) if (b) yield* Object.values(b);
+  for (const m of Object.values(part.motion ?? {})) yield* [m.duration, m.easing];
   if (part.layout?.gap) yield part.layout.gap;
   for (const child of Object.values(part.parts ?? {})) yield* partRefs(child);
 }
@@ -141,8 +143,18 @@ export function treeComponents(tree: { component: string; slots?: Record<string,
   return out;
 }
 
-// Behaviors toggle `hidden`; it must win over any emitted display value.
-export const emitComponentsCss = (catalog: Catalog) => ["[hidden] {\n  display: none !important;\n}\n", ...catalog.contracts.map(emitComponentCss)].join("\n");
+// Behaviors toggle `hidden`; it must win over any emitted display value. Reduced motion collapses every transition.
+const GLOBAL_CSS = `[hidden] {
+  display: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  [class*="ds-"] {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+`;
+export const emitComponentsCss = (catalog: Catalog) => [GLOBAL_CSS, ...catalog.contracts.map(emitComponentCss)].join("\n");
 
 /** token path -> "ds.x css-prop" list, from every binding in every contract (substitutions expanded). */
 export function tokenUsage(catalog: Catalog): Map<string, string[]> {
@@ -159,6 +171,7 @@ export function tokenUsage(catalog: Catalog): Map<string, string[]> {
         part.tokens ?? {},
         ...Object.values(part.states ?? {}),
         ...Object.values(part.tokensByProp ?? {}).flatMap((m) => Object.values(m)),
+        ...Object.entries(part.motion ?? {}).map(([prop, m]) => ({ [`transition ${prop}`]: m.duration, [`transition-timing ${prop}`]: m.easing })),
         part.layout?.gap ? { gap: part.layout.gap } : {},
       ];
       for (const bindings of sets) for (const [prop, ref] of Object.entries(bindings)) for (const path of expand(ref.slice(1, -1))) add(path, `${c.id} ${prop}`);

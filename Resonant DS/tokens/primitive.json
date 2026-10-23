@@ -79,5 +79,24 @@
   "border": {
     "$type": "dimension",
     "width": { "$value": { "value": 1, "unit": "px" } }
+  },
+  "motion": {
+    "duration": {
+      "$type": "duration",
+      "instant": { "$value": "80ms" },
+      "fast": { "$value": "150ms" },
+      "base": { "$value": "220ms" },
+      "slow": { "$value": "360ms" }
+    },
+    "easing": {
+      "$type": "cubicBezier",
+      "standard": { "$value": [0.2, 0, 0, 1], "$description": "Most state changes" },
+      "enter": { "$value": [0, 0, 0.2, 1], "$description": "Things appearing" },
+      "exit": { "$value": [0.4, 0, 1, 1], "$description": "Things leaving" }
+    }
+  },
+  "shadow": {
+    "$type": "shadow",
+    "overlay": { "$value": "0 8px 24px #0b0b0d26", "$description": "Popovers, menus, toasts" }
   }
 }

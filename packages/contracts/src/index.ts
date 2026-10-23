@@ -17,7 +17,7 @@ const Scalar = z.union([z.string(), z.number(), z.boolean()]);
 const Dimension = z.object({ value: z.number(), unit: z.enum(["px", "rem", "em", "%"]) });
 export const Token = z.object({
   $type: z.enum(["color", "dimension", "fontFamily", "fontWeight", "number", "duration", "shadow", "cubicBezier"]).optional(),
-  $value: z.union([z.string(), z.number(), Dimension, z.record(z.string(), z.unknown())]),
+  $value: z.union([z.string(), z.number(), Dimension, z.array(z.number()).length(4), z.record(z.string(), z.unknown())]),
   $description: z.string().optional(),
 });
 export type Token = z.infer<typeof Token>;
@@ -51,9 +51,11 @@ export const Prop = z.object({
   required: z.boolean().default(false),
   // Rendered as this HTML attribute on the root element (e.g. "placeholder", "disabled", "aria-invalid").
   attribute: z.string().optional(),
+  // Exposed as this CSS custom property on the root element, so styles can use the value (e.g. a progress width).
+  cssVar: z.string().regex(/^--[a-z][a-z0-9-]*$/).optional(),
 });
 
-export const State = z.enum(["hover", "focus-visible", "active", "disabled", "selected", "checked", "open", "invalid"]);
+export const State = z.enum(["hover", "focus-visible", "active", "disabled", "selected", "checked", "open", "invalid", "highlighted"]);
 export type State = z.infer<typeof State>;
 
 const TokenBindings = z.record(z.string(), TokenRef); // css-property -> token ref
@@ -67,10 +69,15 @@ export const StyleKey = z.enum([
 const Styles = z.partialRecord(StyleKey, z.string());
 export type Styles = z.infer<typeof Styles>;
 
+// Motion: which CSS properties of a part transition, bound to duration and easing tokens.
+const Motion = z.record(z.string(), z.object({ duration: TokenRef, easing: TokenRef }));
+export type Motion = z.infer<typeof Motion>;
+
 export type Part = {
   description?: string;
   element?: string; // HTML element, or "{prop}" to take it from an enum prop (e.g. Text's "as")
   tokens?: Record<string, string>;
+  motion?: Motion;
   states?: Partial<Record<State, Record<string, string>>>;
   tokensByProp?: Record<string, Record<string, Record<string, string>>>;
   styles?: Styles;
@@ -88,6 +95,7 @@ export const Part: z.ZodType<Part> = z.lazy(() =>
     description: z.string().optional(),
     element: z.string().optional(),
     tokens: TokenBindings.optional(),
+    motion: Motion.optional(),
     states: z.partialRecord(State, TokenBindings).optional(),
     tokensByProp: z.record(z.string(), z.record(z.string(), TokenBindings)).optional(),
     styles: Styles.optional(),
