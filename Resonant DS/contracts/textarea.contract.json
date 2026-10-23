@@ -1,0 +1,49 @@
+{
+  "id": "ds.textarea",
+  "name": "Textarea",
+  "version": "0.1.0",
+  "status": "draft",
+  "category": "form",
+  "description": "Multi-line text entry.",
+  "semantics": { "element": "textarea" },
+  "props": [
+    { "name": "name", "description": "Form field name.", "type": "text", "attribute": "name" },
+    { "name": "placeholder", "description": "Hint shown when empty.", "type": "text", "attribute": "placeholder" },
+    { "name": "rows", "description": "Visible lines.", "type": "number", "default": 3, "attribute": "rows" },
+    { "name": "disabled", "description": "Prevents editing.", "type": "boolean", "default": false, "attribute": "disabled" },
+    { "name": "invalid", "description": "Marks the value as failing validation.", "type": "boolean", "default": false, "attribute": "aria-invalid" }
+  ],
+  "states": ["focus-visible", "disabled", "invalid"],
+  "anatomy": {
+    "root": {
+      "description": "The native textarea, styled like Input.",
+      "element": "textarea",
+      "tokens": {
+        "background-color": "{color.surface.raised}", "color": "{color.text.primary}", "border-color": "{color.border.subtle}", "border-width": "{border.width}",
+        "border-radius": "{radius.control}", "padding-inline": "{space.inset.md}", "padding-block": "{space.inset.sm}", "font-size": "{font.size.md}", "font-family": "{font.family.sans}"
+      },
+      "motion": { "border-color": { "duration": "{motion.duration.fast}", "easing": "{motion.easing.standard}" } },
+      "states": {
+        "focus-visible": { "border-color": "{color.border.focus}", "outline-color": "{color.border.focus}" },
+        "invalid": { "border-color": "{color.border.danger}" },
+        "disabled": { "opacity": "{opacity.disabled}" }
+      },
+      "styles": { "width": "100%", "box-sizing": "border-box", "resize": "vertical", "line-height": "1.5" }
+    }
+  },
+  "a11y": { "focusVisible": true, "minHitArea": 44, "contrast": "AA", "keyboard": [], "aria": ["always inside ds.field or with aria-label"] },
+  "usage": {
+    "when": ["free text longer than one line: notes, descriptions, messages"],
+    "whenNot": ["single values (use ds.input)", "rich formatting"],
+    "intents": ["enter text", "notes", "description", "message", "comment"],
+    "alternatives": [{ "component": "ds.input", "when": "the value fits one line" }]
+  },
+  "guidelines": { "do": ["size rows to the expected length", "allow vertical resize"], "dont": ["use for a title or a name"] },
+  "relationships": { "pairsWith": ["ds.field"], "excludes": [], "contains": [], "within": ["ds.field"] },
+  "channels": {
+    "web": { "support": "native" }, "widget": { "support": "native" },
+    "slack": { "support": "native", "as": "plain_text_input multiline" },
+    "markdown": { "support": "degraded", "as": "a question the agent asks" }
+  },
+  "examples": [{ "name": "Notes", "tree": { "component": "ds.textarea", "props": { "placeholder": "What changed and why", "rows": 3 } } }]
+}

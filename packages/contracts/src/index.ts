@@ -64,7 +64,8 @@ const TokenBindings = z.record(z.string(), TokenRef); // css-property -> token r
 export const StyleKey = z.enum([
   "position", "inset", "top", "right", "bottom", "left", "z-index", "width", "min-width", "max-width", "height", "min-height", "max-height",
   "overflow", "overflow-y", "flex", "flex-wrap", "flex-direction", "align-items", "justify-content", "align-self", "text-align", "white-space",
-  "cursor", "transform", "transition", "appearance", "box-sizing", "margin", "line-height", "text-transform", "letter-spacing", "resize", "display",
+  "cursor", "transform", "transition", "appearance", "box-sizing", "margin", "padding", "border", "line-height", "text-transform", "letter-spacing", "resize", "display",
+  "text-decoration", "text-underline-offset", "vertical-align", "list-style", "border-collapse", "table-layout", "object-fit", "aspect-ratio", "pointer-events", "user-select",
 ]);
 const Styles = z.partialRecord(StyleKey, z.string());
 export type Styles = z.infer<typeof Styles>;
@@ -76,6 +77,7 @@ export type Motion = z.infer<typeof Motion>;
 export type Part = {
   description?: string;
   element?: string; // HTML element, or "{prop}" to take it from an enum prop (e.g. Text's "as")
+  attrs?: Record<string, string>; // HTML attribute -> prop name, for parts below the root (e.g. an anchor's href)
   tokens?: Record<string, string>;
   motion?: Motion;
   states?: Partial<Record<State, Record<string, string>>>;
@@ -94,6 +96,7 @@ export const Part: z.ZodType<Part> = z.lazy(() =>
   z.object({
     description: z.string().optional(),
     element: z.string().optional(),
+    attrs: z.record(z.string(), z.string()).optional(),
     tokens: TokenBindings.optional(),
     motion: Motion.optional(),
     states: z.partialRecord(State, TokenBindings).optional(),

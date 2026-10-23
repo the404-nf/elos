@@ -1,0 +1,73 @@
+{
+  "id": "ds.field",
+  "name": "Field",
+  "version": "0.1.0",
+  "status": "draft",
+  "category": "form",
+  "description": "A label, a control, and optional help and error text, wired together.",
+  "semantics": { "element": "div" },
+  "props": [
+    { "name": "label", "description": "What the control asks for.", "type": "text", "required": true },
+    { "name": "help", "description": "Hint shown under the control.", "type": "text" },
+    { "name": "error", "description": "Validation message; shown in the danger color when present.", "type": "text" }
+  ],
+  "states": [],
+  "anatomy": {
+    "root": {
+      "description": "Stacks label, control, help and error.",
+      "element": "div",
+      "layout": { "display": "flex", "direction": "column", "gap": "{space.inset.sm}" },
+      "tokens": { "font-family": "{font.family.sans}" },
+      "parts": {
+        "label": {
+          "description": "A native label wrapping the control, so clicking the text focuses it.",
+          "element": "label",
+          "layout": { "display": "flex", "direction": "column", "gap": "{space.inset.sm}" },
+          "parts": {
+            "text": { "description": "Label text.", "element": "span", "content": { "prop": "label" }, "tokens": { "font-size": "{font.size.sm}", "font-weight": "{font.weight.medium}", "color": "{color.text.primary}" } },
+            "control": { "description": "Exactly one form control.", "element": "div", "slot": { "accepts": ["ds.input", "ds.select", "ds.textarea"], "acceptsMode": "restrict", "min": 1, "max": 1 } }
+          }
+        },
+        "help": { "description": "Optional hint.", "element": "p", "optional": true, "content": { "prop": "help" }, "tokens": { "font-size": "{font.size.sm}", "color": "{color.text.secondary}" }, "styles": { "margin": "0" } },
+        "error": { "description": "Optional validation message.", "element": "p", "optional": true, "content": { "prop": "error" }, "tokens": { "font-size": "{font.size.sm}", "color": "{color.text.danger}" }, "styles": { "margin": "0" } }
+      }
+    }
+  },
+  "a11y": { "focusVisible": false, "contrast": "AA", "keyboard": [], "aria": ["the control is labelled by wrapping, no ids needed", "set invalid on the control when error is present"] },
+  "usage": {
+    "when": ["any text, select or textarea control in a form"],
+    "whenNot": ["switches and checkboxes, which carry their own label"],
+    "intents": ["form field", "labelled input", "ask for a value"],
+    "alternatives": []
+  },
+  "guidelines": { "do": ["write labels as nouns", "keep help to one sentence", "put the error next to the field, not at the top of the form"], "dont": ["rely on placeholder as the label"] },
+  "relationships": { "pairsWith": [], "excludes": [], "contains": ["ds.input", "ds.select", "ds.textarea"], "within": ["ds.stack", "ds.card", "ds.dialog"] },
+  "channels": {
+    "web": { "support": "native" },
+    "widget": { "support": "native" },
+    "slack": { "support": "native", "as": "input block with label and hint" },
+    "markdown": { "support": "degraded", "as": "a labelled question" }
+  },
+  "examples": [
+    {
+      "name": "Email with error",
+      "tree": {
+        "component": "ds.field",
+        "props": { "label": "Email", "help": "We only use it for billing.", "error": "Enter a valid email address." },
+        "slots": { "control": [{ "component": "ds.input", "props": { "type": "email", "placeholder": "you@example.com", "invalid": true } }] }
+      }
+    },
+    {
+      "name": "Select",
+      "tree": {
+        "component": "ds.field",
+        "props": { "label": "Visibility" },
+        "slots": {
+          "control": [
+            { "component": "ds.select", "slots": { "root": [{ "component": "ds.option", "props": { "value": "private", "label": "Private" } }, { "component": "ds.option", "props": { "value": "team", "label": "Team" } }] } }
+          ]
+        }
+      }
+    }
+  ]
+}

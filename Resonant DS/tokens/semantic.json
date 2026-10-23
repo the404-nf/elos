@@ -1,14 +1,18 @@
 {
   "color": {
     "$type": "color",
-    "surface": {
-      "canvas": { "$value": "{color.gray.50}", "$description": "Page background" },
-      "raised": { "$value": "{color.white}", "$description": "Cards, panels" }
-    },
     "text": {
       "primary": { "$value": "{color.gray.900}" },
       "secondary": { "$value": "{color.gray.600}" },
-      "inverse": { "$value": "{color.white}" }
+      "inverse": { "$value": "{color.white}" },
+      "link": { "$value": "{color.blue.600}", "$description": "Inline links" },
+      "danger": { "$value": "{color.red.700}", "$description": "Error messages" }
+    },
+    "surface": {
+      "canvas": { "$value": "{color.gray.50}", "$description": "Page background" },
+      "raised": { "$value": "{color.white}", "$description": "Cards, panels" },
+      "sunken": { "$value": "{color.gray.100}", "$description": "Skeletons, table header, track backgrounds" },
+      "inverse": { "$value": "{color.gray.900}", "$description": "Tooltips" }
     },
     "border": {
       "subtle": { "$value": "{color.gray.200}" },

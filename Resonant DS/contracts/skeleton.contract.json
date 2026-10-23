@@ -1,0 +1,35 @@
+{
+  "id": "ds.skeleton",
+  "name": "Skeleton",
+  "version": "0.1.0",
+  "status": "draft",
+  "category": "feedback",
+  "description": "A placeholder shape shown while content loads.",
+  "semantics": { "element": "span" },
+  "props": [
+    { "name": "width", "description": "Approximate width of the content.", "type": { "enum": ["sm", "md", "lg", "full"] }, "default": "full" },
+    { "name": "height", "description": "Shape of the content.", "type": { "enum": ["text", "control", "block"] }, "default": "text" }
+  ],
+  "states": [],
+  "anatomy": {
+    "root": {
+      "description": "A sunken rounded block.",
+      "element": "span",
+      "tokens": { "background-color": "{color.surface.sunken}", "border-radius": "{radius.sm}" },
+      "styles": { "display": "block" },
+      "stylesByProp": {
+        "width": { "sm": { "width": "80px" }, "md": { "width": "160px" }, "lg": { "width": "240px" }, "full": { "width": "100%" } },
+        "height": { "text": { "height": "1em" }, "control": { "height": "36px" }, "block": { "height": "120px" } }
+      }
+    }
+  },
+  "a11y": { "focusVisible": false, "contrast": "AA", "keyboard": [], "aria": ["decorative; announce loading on the region, not on each skeleton"] },
+  "usage": { "when": ["content is loading and its shape is known"], "whenNot": ["a known total (use ds.progress)", "instant content"], "intents": ["loading", "placeholder", "pending"], "alternatives": [{ "component": "ds.progress", "when": "the total is known" }] },
+  "guidelines": { "do": ["match the layout of the content that will replace it"], "dont": ["show skeletons for more than a few seconds without a message"] },
+  "relationships": { "pairsWith": ["ds.stack"], "excludes": [], "contains": [], "within": ["ds.stack", "ds.card", "ds.table-cell"] },
+  "channels": { "web": { "support": "native" }, "widget": { "support": "native" }, "slack": { "support": "unsupported" }, "markdown": { "support": "unsupported" } },
+  "examples": [
+    { "name": "Text lines", "tree": { "component": "ds.stack", "props": { "gap": "sm" }, "slots": { "root": [{ "component": "ds.skeleton", "props": { "width": "lg" } }, { "component": "ds.skeleton", "props": { "width": "md" } }] } } },
+    { "name": "Block", "tree": { "component": "ds.skeleton", "props": { "height": "block" } } }
+  ]
+}

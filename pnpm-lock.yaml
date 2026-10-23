@@ -142,6 +142,12 @@ importers:
       '@zag-js/dialog':
         specifier: ^1.46.0
         version: 1.46.0
+      '@zag-js/menu':
+        specifier: ^1.46.0
+        version: 1.46.0
+      '@zag-js/popover':
+        specifier: ^1.46.0
+        version: 1.46.0
       '@zag-js/react':
         specifier: ^1.46.0
         version: 1.46.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -149,6 +155,9 @@ importers:
         specifier: ^1.46.0
         version: 1.46.0
       '@zag-js/tabs':
+        specifier: ^1.46.0
+        version: 1.46.0
+      '@zag-js/tooltip':
         specifier: ^1.46.0
         version: 1.46.0
     devDependencies:
@@ -411,6 +420,15 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
+
+  '@floating-ui/core@1.8.0':
+    resolution: {integrity: sha512-0CIZ5itps/8x7BG8dEIhs53BvCUH2PCoogtakwRTut+Arm58sJooJ0AuZhLw2HJYIR5cMLNPBSS728sPho2khQ==}
+
+  '@floating-ui/dom@1.8.0':
+    resolution: {integrity: sha512-yXSrzeHZBTZadLOlfyhCkJHNeLJnHRnRInwdZ40L7ZiaAtrBwoYlsDrX3v5zB1Utk7CLfzcOVnVVWoXEky7Ceg==}
+
+  '@floating-ui/utils@0.2.12':
+    resolution: {integrity: sha512-HpCo8tmWzLVad5s2d19EhAz5zqrrQ6s69qd6moPMQvkOuSwDT1YgRfWSVuc4ennqrgv3OHppiOGMQ7oC13yIww==}
 
   '@hono/node-server@2.1.5':
     resolution: {integrity: sha512-MgP/I06GdvsilDspMk/qmRzpk8LOUStP6jFAbSRi40W09DhoyUn+Mj7eyKICPqeYKybOjVFLVIAQzvu1bfIa7Q==}
@@ -874,11 +892,23 @@ packages:
   '@zag-js/interact-outside@1.46.0':
     resolution: {integrity: sha512-gzOj8zNvZzrF8l7ikYcYmdOlhLXEBGm7Qsp++hE/in47Nhi1uHWlamW21orqYdNF8Y250qrK24vIr0ZW4xTPcw==}
 
+  '@zag-js/menu@1.46.0':
+    resolution: {integrity: sha512-oQZ0SUI4AWQP5CocSVyiP55SVQZUa6eHTl3Ia8W0ByH/LK6ShFHTpEr/7eDt6uoHT9pDMpAscIIoMF70LvunTg==}
+
+  '@zag-js/popover@1.46.0':
+    resolution: {integrity: sha512-9S5+S6GjfQFwy3lfeQw2VIIPmpz3YjWkqnXV2/xc6p6vcVDjV4NOyIkLEUQhbWwXNP8J8yFbAqAxuQoH2Uozpg==}
+
+  '@zag-js/popper@1.46.0':
+    resolution: {integrity: sha512-tpTOiwWY8FRQHzKycKbj+aJbhMpjvTsH871XXQdB2H+56eJ7sgffECCJZTByq3qsC+d2g/WCJqAfLJqgtYagww==}
+
   '@zag-js/react@1.46.0':
     resolution: {integrity: sha512-x13nWlS/lwvK81gTJKhe4SUvyxgPCAzjkE8n+0vVtN7q4xi1zFPwhdSAu8EZGPGvQ4UWJt6ENLpm4sxWyey7Yg==}
     peerDependencies:
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
+
+  '@zag-js/rect-utils@1.46.0':
+    resolution: {integrity: sha512-w9USQ+fm2Ad9Z9loSdGic5pawCP2ALHW1p1IES3J6neXcbd4PyAX744qmUq3AckdVK+c88PSRL02i1ctCOFmYQ==}
 
   '@zag-js/remove-scroll@1.46.0':
     resolution: {integrity: sha512-i/GbBWtlmWBpA3YGCWxIBnzNhEtZ42o7rjRL9JrHb7xX6oyHzDB5sVT9oImrB3ih63V5/Y5YTbkkAAmL5D9G0w==}
@@ -891,6 +921,9 @@ packages:
 
   '@zag-js/tabs@1.46.0':
     resolution: {integrity: sha512-OdD0zPgYOagW/8tm0PfIm/UwBjLKS3fjaIGXzUNH6yC0E2JMD6IrHCAh69V2qsIxtzT8+tVky1IQo5P3WsO3Ow==}
+
+  '@zag-js/tooltip@1.46.0':
+    resolution: {integrity: sha512-H0Ov0bDW8thYqRO/VI5RW4vVc/qOW8S8du9uI5mSisyyY25GiG5N2iuOiM0kaYXBo1wUTvMJFsBdfMwhi4z9oA==}
 
   '@zag-js/types@1.46.0':
     resolution: {integrity: sha512-HwIvuXCGx/wgCNNXYvKyCJ62e/QmIi02v9GsA0icFxDKxv6i7J2mZmAQ/vF5Nmh3q80Nj5CZ1DdQ7bXYt/Yzww==}
@@ -1846,6 +1879,17 @@ snapshots:
   '@esbuild/win32-x64@0.28.2':
     optional: true
 
+  '@floating-ui/core@1.8.0':
+    dependencies:
+      '@floating-ui/utils': 0.2.12
+
+  '@floating-ui/dom@1.8.0':
+    dependencies:
+      '@floating-ui/core': 1.8.0
+      '@floating-ui/utils': 0.2.12
+
+  '@floating-ui/utils@0.2.12': {}
+
   '@hono/node-server@2.1.5(hono@4.13.13)':
     dependencies:
       hono: 4.13.13
@@ -2207,6 +2251,37 @@ snapshots:
       '@zag-js/dom-query': 1.46.0
       '@zag-js/utils': 1.46.0
 
+  '@zag-js/menu@1.46.0':
+    dependencies:
+      '@zag-js/anatomy': 1.46.0
+      '@zag-js/core': 1.46.0
+      '@zag-js/dismissable': 1.46.0
+      '@zag-js/dom-query': 1.46.0
+      '@zag-js/focus-visible': 1.46.0
+      '@zag-js/popper': 1.46.0
+      '@zag-js/rect-utils': 1.46.0
+      '@zag-js/types': 1.46.0
+      '@zag-js/utils': 1.46.0
+
+  '@zag-js/popover@1.46.0':
+    dependencies:
+      '@zag-js/anatomy': 1.46.0
+      '@zag-js/aria-hidden': 1.46.0
+      '@zag-js/core': 1.46.0
+      '@zag-js/dismissable': 1.46.0
+      '@zag-js/dom-query': 1.46.0
+      '@zag-js/focus-trap': 1.46.0
+      '@zag-js/popper': 1.46.0
+      '@zag-js/remove-scroll': 1.46.0
+      '@zag-js/types': 1.46.0
+      '@zag-js/utils': 1.46.0
+
+  '@zag-js/popper@1.46.0':
+    dependencies:
+      '@floating-ui/dom': 1.8.0
+      '@zag-js/dom-query': 1.46.0
+      '@zag-js/utils': 1.46.0
+
   '@zag-js/react@1.46.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
     dependencies:
       '@zag-js/core': 1.46.0
@@ -2215,6 +2290,8 @@ snapshots:
       '@zag-js/utils': 1.46.0
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
+
+  '@zag-js/rect-utils@1.46.0': {}
 
   '@zag-js/remove-scroll@1.46.0':
     dependencies:
@@ -2238,6 +2315,16 @@ snapshots:
       '@zag-js/anatomy': 1.46.0
       '@zag-js/core': 1.46.0
       '@zag-js/dom-query': 1.46.0
+      '@zag-js/types': 1.46.0
+      '@zag-js/utils': 1.46.0
+
+  '@zag-js/tooltip@1.46.0':
+    dependencies:
+      '@zag-js/anatomy': 1.46.0
+      '@zag-js/core': 1.46.0
+      '@zag-js/dom-query': 1.46.0
+      '@zag-js/focus-visible': 1.46.0
+      '@zag-js/popper': 1.46.0
       '@zag-js/types': 1.46.0
       '@zag-js/utils': 1.46.0
 

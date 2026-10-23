@@ -4,6 +4,9 @@ import { useId } from "react";
 import * as dialog from "@zag-js/dialog";
 import * as tabs from "@zag-js/tabs";
 import * as zswitch from "@zag-js/switch";
+import * as tooltip from "@zag-js/tooltip";
+import * as popover from "@zag-js/popover";
+import * as menu from "@zag-js/menu";
 import { normalizeProps, useMachine } from "@zag-js/react";
 import type { Behavior } from "./index.ts";
 
@@ -63,10 +66,51 @@ const useSwitch: Behavior = ({ props }) => {
   };
 };
 
+const useTooltip: Behavior = () => {
+  const service = useMachine(tooltip.machine, { id: useId(), openDelay: 300, closeDelay: 100 });
+  const api = tooltip.connect(service, normalizeProps);
+  return {
+    parts: { trigger: api.getTriggerProps(), positioner: { ...api.getPositionerProps(), hidden: !api.open }, content: api.getContentProps() },
+    expose: api,
+  };
+};
+
+const usePopover: Behavior = () => {
+  const service = useMachine(popover.machine, { id: useId() });
+  const api = popover.connect(service, normalizeProps);
+  return {
+    parts: {
+      trigger: api.getTriggerProps(),
+      positioner: { ...api.getPositionerProps(), hidden: !api.open },
+      content: api.getContentProps(),
+      title: api.getTitleProps(),
+      description: api.getDescriptionProps(),
+    },
+    expose: api,
+  };
+};
+
+const useMenu: Behavior = () => {
+  const service = useMachine(menu.machine, { id: useId() });
+  const api = menu.connect(service, normalizeProps);
+  return {
+    parts: { trigger: api.getTriggerProps(), positioner: { ...api.getPositionerProps(), hidden: !api.open }, content: api.getContentProps() },
+    expose: api,
+  };
+};
+
+const useMenuItem: Behavior = ({ props, parent }) => ({
+  parts: { root: requireParent<menu.Api>(parent, "ds.menu", "ds.menu-item").getItemProps({ value: String(props.value) }) },
+});
+
 export const zagBehaviors: Record<string, Behavior> = {
   dialog: useDialog,
   tabs: useTabs,
   "tabs.trigger": useTab,
   "tabs.panel": useTabPanel,
   switch: useSwitch,
+  tooltip: useTooltip,
+  popover: usePopover,
+  menu: useMenu,
+  "menu.item": useMenuItem,
 };

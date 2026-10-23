@@ -1,0 +1,38 @@
+{
+  "id": "ds.avatar",
+  "name": "Avatar",
+  "version": "0.1.0",
+  "status": "draft",
+  "category": "data-display",
+  "description": "A person or team as initials in a circle.",
+  "semantics": { "element": "span", "role": "img" },
+  "props": [
+    { "name": "name", "description": "Full name, read by assistive technology.", "type": "text", "required": true, "attribute": "aria-label" },
+    { "name": "initials", "description": "One or two letters shown.", "type": "text", "required": true },
+    { "name": "size", "description": "Diameter.", "type": { "enum": ["sm", "md", "lg"] }, "default": "md" }
+  ],
+  "states": [],
+  "anatomy": {
+    "root": {
+      "description": "Circle with centered initials.",
+      "element": "span",
+      "content": { "prop": "initials" },
+      "layout": { "display": "inline-flex", "align": "center", "justify": "center" },
+      "tokens": {
+        "width": "{avatar.size.{size}}", "height": "{avatar.size.{size}}",
+        "background-color": "{color.action.secondary.background}", "color": "{color.text.primary}",
+        "border-radius": "{radius.pill}", "font-size": "{font.size.sm}", "font-weight": "{font.weight.semibold}", "font-family": "{font.family.sans}"
+      },
+      "styles": { "text-transform": "uppercase", "user-select": "none" }
+    }
+  },
+  "a11y": { "focusVisible": false, "contrast": "AA", "keyboard": [], "aria": ["role img with the full name as the label"] },
+  "usage": { "when": ["identifying a person or team next to their content"], "whenNot": ["decoration", "a logo"], "intents": ["person", "user", "author", "member", "team"], "alternatives": [] },
+  "guidelines": { "do": ["use one or two initials", "pair with the name in text where space allows"], "dont": ["use more than three sizes"] },
+  "relationships": { "pairsWith": ["ds.text"], "excludes": [], "contains": [], "within": ["ds.stack", "ds.card", "ds.table-cell"] },
+  "channels": { "web": { "support": "native" }, "widget": { "support": "native" }, "slack": { "support": "degraded", "as": "name text" }, "markdown": { "support": "degraded", "as": "name text" } },
+  "examples": [
+    { "name": "Medium", "tree": { "component": "ds.avatar", "props": { "name": "Lê Gravallos", "initials": "LG" } } },
+    { "name": "Large", "tree": { "component": "ds.avatar", "props": { "name": "Elos team", "initials": "E", "size": "lg" } } }
+  ]
+}

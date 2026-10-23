@@ -28,7 +28,7 @@ test("refuses what the contract forbids instead of guessing", () => {
   assert.throws(() => render({ component: "ds.button" }), /"label" is required/);
   assert.throws(() => render({ component: "ds.button", props: { label: "x", variant: "loud" } }), /must be one of/);
   assert.throws(() => render({ component: "ds.card", slots: { actions: [{ component: "ds.card" }] } }), /accepts only ds.button/);
-  assert.throws(() => render({ component: "ds.toast", props: {} }), /Unknown component ds.toast/);
+  assert.throws(() => render({ component: "ds.nope", props: {} }), /Unknown component ds.nope/);
 });
 
 test("behaviors: Zag props land on the right parts, including a decorated slotted trigger", () => {

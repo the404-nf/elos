@@ -1,0 +1,57 @@
+{
+  "id": "ds.radio-group",
+  "name": "Radio group",
+  "version": "0.1.0",
+  "status": "draft",
+  "category": "form",
+  "description": "Exactly one choice among a few visible options.",
+  "semantics": { "element": "fieldset", "role": "radiogroup" },
+  "props": [
+    { "name": "legend", "description": "What is being chosen.", "type": "text", "required": true },
+    { "name": "name", "description": "Shared form field name; set the same name on each ds.radio.", "type": "text" }
+  ],
+  "states": [],
+  "anatomy": {
+    "root": {
+      "description": "Fieldset with a legend and the options stacked.",
+      "element": "fieldset",
+      "layout": { "display": "flex", "direction": "column", "gap": "{space.inset.sm}" },
+      "tokens": { "font-family": "{font.family.sans}" },
+      "styles": { "margin": "0", "padding": "0", "border": "0", "box-sizing": "border-box" },
+      "parts": {
+        "legend": { "description": "The question.", "element": "legend", "content": { "prop": "legend" }, "tokens": { "font-size": "{font.size.sm}", "font-weight": "{font.weight.medium}", "color": "{color.text.primary}", "padding-block": "{space.inset.sm}" }, "styles": { "margin": "0" } },
+        "options": { "description": "Two to five ds.radio children.", "element": "div", "slot": { "accepts": ["ds.radio"], "acceptsMode": "restrict", "min": 2, "max": 6 }, "layout": { "display": "flex", "direction": "column", "gap": "{space.inset.sm}" } }
+      }
+    }
+  },
+  "a11y": { "focusVisible": false, "contrast": "AA", "keyboard": [{ "key": "ArrowUp/ArrowDown", "action": "move selection" }], "aria": ["fieldset and legend give the group its name"] },
+  "usage": {
+    "when": ["one choice among two to six options that should all be visible"],
+    "whenNot": ["more than six options (use ds.select)", "several choices (use ds.checkbox)"],
+    "intents": ["choose one", "pick", "option", "plan", "mode"],
+    "alternatives": [{ "component": "ds.select", "when": "there are more than six options" }]
+  },
+  "guidelines": { "do": ["preselect a sensible default", "order options by likelihood"], "dont": ["use radios for yes/no (use a switch or checkbox)"] },
+  "relationships": { "pairsWith": [], "excludes": [], "contains": ["ds.radio"], "within": ["ds.stack", "ds.card", "ds.dialog"] },
+  "channels": {
+    "web": { "support": "native" }, "widget": { "support": "native" },
+    "slack": { "support": "native", "as": "radio_buttons element" },
+    "markdown": { "support": "degraded", "as": "numbered options" }
+  },
+  "examples": [
+    {
+      "name": "Plan",
+      "tree": {
+        "component": "ds.radio-group",
+        "props": { "legend": "Plan", "name": "plan" },
+        "slots": {
+          "options": [
+            { "component": "ds.radio", "props": { "name": "plan", "value": "starter", "label": "Starter", "checked": true } },
+            { "component": "ds.radio", "props": { "name": "plan", "value": "pro", "label": "Pro" } },
+            { "component": "ds.radio", "props": { "name": "plan", "value": "enterprise", "label": "Enterprise" } }
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -3,12 +3,16 @@
     "$type": "color",
     "surface": {
       "canvas": { "$value": "{color.black}" },
-      "raised": { "$value": "{color.gray.900}" }
+      "raised": { "$value": "{color.gray.900}" },
+      "sunken": { "$value": "{color.gray.800}" },
+      "inverse": { "$value": "{color.gray.50}" }
     },
     "text": {
       "primary": { "$value": "{color.gray.50}" },
       "secondary": { "$value": "{color.gray.400}" },
-      "inverse": { "$value": "{color.gray.900}" }
+      "inverse": { "$value": "{color.gray.900}" },
+      "link": { "$value": "{color.blue.100}" },
+      "danger": { "$value": "{color.red.100}" }
     },
     "border": {
       "subtle": { "$value": "{color.gray.800}" }

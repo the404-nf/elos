@@ -1,0 +1,53 @@
+{
+  "id": "ds.checkbox",
+  "name": "Checkbox",
+  "version": "0.1.0",
+  "status": "draft",
+  "category": "form",
+  "description": "A choice that is saved with the form, alone or as one of many.",
+  "semantics": { "element": "label" },
+  "props": [
+    { "name": "label", "description": "What is being agreed to or selected.", "type": "text", "required": true },
+    { "name": "name", "description": "Form field name.", "type": "text" },
+    { "name": "checked", "description": "Initial state.", "type": "boolean", "default": false },
+    { "name": "disabled", "description": "Prevents changes.", "type": "boolean", "default": false }
+  ],
+  "states": ["disabled", "focus-visible"],
+  "anatomy": {
+    "root": {
+      "description": "Label wrapping the native checkbox.",
+      "element": "label",
+      "layout": { "display": "inline-flex", "align": "center", "gap": "{space.inset.sm}" },
+      "tokens": { "font-family": "{font.family.sans}", "font-size": "{font.size.md}", "color": "{color.text.primary}" },
+      "styles": { "cursor": "pointer" },
+      "states": { "disabled": { "opacity": "{opacity.disabled}" } },
+      "parts": {
+        "input": {
+          "description": "Native checkbox, tinted with the primary action color.",
+          "element": "input",
+          "tokens": { "accent-color": "{color.action.primary.background}", "width": "{space.4}", "height": "{space.4}" },
+          "styles": { "margin": "0" }
+        },
+        "label": { "description": "Visible label.", "element": "span", "content": { "prop": "label" } }
+      }
+    }
+  },
+  "a11y": { "focusVisible": true, "minHitArea": 44, "contrast": "AA", "keyboard": [{ "key": "Space", "action": "toggle" }], "aria": ["native semantics; the label is always visible"] },
+  "usage": {
+    "when": ["agreeing to something", "selecting several items from a list", "an option saved on submit"],
+    "whenNot": ["a setting that applies immediately (use ds.switch)", "one choice among few (use ds.radio-group)"],
+    "intents": ["agree", "select many", "opt in", "include"],
+    "alternatives": [{ "component": "ds.switch", "when": "the change applies at once" }, { "component": "ds.radio-group", "when": "exactly one option can be chosen" }]
+  },
+  "guidelines": { "do": ["phrase the label as the positive state", "group related checkboxes in a stack"], "dont": ["use a checkbox for an instant setting"] },
+  "relationships": { "pairsWith": ["ds.stack"], "excludes": [], "contains": [], "within": ["ds.stack", "ds.card", "ds.dialog"] },
+  "channels": {
+    "web": { "support": "native" }, "widget": { "support": "native" },
+    "slack": { "support": "native", "as": "checkboxes element" },
+    "markdown": { "support": "degraded", "as": "a yes/no item in a list" }
+  },
+  "examples": [
+    { "name": "Unchecked", "tree": { "component": "ds.checkbox", "props": { "label": "I agree to the terms" } } },
+    { "name": "Checked", "tree": { "component": "ds.checkbox", "props": { "label": "Send me release notes", "checked": true } } }
+  ]
+}

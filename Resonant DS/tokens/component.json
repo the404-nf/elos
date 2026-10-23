@@ -14,5 +14,24 @@
   "dialog": {
     "$type": "dimension",
     "width": { "$value": { "value": 480, "unit": "px" } }
+  },
+  "avatar": {
+    "$type": "dimension",
+    "size": {
+      "sm": { "$value": { "value": 24, "unit": "px" } },
+      "md": { "$value": { "value": 32, "unit": "px" } },
+      "lg": { "$value": { "value": 40, "unit": "px" } }
+    }
+  },
+  "progress": {
+    "$type": "dimension",
+    "height": { "$value": { "value": 6, "unit": "px" } }
+  },
+  "overlay": {
+    "$type": "dimension",
+    "tooltip-width": { "$value": { "value": 240, "unit": "px" } },
+    "popover-width": { "$value": { "value": 280, "unit": "px" } },
+    "menu-width": { "$value": { "value": 180, "unit": "px" } },
+    "toast-width": { "$value": { "value": 320, "unit": "px" } }
   }
 }

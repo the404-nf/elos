@@ -91,6 +91,11 @@ function renderPart(ctx: PartCtx, name: string, part: Part, isRoot: boolean): Re
     children.push(h(Fragment, { key: childName }, renderPart(ctx, childName, child, false)));
 
   const attrs: DomProps = { className: partClass(contract.id, name) };
+  for (const [attr, propName] of Object.entries(part.attrs ?? {})) {
+    const v = props[propName];
+    if (v === undefined || v === false || v === "") continue;
+    attrs[attr] = v === true ? (attr.startsWith("aria-") ? "true" : true) : v;
+  }
   if (isRoot) {
     for (const p of contract.props) {
       const v = props[p.name];

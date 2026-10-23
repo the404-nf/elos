@@ -1,0 +1,42 @@
+{
+  "id": "ds.breadcrumb-item",
+  "name": "Breadcrumb item",
+  "version": "0.1.0",
+  "status": "draft",
+  "category": "navigation",
+  "description": "One level in a Breadcrumb.",
+  "semantics": { "element": "li" },
+  "props": [
+    { "name": "href", "description": "Where the level links to.", "type": "text", "required": true },
+    { "name": "label", "description": "Name of the level.", "type": "text", "required": true },
+    { "name": "current", "description": "This is the current page.", "type": "boolean", "default": false },
+    { "name": "separator", "description": "Character after the link; empty on the last item.", "type": "text", "default": "/" }
+  ],
+  "states": [],
+  "anatomy": {
+    "root": {
+      "description": "List item with the link and a separator.",
+      "element": "li",
+      "layout": { "display": "inline-flex", "align": "center", "gap": "{space.inset.sm}" },
+      "parts": {
+        "link": {
+          "description": "The level, as a link; the current page gets aria-current.",
+          "element": "a",
+          "attrs": { "href": "href", "aria-current": "current" },
+          "content": { "prop": "label" },
+          "tokens": { "color": "{color.text.secondary}", "border-radius": "{radius.sm}" },
+          "motion": { "color": { "duration": "{motion.duration.fast}", "easing": "{motion.easing.standard}" } },
+          "states": { "hover": { "color": "{color.text.primary}" }, "focus-visible": { "outline-color": "{color.border.focus}" } },
+          "styles": { "text-decoration": "none" }
+        },
+        "sep": { "description": "Separator.", "element": "span", "optional": true, "content": { "prop": "separator" }, "tokens": { "color": "{color.text.secondary}" }, "styles": { "user-select": "none" } }
+      }
+    }
+  },
+  "a11y": { "focusVisible": true, "contrast": "AA", "keyboard": [], "aria": ["aria-current on the current page's link"] },
+  "usage": { "when": ["inside ds.breadcrumb only"], "whenNot": ["anywhere else"], "intents": ["level"], "alternatives": [] },
+  "guidelines": { "do": ["set separator to empty on the last item"], "dont": [] },
+  "relationships": { "pairsWith": [], "excludes": [], "contains": [], "within": ["ds.breadcrumb"] },
+  "channels": { "web": { "support": "native" }, "widget": { "support": "native" }, "slack": { "support": "degraded", "as": "text" }, "markdown": { "support": "native", "as": "link" } },
+  "examples": []
+}

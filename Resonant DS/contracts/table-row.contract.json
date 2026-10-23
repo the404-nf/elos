@@ -1,0 +1,26 @@
+{
+  "id": "ds.table-row",
+  "name": "Table row",
+  "version": "0.1.0",
+  "status": "draft",
+  "category": "data-display",
+  "description": "One record in a Table.",
+  "semantics": { "element": "tr" },
+  "props": [],
+  "states": ["hover"],
+  "anatomy": {
+    "root": {
+      "description": "Row of ds.table-cell.",
+      "element": "tr",
+      "slot": { "accepts": ["ds.table-cell"], "acceptsMode": "restrict", "min": 1 },
+      "motion": { "background-color": { "duration": "{motion.duration.fast}", "easing": "{motion.easing.standard}" } },
+      "states": { "hover": { "background-color": "{color.surface.canvas}" } }
+    }
+  },
+  "a11y": { "focusVisible": false, "contrast": "AA", "keyboard": [], "aria": [] },
+  "usage": { "when": ["inside ds.table only"], "whenNot": ["anywhere else"], "intents": ["row", "record"], "alternatives": [] },
+  "guidelines": { "do": ["keep the same cells in every row"], "dont": [] },
+  "relationships": { "pairsWith": [], "excludes": [], "contains": ["ds.table-cell"], "within": ["ds.table"] },
+  "channels": { "web": { "support": "native" }, "widget": { "support": "native" }, "slack": { "support": "degraded", "as": "line" }, "markdown": { "support": "native", "as": "table row" } },
+  "examples": []
+}

@@ -1,0 +1,34 @@
+{
+  "id": "ds.menu-item",
+  "name": "Menu item",
+  "version": "0.1.0",
+  "status": "draft",
+  "category": "overlay",
+  "description": "One action in a Menu.",
+  "semantics": { "element": "div", "role": "menuitem" },
+  "behavior": "menu.item",
+  "props": [
+    { "name": "value", "description": "Identifies the action.", "type": "text", "required": true },
+    { "name": "label", "description": "Verb phrase.", "type": "text", "required": true },
+    { "name": "tone", "description": "Danger for destructive actions.", "type": { "enum": ["default", "danger"] }, "default": "default" }
+  ],
+  "states": ["highlighted", "disabled"],
+  "anatomy": {
+    "root": {
+      "description": "The item; highlighted by keyboard or pointer.",
+      "element": "div",
+      "content": { "prop": "label" },
+      "tokens": { "padding-inline": "{space.inset.md}", "padding-block": "{space.inset.sm}", "border-radius": "{radius.control}", "font-size": "{font.size.md}", "color": "{color.text.primary}" },
+      "tokensByProp": { "tone": { "danger": { "color": "{color.text.danger}" } } },
+      "motion": { "background-color": { "duration": "{motion.duration.instant}", "easing": "{motion.easing.standard}" } },
+      "states": { "highlighted": { "background-color": "{color.surface.sunken}" }, "disabled": { "opacity": "{opacity.disabled}" } },
+      "styles": { "cursor": "pointer", "user-select": "none" }
+    }
+  },
+  "a11y": { "focusVisible": false, "contrast": "AA", "keyboard": [], "aria": ["role menuitem from the behavior"] },
+  "usage": { "when": ["inside ds.menu only"], "whenNot": ["anywhere else"], "intents": ["action"], "alternatives": [] },
+  "guidelines": { "do": ["start with a verb"], "dont": ["use danger tone for more than one item"] },
+  "relationships": { "pairsWith": [], "excludes": [], "contains": [], "within": ["ds.menu"] },
+  "channels": { "web": { "support": "native" }, "widget": { "support": "native" }, "slack": { "support": "native", "as": "option" }, "markdown": { "support": "native", "as": "list item" } },
+  "examples": []
+}

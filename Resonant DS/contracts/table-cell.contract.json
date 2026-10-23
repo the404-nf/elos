@@ -1,0 +1,31 @@
+{
+  "id": "ds.table-cell",
+  "name": "Table cell",
+  "version": "0.1.0",
+  "status": "draft",
+  "category": "data-display",
+  "description": "One cell in a Table row; a header cell when `as` is th.",
+  "semantics": { "element": "td" },
+  "props": [
+    { "name": "as", "description": "td for data, th for a header.", "type": { "enum": ["td", "th"] }, "default": "td" },
+    { "name": "align", "description": "Text alignment; end for numbers.", "type": { "enum": ["start", "end"] }, "default": "start" }
+  ],
+  "states": [],
+  "anatomy": {
+    "root": {
+      "description": "The cell; any content.",
+      "element": "{as}",
+      "slot": { "acceptsMode": "open" },
+      "tokens": { "padding-inline": "{space.inset.md}", "padding-block": "{space.inset.sm}", "border-bottom-color": "{color.border.subtle}", "border-bottom-width": "{border.width}" },
+      "tokensByProp": { "as": { "th": { "background-color": "{color.surface.sunken}", "color": "{color.text.secondary}", "font-weight": "{font.weight.medium}", "font-size": "{font.size.sm}" } } },
+      "stylesByProp": { "align": { "start": { "text-align": "left" }, "end": { "text-align": "right" } } },
+      "styles": { "vertical-align": "top" }
+    }
+  },
+  "a11y": { "focusVisible": false, "contrast": "AA", "keyboard": [], "aria": ["th cells get scope col from the browser's defaults"] },
+  "usage": { "when": ["inside ds.table-row only"], "whenNot": ["anywhere else"], "intents": ["cell", "column"], "alternatives": [] },
+  "guidelines": { "do": ["align numbers to the end"], "dont": ["nest tables"] },
+  "relationships": { "pairsWith": [], "excludes": [], "contains": [], "within": ["ds.table-row"] },
+  "channels": { "web": { "support": "native" }, "widget": { "support": "native" }, "slack": { "support": "degraded", "as": "text" }, "markdown": { "support": "native", "as": "table cell" } },
+  "examples": []
+}

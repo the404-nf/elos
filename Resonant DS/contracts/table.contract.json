@@ -1,0 +1,45 @@
+{
+  "id": "ds.table",
+  "name": "Table",
+  "version": "0.1.0",
+  "status": "draft",
+  "category": "data-display",
+  "description": "Rows of records with the same columns.",
+  "semantics": { "element": "table" },
+  "props": [{ "name": "caption", "description": "What the table lists; read by assistive technology.", "type": "text" }],
+  "states": [],
+  "anatomy": {
+    "root": {
+      "description": "Native table with collapsed borders.",
+      "element": "table",
+      "tokens": { "font-family": "{font.family.sans}", "font-size": "{font.size.md}", "color": "{color.text.primary}" },
+      "styles": { "width": "100%", "border-collapse": "collapse", "table-layout": "auto" },
+      "parts": {
+        "caption": { "description": "Optional caption.", "element": "caption", "optional": true, "content": { "prop": "caption" }, "tokens": { "color": "{color.text.secondary}", "font-size": "{font.size.sm}", "padding-block": "{space.inset.sm}" }, "styles": { "text-align": "left" } },
+        "head": { "description": "One ds.table-row of header cells.", "element": "thead", "optional": true, "slot": { "accepts": ["ds.table-row"], "acceptsMode": "restrict", "max": 1 } },
+        "body": { "description": "ds.table-row children.", "element": "tbody", "slot": { "accepts": ["ds.table-row"], "acceptsMode": "restrict", "min": 1 } }
+      }
+    }
+  },
+  "a11y": { "focusVisible": false, "contrast": "AA", "keyboard": [], "aria": ["header cells use th through the cell's `as` prop", "caption names the table"] },
+  "usage": { "when": ["comparing records across the same fields", "more than a handful of rows"], "whenNot": ["a list of cards with different shapes", "key-value pairs (use a stack of text)"], "intents": ["list records", "table", "compare", "rows", "report"], "alternatives": [{ "component": "ds.card", "when": "each record has its own layout" }] },
+  "guidelines": { "do": ["left-align text, right-align numbers", "keep one action per row at most"], "dont": ["put long paragraphs in cells"] },
+  "relationships": { "pairsWith": [], "excludes": [], "contains": ["ds.table-row"], "within": ["ds.card", "ds.stack"] },
+  "channels": { "web": { "support": "native" }, "widget": { "support": "native" }, "slack": { "support": "degraded", "as": "section fields or a code block" }, "markdown": { "support": "native", "as": "pipe table" } },
+  "examples": [
+    {
+      "name": "Versions",
+      "tree": {
+        "component": "ds.table",
+        "props": { "caption": "Published versions" },
+        "slots": {
+          "head": [{ "component": "ds.table-row", "slots": { "root": [{ "component": "ds.table-cell", "props": { "as": "th" }, "slots": { "root": ["Version"] } }, { "component": "ds.table-cell", "props": { "as": "th" }, "slots": { "root": ["Note"] } }, { "component": "ds.table-cell", "props": { "as": "th", "align": "end" }, "slots": { "root": ["Files"] } }] } }],
+          "body": [
+            { "component": "ds.table-row", "slots": { "root": [{ "component": "ds.table-cell", "slots": { "root": ["v0.1.1"] } }, { "component": "ds.table-cell", "slots": { "root": ["Dialog corners follow radius.control"] } }, { "component": "ds.table-cell", "props": { "align": "end" }, "slots": { "root": ["1"] } }] } },
+            { "component": "ds.table-row", "slots": { "root": [{ "component": "ds.table-cell", "slots": { "root": ["v0.1.0"] } }, { "component": "ds.table-cell", "slots": { "root": ["First publish"] } }, { "component": "ds.table-cell", "props": { "align": "end" }, "slots": { "root": ["20"] } }] } }
+          ]
+        }
+      }
+    }
+  ]
+}

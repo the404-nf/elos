@@ -1,0 +1,28 @@
+{
+  "id": "ds.separator",
+  "name": "Separator",
+  "version": "0.1.0",
+  "status": "draft",
+  "category": "layout",
+  "description": "A hairline that divides groups of content.",
+  "semantics": { "element": "hr", "role": "separator" },
+  "props": [{ "name": "orientation", "description": "Direction of the line.", "type": { "enum": ["horizontal", "vertical"] }, "default": "horizontal" }],
+  "states": [],
+  "anatomy": {
+    "root": {
+      "description": "The line.",
+      "element": "hr",
+      "tokens": { "background-color": "{color.border.subtle}" },
+      "styles": { "margin": "0", "border": "0" },
+      "stylesByProp": {
+        "orientation": { "horizontal": { "width": "100%", "height": "1px" }, "vertical": { "width": "1px", "height": "100%", "align-self": "stretch" } }
+      }
+    }
+  },
+  "a11y": { "focusVisible": false, "contrast": "AA", "keyboard": [], "aria": ["decorative when content is already grouped by headings"] },
+  "usage": { "when": ["separating groups inside a card, menu or toolbar"], "whenNot": ["between every list item", "where spacing alone already separates"], "intents": ["divide", "separate", "section break"], "alternatives": [] },
+  "guidelines": { "do": ["prefer spacing; add a separator only when groups still blur"], "dont": ["stack separators"] },
+  "relationships": { "pairsWith": ["ds.stack"], "excludes": [], "contains": [], "within": ["ds.stack", "ds.card", "ds.menu"] },
+  "channels": { "web": { "support": "native" }, "widget": { "support": "native" }, "slack": { "support": "native", "as": "divider block" }, "markdown": { "support": "native", "as": "---" } },
+  "examples": [{ "name": "Horizontal", "tree": { "component": "ds.separator" } }]
+}

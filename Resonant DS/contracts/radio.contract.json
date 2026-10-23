@@ -1,0 +1,37 @@
+{
+  "id": "ds.radio",
+  "name": "Radio",
+  "version": "0.1.0",
+  "status": "draft",
+  "category": "form",
+  "description": "One option inside a Radio group.",
+  "semantics": { "element": "label" },
+  "props": [
+    { "name": "label", "description": "The option.", "type": "text", "required": true },
+    { "name": "value", "description": "Submitted value.", "type": "text", "required": true },
+    { "name": "name", "description": "Must match the group's name.", "type": "text" },
+    { "name": "checked", "description": "Initially selected.", "type": "boolean", "default": false },
+    { "name": "disabled", "description": "Prevents selection.", "type": "boolean", "default": false }
+  ],
+  "states": ["disabled"],
+  "anatomy": {
+    "root": {
+      "description": "Label wrapping the native radio.",
+      "element": "label",
+      "layout": { "display": "inline-flex", "align": "center", "gap": "{space.inset.sm}" },
+      "tokens": { "font-family": "{font.family.sans}", "font-size": "{font.size.md}", "color": "{color.text.primary}" },
+      "styles": { "cursor": "pointer" },
+      "states": { "disabled": { "opacity": "{opacity.disabled}" } },
+      "parts": {
+        "input": { "description": "Native radio.", "element": "input", "tokens": { "accent-color": "{color.action.primary.background}", "width": "{space.4}", "height": "{space.4}" }, "styles": { "margin": "0" } },
+        "label": { "description": "Visible option text.", "element": "span", "content": { "prop": "label" } }
+      }
+    }
+  },
+  "a11y": { "focusVisible": true, "minHitArea": 44, "contrast": "AA", "keyboard": [{ "key": "Space", "action": "select" }], "aria": [] },
+  "usage": { "when": ["inside ds.radio-group only"], "whenNot": ["anywhere else"], "intents": ["option"], "alternatives": [] },
+  "guidelines": { "do": ["keep option labels parallel"], "dont": ["disable the selected option"] },
+  "relationships": { "pairsWith": [], "excludes": [], "contains": [], "within": ["ds.radio-group"] },
+  "channels": { "web": { "support": "native" }, "widget": { "support": "native" }, "slack": { "support": "native", "as": "option" }, "markdown": { "support": "native", "as": "list item" } },
+  "examples": []
+}

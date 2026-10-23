@@ -1,0 +1,44 @@
+{
+  "id": "ds.alert",
+  "name": "Alert",
+  "version": "0.1.0",
+  "status": "draft",
+  "category": "feedback",
+  "description": "Inline message about the state of the page or a section; stays until the state changes.",
+  "semantics": { "element": "div", "role": "status" },
+  "props": [
+    { "name": "tone", "description": "Meaning of the message.", "type": { "enum": ["info", "success", "warning", "danger"] }, "default": "info" },
+    { "name": "title", "description": "The message in one line.", "type": "text", "required": true },
+    { "name": "description", "description": "What to do about it.", "type": "text" }
+  ],
+  "states": [],
+  "anatomy": {
+    "root": {
+      "description": "Tinted surface; the tone color is in the text and border, never only in the background.",
+      "element": "div",
+      "layout": { "display": "flex", "direction": "column", "gap": "{space.1}" },
+      "tokens": {
+        "background-color": "{color.status.{tone}.background}", "color": "{color.status.{tone}.foreground}", "border-color": "{color.status.{tone}.foreground}", "border-width": "{border.width}",
+        "border-radius": "{radius.container}", "padding": "{space.inset.md}", "font-family": "{font.family.sans}", "font-size": "{font.size.md}"
+      },
+      "parts": {
+        "title": { "description": "Message.", "element": "strong", "content": { "prop": "title" }, "tokens": { "font-weight": "{font.weight.semibold}" } },
+        "description": { "description": "Next step.", "element": "p", "optional": true, "content": { "prop": "description" }, "styles": { "margin": "0" } }
+      }
+    }
+  },
+  "a11y": { "focusVisible": false, "contrast": "AA", "keyboard": [], "aria": ["role status; use role alert only for danger that needs immediate attention"] },
+  "usage": {
+    "when": ["a page or section state the user must know about", "the result of an action, kept in place"],
+    "whenNot": ["a transient confirmation (use ds.toast)", "field validation (use ds.field error)"],
+    "intents": ["notify", "warn", "error state", "success message", "info"],
+    "alternatives": [{ "component": "ds.toast", "when": "the message is transient" }, { "component": "ds.badge", "when": "a one-word status is enough" }]
+  },
+  "guidelines": { "do": ["say what happened and what to do", "keep one alert per section"], "dont": ["stack several alerts", "use danger for warnings"] },
+  "relationships": { "pairsWith": ["ds.button"], "excludes": [], "contains": [], "within": ["ds.stack", "ds.card", "ds.dialog"] },
+  "channels": { "web": { "support": "native" }, "widget": { "support": "native" }, "slack": { "support": "degraded", "as": "section with emoji prefix" }, "markdown": { "support": "degraded", "as": "blockquote with a bold title" } },
+  "examples": [
+    { "name": "Warning", "tree": { "component": "ds.alert", "props": { "tone": "warning", "title": "Draft has unpublished changes", "description": "Publish a version before sharing the catalog." } } },
+    { "name": "Success", "tree": { "component": "ds.alert", "props": { "tone": "success", "title": "Version 0.1.1 published" } } }
+  ]
+}

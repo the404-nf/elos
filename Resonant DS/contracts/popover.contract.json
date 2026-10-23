@@ -1,0 +1,52 @@
+{
+  "id": "ds.popover",
+  "name": "Popover",
+  "version": "0.1.0",
+  "status": "draft",
+  "category": "overlay",
+  "description": "A small panel anchored to its trigger, for secondary content or a short form.",
+  "semantics": { "element": "span" },
+  "behavior": "popover",
+  "props": [
+    { "name": "title", "description": "Names the panel.", "type": "text" },
+    { "name": "description", "description": "Supporting sentence.", "type": "text" }
+  ],
+  "states": ["open"],
+  "anatomy": {
+    "root": {
+      "description": "Holds the trigger in flow and the panel out of flow.",
+      "element": "span",
+      "layout": { "display": "inline-flex" },
+      "parts": {
+        "trigger": { "description": "Exactly one button.", "element": "span", "layout": { "display": "inline-flex" }, "slot": { "accepts": ["ds.button"], "acceptsMode": "restrict", "min": 1, "max": 1, "decorate": "trigger" } },
+        "positioner": {
+          "description": "Placed next to the trigger by the behavior.",
+          "element": "div",
+          "styles": { "z-index": "60" },
+          "parts": {
+            "content": {
+              "description": "The panel, role dialog, not modal.",
+              "element": "div",
+              "layout": { "display": "flex", "direction": "column", "gap": "{space.inset.sm}" },
+              "tokens": { "background-color": "{color.surface.raised}", "color": "{color.text.primary}", "border-color": "{color.border.subtle}", "border-width": "{border.width}", "border-radius": "{radius.container}", "padding": "{space.inset.md}", "min-width": "{overlay.popover-width}", "box-shadow": "{shadow.overlay}", "font-family": "{font.family.sans}" },
+              "motion": { "opacity": { "duration": "{motion.duration.fast}", "easing": "{motion.easing.enter}" } },
+              "parts": {
+                "title": { "description": "Optional title.", "element": "strong", "optional": true, "content": { "prop": "title" }, "tokens": { "font-size": "{font.size.md}", "font-weight": "{font.weight.semibold}" } },
+                "description": { "description": "Optional sentence.", "element": "p", "optional": true, "content": { "prop": "description" }, "tokens": { "color": "{color.text.secondary}", "font-size": "{font.size.sm}" }, "styles": { "margin": "0" } },
+                "body": { "description": "Any content.", "element": "div", "optional": true, "slot": { "acceptsMode": "open" } }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "a11y": { "focusVisible": true, "contrast": "AA", "keyboard": [{ "key": "Escape", "action": "close" }, { "key": "Tab", "action": "move through the panel" }], "aria": ["role dialog with aria-labelledby title from the behavior", "focus moves into the panel on open and back on close"] },
+  "usage": { "when": ["a short form or details next to the thing they concern", "filters, pickers, quick settings"], "whenNot": ["a decision that must block the page (use ds.dialog)", "a plain hint (use ds.tooltip)"], "intents": ["details", "quick edit", "filter", "picker", "more options"], "alternatives": [{ "component": "ds.dialog", "when": "the task must block the page" }, { "component": "ds.menu", "when": "the content is a list of actions" }] },
+  "guidelines": { "do": ["keep it under a few fields", "close on Escape and outside click"], "dont": ["nest popovers"] },
+  "relationships": { "pairsWith": ["ds.button"], "excludes": ["ds.popover"], "contains": ["ds.button"], "within": [] },
+  "channels": { "web": { "support": "native" }, "widget": { "support": "native" }, "slack": { "support": "degraded", "as": "a follow-up message" }, "markdown": { "support": "degraded", "as": "a section" } },
+  "examples": [
+    { "name": "Quick settings", "tree": { "component": "ds.popover", "props": { "title": "Preview options", "description": "Applies to this session only." }, "slots": { "trigger": [{ "component": "ds.button", "props": { "label": "Options", "variant": "secondary" } }], "body": [{ "component": "ds.switch", "props": { "label": "Show grid" } }] } } }
+  ]
+}

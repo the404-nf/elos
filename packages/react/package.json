@@ -11,9 +11,12 @@
     "@elos/contracts": "workspace:*",
     "@elos/core": "workspace:*",
     "@zag-js/dialog": "^1.46.0",
+    "@zag-js/menu": "^1.46.0",
+    "@zag-js/popover": "^1.46.0",
     "@zag-js/react": "^1.46.0",
     "@zag-js/switch": "^1.46.0",
-    "@zag-js/tabs": "^1.46.0"
+    "@zag-js/tabs": "^1.46.0",
+    "@zag-js/tooltip": "^1.46.0"
   },
   "peerDependencies": {
     "react": ">=19"

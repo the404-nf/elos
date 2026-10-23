@@ -1,0 +1,41 @@
+{
+  "id": "ds.breadcrumb",
+  "name": "Breadcrumb",
+  "version": "0.1.0",
+  "status": "draft",
+  "category": "navigation",
+  "description": "Where the current page sits in the hierarchy, with links back up.",
+  "semantics": { "element": "nav" },
+  "props": [{ "name": "label", "description": "Accessible name of the navigation.", "type": "text", "default": "Breadcrumb", "attribute": "aria-label" }],
+  "states": [],
+  "anatomy": {
+    "root": {
+      "description": "Navigation landmark.",
+      "element": "nav",
+      "tokens": { "font-family": "{font.family.sans}", "font-size": "{font.size.sm}" },
+      "parts": {
+        "list": { "description": "Ordered list of ds.breadcrumb-item.", "element": "ol", "slot": { "accepts": ["ds.breadcrumb-item"], "acceptsMode": "restrict", "min": 1 }, "layout": { "display": "flex", "direction": "row", "align": "center", "gap": "{space.inset.sm}" }, "styles": { "list-style": "none", "margin": "0", "padding": "0" } }
+      }
+    }
+  },
+  "a11y": { "focusVisible": false, "contrast": "AA", "keyboard": [], "aria": ["nav with aria-label; the current item carries aria-current"] },
+  "usage": { "when": ["pages nested two or more levels deep"], "whenNot": ["flat sites", "as the primary navigation"], "intents": ["where am I", "hierarchy", "go up", "path"], "alternatives": [] },
+  "guidelines": { "do": ["end with the current page, not linked"], "dont": ["show more than five levels"] },
+  "relationships": { "pairsWith": [], "excludes": [], "contains": ["ds.breadcrumb-item"], "within": [] },
+  "channels": { "web": { "support": "native" }, "widget": { "support": "native" }, "slack": { "support": "degraded", "as": "text path" }, "markdown": { "support": "native", "as": "links separated by /" } },
+  "examples": [
+    {
+      "name": "Three levels",
+      "tree": {
+        "component": "ds.breadcrumb",
+        "slots": {
+          "list": [
+            { "component": "ds.breadcrumb-item", "props": { "href": "/resonant", "label": "Resonant" } },
+            { "component": "ds.breadcrumb-item", "props": { "href": "/resonant/components", "label": "Components" } },
+            { "component": "ds.breadcrumb-item", "props": { "href": "/resonant/components/ds.button", "label": "Button", "current": true, "separator": "" } }
+          ]
+        }
+      }
+    }
+  ]
+}

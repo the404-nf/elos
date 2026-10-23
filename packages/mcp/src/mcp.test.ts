@@ -34,7 +34,7 @@ test("tools expose the menu, contracts, tokens and validation over MCP", async (
   assert.equal((await call("get_component", { id: "ds.nope" })).isError, true);
 
   const dark = await call("list_tokens", { theme: "dark", prefix: "color.surface" });
-  assert.deepEqual(dark.data.map((t: { cssVar: string }) => t.cssVar), ["--color-surface-canvas", "--color-surface-raised"]);
+  assert.deepEqual(dark.data.map((t: { cssVar: string }) => t.cssVar), ["--color-surface-canvas", "--color-surface-raised", "--color-surface-sunken", "--color-surface-inverse"]);
 
   const bad = await call("validate_composition", { tree: { component: "ds.card", slots: { actions: [{ component: "ds.card" }] } } });
   assert.equal(bad.isError, true);
@@ -48,6 +48,7 @@ test("find_component ranks by intent and flags when-not rules", () => {
   assert.equal(r[0]!.id, "ds.card");
   assert.deepEqual(r.find((x) => x.id === "ds.button")!.matched, ["delete", "action"]);
   const nav = findComponents(catalog, "navigating to another page");
-  assert.deepEqual(nav[0]!.caution, ["navigating to another page"]);
+  assert.equal(nav[0]!.id, "ds.link"); // the right answer ranks first
+  assert.deepEqual(nav.find((x) => x.id === "ds.button")!.caution, ["navigating to another page"]); // the wrong one is flagged
   assert.deepEqual(findComponents(catalog, "zebra"), []);
 });
