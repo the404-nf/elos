@@ -5,8 +5,8 @@ import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from
 import { join } from "node:path";
 import { createElement as h } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import type { Catalog, Contract, ResolvedToken } from "@elos/contracts";
-import { build, contractToMarkdown, emitComponentsCss } from "@elos/core";
+import type { ResolvedToken } from "@elos/contracts";
+import { build, contractToMarkdown, emitComponentsCss, tokenUsage } from "@elos/core";
 import { ElosProvider, Render } from "./index.ts";
 import { zagBehaviors } from "./behaviors.ts";
 
@@ -123,32 +123,3 @@ const index = {
 };
 write("design-system.json", JSON.stringify(index, null, 2));
 console.log(`wrote ${Object.keys(files).length + 3} files under ${project}`);
-
-/** token path -> "ds.x css-prop" list, from every binding in every contract (substitutions expanded). */
-function tokenUsage(catalog: Catalog): Map<string, string[]> {
-  const map = new Map<string, string[]>();
-  const add = (path: string, use: string) => map.set(path, [...(map.get(path) ?? []), use]);
-  for (const c of catalog.contracts) {
-    const enums = new Map(c.props.map((p) => [p.name, typeof p.type === "object" ? p.type.enum : null]));
-    const expand = (inner: string): string[] => {
-      const m = inner.match(/\{(\w+)\}/);
-      return m ? (enums.get(m[1]!) ?? []).flatMap((v) => expand(inner.replace(m[0], v))) : [inner];
-    };
-    const visit = (parts: Contract["anatomy"]) => {
-      for (const part of Object.values(parts)) {
-        const bindingSets: Record<string, string>[] = [
-          part.tokens ?? {},
-          ...Object.values(part.states ?? {}),
-          ...Object.values(part.tokensByProp ?? {}).flatMap((m) => Object.values(m)),
-          part.layout?.gap ? { gap: part.layout.gap } : {},
-        ];
-        for (const bindings of bindingSets)
-          for (const [prop, ref] of Object.entries(bindings)) for (const path of expand(ref.slice(1, -1))) add(path, `${c.id} ${prop}`);
-        if (part.parts) visit(part.parts);
-      }
-    };
-    visit(c.anatomy);
-  }
-  for (const [k, v] of map) map.set(k, [...new Set(v)]);
-  return map;
-}

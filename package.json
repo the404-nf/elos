@@ -12,7 +12,8 @@
     "playground": "pnpm run build:resonant && pnpm --filter playground dev",
     "test": "node --test packages/*/src/*.test.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "export:resonant": "node packages/react/src/export-design-system.ts \"Resonant DS\""
+    "export:resonant": "node packages/react/src/export-design-system.ts \"Resonant DS\"",
+    "portal": "pnpm run build:resonant && pnpm --filter portal dev"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

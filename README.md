@@ -14,6 +14,7 @@ Elos stores design systems and makes them usable by humans and AI agents alike. 
 | `packages/react` | Data-driven React renderer: draws any composition tree from the catalog using contract anatomy; `behaviors` maps Zag.js machines (dialog, tabs, switch) onto anatomy parts |
 | `packages/mcp` | Read-only MCP server over a catalog: list, get, find by intent, tokens, validate composition |
 | `apps/playground` | Vite app rendering every contract example in every theme with real behavior |
+| `apps/portal` | The Elos portal: Next.js, Drizzle on PGlite (or Postgres via `DATABASE_URL`). Tokens and components areas, token editing previewed in real compositions, component canvas and advanced editing, versions with publish and rollback, REST (`/api/<ds>/catalog`, `/api/<ds>/css`) and remote MCP (`POST /api/<ds>/mcp`) |
 | `Resonant DS/` | The Resonant design system: `system.json`, `tokens/`, `themes/`, `contracts/` |
 
 ## Commands
@@ -24,6 +25,7 @@ pnpm run build:resonant   # emits Resonant DS/dist
 pnpm run preview:resonant # emits Resonant DS/dist/preview.html, static, every example in every theme
 pnpm run playground       # builds the catalog and serves the interactive playground on :5173
 pnpm run export:resonant <out-dir> --by <name>   # Design System artifact file tree for Claude's design mode
+pnpm run portal           # the portal on :3000; first run seeds the Resonant DS directory into an embedded database (apps/portal/.data)
 pnpm test
 pnpm run typecheck
 ```

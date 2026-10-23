@@ -81,7 +81,7 @@ API keys for the MVP. OAuth for the remote MCP server once ChatGPT and Claude De
 2. React renderer, data-driven from the catalog, Button and Card first. Done.
 3. MCP server over the catalog (stdio). Done. REST and HTTP transport arrive with the portal.
 4. Grow Resonant to what the portal needs: Dialog, Tabs and Switch on Zag.js, Input, Select, Text, Stack, Badge, a Vite playground, and the export of the catalog as a Design System artifact that design mode builds on. Done.
-5. Portal skeleton: editing, multi-channel preview, versions. Screens designed in design mode on the exported artifact, implemented with the React renderer.
+5. Portal skeleton. Done in its first form: tokens and components as separate areas; token editing with the value applied live in every composition that binds to it; component editing with a canvas (click a part, edit its bindings and styles) and an advanced JSON mode; versions with publish, per-file and whole rollback, and diffs; REST catalog and CSS; remote MCP over Streamable HTTP. Runs on PGlite locally and Postgres through `DATABASE_URL`. Not yet: authentication, API keys, multi-channel preview panels, editing props, slots and usage through forms, Markdown rendering for the brand book.
 6. Slack emitter, HTML widget bundle. The Markdown emitter exists as `contractToMarkdown`.
 7. Composition language adapters (OpenUI Lang, A2UI), OAuth, client onboarding.
 

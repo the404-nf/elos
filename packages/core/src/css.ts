@@ -1,8 +1,20 @@
 // Turns a contract's anatomy into CSS rules bound to token variables.
 // Framework-agnostic and browser-safe: the React renderer, the HTML widget and the portal preview all use this output.
-import type { Contract, Part, State } from "@elos/contracts";
+import type { Catalog, Contract, Part, ResolvedToken, State, Theme } from "@elos/contracts";
 
 export const cssVar = (path: string) => `--${path.replace(/\./g, "-")}`;
+
+/** Token variables: the base under :root, each theme's differing values under its selector.
+ *  An alias is emitted as var(--target), so changing one variable at runtime cascades. */
+export function emitCss(catalog: Catalog): string {
+  const decl = (t: ResolvedToken) => `  ${cssVar(t.path)}: ${t.alias ? `var(${cssVar(t.alias)})` : t.value};`;
+  const block = (selector: string, tokens: ResolvedToken[]) => `${selector} {\n${tokens.map(decl).join("\n")}\n}\n`;
+  const base = new Map(catalog.tokens.base.map((t) => [t.path, `${t.alias}|${t.value}`]));
+  const themes = catalog.system.themes.map((th: Theme) =>
+    block(th.selector, catalog.tokens[th.name]!.filter((t) => base.get(t.path) !== `${t.alias}|${t.value}`)),
+  );
+  return [block(":root", catalog.tokens.base), ...themes].join("\n");
+}
 
 const STATE_SELECTORS: Record<State, string[]> = {
   hover: [":hover"],
