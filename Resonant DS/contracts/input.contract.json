@@ -8,6 +8,7 @@
   "semantics": { "element": "input" },
   "props": [
     { "name": "type", "description": "Kind of value; drives keyboard and validation.", "type": { "enum": ["text", "email", "password", "number", "search"] }, "default": "text", "attribute": "type" },
+    { "name": "value", "description": "Current value when the page controls it; omit for a free control.", "type": "text", "attribute": "value" },
     { "name": "name", "description": "Form field name.", "type": "text", "attribute": "name" },
     { "name": "placeholder", "description": "Hint shown when empty. Not a replacement for a label.", "type": "text", "attribute": "placeholder" },
     { "name": "size", "description": "Control size.", "type": { "enum": ["sm", "md"] }, "default": "md" },
@@ -22,7 +23,7 @@
       "tokens": {
         "background-color": "{color.surface.raised}",
         "color": "{color.text.primary}",
-        "border-color": "{color.border.subtle}",
+        "border-color": "{color.border.strong}",
         "border-width": "{border.width}",
         "border-radius": "{radius.control}",
         "padding-inline": "{space.inset.{size}}",

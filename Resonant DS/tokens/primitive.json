@@ -8,6 +8,7 @@
       "100": { "$value": "#ececef" },
       "200": { "$value": "#d9d9df" },
       "400": { "$value": "#9a9aa6" },
+      "500": { "$value": "#8a8a96" },
       "600": { "$value": "#5c5c69" },
       "800": { "$value": "#2a2a33" },
       "900": { "$value": "#1a1a21" }
@@ -30,7 +31,8 @@
     },
     "amber": {
       "100": { "$value": "#fdf1d6" },
-      "700": { "$value": "#9a6700" }
+      "700": { "$value": "#9a6700" },
+      "800": { "$value": "#805600" }
     },
     "alpha": {
       "black-60": { "$value": "#0b0b0d99" }
@@ -56,7 +58,8 @@
   "font": {
     "family": {
       "$type": "fontFamily",
-      "sans": { "$value": "Inter, system-ui, sans-serif" }
+      "sans": { "$value": "Inter, system-ui, sans-serif" },
+      "mono": { "$value": "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace", "$description": "Token paths, ids and code" }
     },
     "size": {
       "$type": "dimension",

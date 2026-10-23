@@ -13,9 +13,9 @@ const example = (id: string, name: string) => catalog.contracts.find((c) => c.id
 
 test("card example renders anatomy, data attributes and nested buttons from the contract", () => {
   const html = render(catalog.contracts.find((c) => c.id === "ds.card")!.examples[0]!.tree);
-  assert.match(html, /^<article class="ds-card__root" data-padding="md">/);
+  assert.match(html, /^<article class="ds-card__root" data-padding="md" data-heading="h3">/);
   assert.match(html, /<h3 class="ds-card__header">Weekly report<\/h3>/);
-  assert.match(html, /<button class="ds-button__root" data-variant="ghost" data-size="md"><span class="ds-button__label">Dismiss<\/span><\/button>/);
+  assert.match(html, /<button class="ds-button__root" data-variant="ghost" data-size="md"[^>]*><span class="ds-button__label">Dismiss<\/span><\/button>/);
 });
 
 test("optional parts disappear when empty; disabled sets the native attribute", () => {
@@ -64,4 +64,20 @@ test("createComponent maps children and named slots", () => {
   );
   assert.match(html, /<div class="ds-card__body">body text<\/div>/);
   assert.match(html, /<footer class="ds-card__actions"><button/);
+});
+
+test("createComponent passes DOM props to the root; elements map swaps an element for a host component", () => {
+  const Button = createComponent<{ label: string; onClick?: () => void; "aria-label"?: string; id?: string }>("ds.button");
+  const html = renderToStaticMarkup(h(ElosProvider, { catalog }, h(Button, { label: "Go", onClick: () => {}, "aria-label": "Go now", id: "go" })));
+  assert.match(html, /<button class="ds-button__root"[^>]*aria-label="Go now"[^>]*id="go"/);
+  assert.doesNotMatch(html, /data-aria|data-id/); // never treated as contract props
+  const Card = createComponent<{ title: string }>("ds.card");
+  assert.match(renderToStaticMarkup(h(ElosProvider, { catalog }, h(Card, { title: "Weekly" }))), /<h3 class="ds-card__header">Weekly<\/h3>/); // a contract prop named like a DOM attribute stays a prop
+  const Nav = createComponent<{ label: string; list: unknown }>("ds.nav");
+  const NavItem = createComponent<{ href: string; label: string; current?: boolean }>("ds.nav-item");
+  const nav = renderToStaticMarkup(h(ElosProvider, { catalog }, h(Nav, { label: "Areas", list: h(NavItem, { href: "/x", label: "Tokens", current: true }) })));
+  assert.match(nav, /<nav class="ds-nav__root" aria-label="Areas"><div class="ds-nav__list"><a class="ds-nav-item__root" data-selected="true" href=[^>]*aria-current="true">Tokens/); // a slot named like a DOM attribute stays a slot
+  const RouterLink = (p: { href: string; children?: unknown }) => h("a", { ...p, "data-router": "" });
+  const linked = renderToStaticMarkup(h(ElosProvider, { catalog, elements: { a: RouterLink } }, h(Render, { tree: example("ds.link", "Inline") })));
+  assert.match(linked, /<a class="ds-link__root"[^>]*href="\/resonant\/tokens"[^>]*data-router=""/);
 });

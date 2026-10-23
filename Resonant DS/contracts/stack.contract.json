@@ -8,7 +8,7 @@
   "semantics": { "element": "div" },
   "props": [
     { "name": "direction", "description": "Main axis.", "type": { "enum": ["row", "column"] }, "default": "column" },
-    { "name": "gap", "description": "Space between children.", "type": { "enum": ["sm", "md", "lg"] }, "default": "md" },
+    { "name": "gap", "description": "Space between children.", "type": { "enum": ["xs", "sm", "md", "lg"] }, "default": "md" },
     { "name": "align", "description": "Cross-axis alignment.", "type": { "enum": ["start", "center", "end", "stretch"] }, "default": "stretch" }
   ],
   "states": [],

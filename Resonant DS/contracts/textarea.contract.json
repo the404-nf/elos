@@ -7,6 +7,7 @@
   "description": "Multi-line text entry.",
   "semantics": { "element": "textarea" },
   "props": [
+    { "name": "value", "description": "Current value when the page controls it; omit for a free control.", "type": "text", "attribute": "value" },
     { "name": "name", "description": "Form field name.", "type": "text", "attribute": "name" },
     { "name": "placeholder", "description": "Hint shown when empty.", "type": "text", "attribute": "placeholder" },
     { "name": "rows", "description": "Visible lines.", "type": "number", "default": 3, "attribute": "rows" },
@@ -19,7 +20,7 @@
       "description": "The native textarea, styled like Input.",
       "element": "textarea",
       "tokens": {
-        "background-color": "{color.surface.raised}", "color": "{color.text.primary}", "border-color": "{color.border.subtle}", "border-width": "{border.width}",
+        "background-color": "{color.surface.raised}", "color": "{color.text.primary}", "border-color": "{color.border.strong}", "border-width": "{border.width}",
         "border-radius": "{radius.control}", "padding-inline": "{space.inset.md}", "padding-block": "{space.inset.sm}", "font-size": "{font.size.md}", "font-family": "{font.family.sans}"
       },
       "motion": { "border-color": { "duration": "{motion.duration.fast}", "easing": "{motion.easing.standard}" } },

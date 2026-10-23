@@ -7,6 +7,7 @@
   "description": "Pick one value from a fixed list.",
   "semantics": { "element": "select" },
   "props": [
+    { "name": "value", "description": "Current value when the page controls it; omit for a free control.", "type": "text", "attribute": "value" },
     { "name": "name", "description": "Form field name.", "type": "text", "attribute": "name" },
     { "name": "size", "description": "Control size.", "type": { "enum": ["sm", "md"] }, "default": "md" },
     { "name": "disabled", "description": "Prevents changes.", "type": "boolean", "default": false, "attribute": "disabled" },
@@ -21,7 +22,7 @@
       "tokens": {
         "background-color": "{color.surface.raised}",
         "color": "{color.text.primary}",
-        "border-color": "{color.border.subtle}",
+        "border-color": "{color.border.strong}",
         "border-width": "{border.width}",
         "border-radius": "{radius.control}",
         "padding-inline": "{space.inset.{size}}",

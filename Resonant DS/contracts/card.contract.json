@@ -8,7 +8,8 @@
   "semantics": { "element": "article" },
   "props": [
     { "name": "title", "description": "Heading shown in the header.", "type": "text" },
-    { "name": "padding", "description": "Inner spacing.", "type": { "enum": ["md", "lg"] }, "default": "md" }
+    { "name": "padding", "description": "Inner spacing.", "type": { "enum": ["md", "lg"] }, "default": "md" },
+    { "name": "heading", "description": "Heading level of the title, so cards follow the document outline.", "type": { "enum": ["h2", "h3"] }, "default": "h3" }
   ],
   "states": [],
   "anatomy": {
@@ -28,7 +29,7 @@
       "parts": {
         "header": {
           "description": "Title of the group. Omit when the surrounding context already names it.",
-          "element": "h3",
+          "element": "{heading}",
           "optional": true,
           "content": { "prop": "title" },
           "tokens": { "font-size": "{font.size.lg}", "font-weight": "{font.weight.semibold}" }

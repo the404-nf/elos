@@ -16,6 +16,7 @@
     },
     "border": {
       "subtle": { "$value": "{color.gray.200}" },
+      "strong": { "$value": "{color.gray.500}", "$description": "Control boundaries: 3:1 against raised and canvas in both themes" },
       "focus": { "$value": "{color.blue.500}" },
       "danger": { "$value": "{color.red.500}" }
     },
@@ -26,7 +27,7 @@
       "neutral": { "background": { "$value": "{color.gray.100}" }, "foreground": { "$value": "{color.gray.800}" } },
       "info": { "background": { "$value": "{color.blue.100}" }, "foreground": { "$value": "{color.blue.700}" } },
       "success": { "background": { "$value": "{color.green.100}" }, "foreground": { "$value": "{color.green.700}" } },
-      "warning": { "background": { "$value": "{color.amber.100}" }, "foreground": { "$value": "{color.amber.700}" } },
+      "warning": { "background": { "$value": "{color.amber.100}" }, "foreground": { "$value": "{color.amber.800}" } },
       "danger": { "background": { "$value": "{color.red.100}" }, "foreground": { "$value": "{color.red.700}" } }
     },
     "action": {
@@ -46,8 +47,8 @@
         "foreground": { "$value": "{color.gray.900}" }
       },
       "danger": {
-        "background": { "$value": "{color.red.500}" },
-        "background-hover": { "$value": "{color.red.600}" },
+        "background": { "$value": "{color.red.600}", "$description": "red.600, not 500: white text needs 4.5:1" },
+        "background-hover": { "$value": "{color.red.700}" },
         "foreground": { "$value": "{color.white}" }
       }
     }
@@ -60,6 +61,7 @@
       "lg": { "$value": "{space.4}" }
     },
     "stack": {
+      "xs": { "$value": "{space.1}", "$description": "Tight lists: nav items, chip rows" },
       "sm": { "$value": "{space.2}" },
       "md": { "$value": "{space.4}" },
       "lg": { "$value": "{space.6}" }

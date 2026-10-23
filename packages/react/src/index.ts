@@ -1,7 +1,7 @@
 // Data-driven React renderer: draws any composition tree from a catalog using contract anatomy.
 // No component has hand-written markup; the contract is the component. Behavior (the logic layer)
 // plugs in as hooks that return DOM props per anatomy part.
-import { createContext, createElement as h, useContext, type ReactNode } from "react";
+import { createContext, createElement as h, useContext, type ElementType, type ReactNode } from "react";
 import type { Catalog, Contract, Part } from "@elos/contracts";
 import { partClass } from "@elos/core/css";
 import { checkSlots, isNode, resolveProps, type Node, type Scalar } from "@elos/core/composition";
@@ -14,13 +14,14 @@ export type DomProps = Record<string, unknown>;
  *  behavior ancestor exposed (e.g. the tabs api that a tab trigger needs). */
 export type Behavior = (ctx: { props: Record<string, Scalar>; parent: unknown }) => { parts: Record<string, DomProps>; expose?: unknown };
 
-type Ctx = { catalog: Catalog; behaviors: Record<string, Behavior> };
+/** `elements` swaps an HTML element name for a component of the host app (e.g. "a" -> a router link); it receives the same DOM props. */
+type Ctx = { catalog: Catalog; behaviors: Record<string, Behavior>; elements: Record<string, ElementType> };
 const ElosContext = createContext<Ctx | null>(null);
 const ParentBehavior = createContext<unknown>(undefined);
 const Decoration = createContext<DomProps | undefined>(undefined); // DOM props a parent adds to this component's root
 
-export function ElosProvider({ catalog, behaviors = {}, children }: { catalog: Catalog; behaviors?: Record<string, Behavior>; children?: ReactNode }) {
-  return h(ElosContext.Provider, { value: { catalog, behaviors } }, children);
+export function ElosProvider({ catalog, behaviors = {}, elements = {}, children }: { catalog: Catalog; behaviors?: Record<string, Behavior>; elements?: Record<string, ElementType>; children?: ReactNode }) {
+  return h(ElosContext.Provider, { value: { catalog, behaviors, elements } }, children);
 }
 
 function useElos(): Ctx {
@@ -57,12 +58,13 @@ function WithBehavior({ tree, contract, props }: Omit<BodyProps, "parts">) {
 
 function Body({ tree, contract, props, parts }: BodyProps) {
   const decoration = useContext(Decoration);
+  const { elements } = useElos();
   const [rootName, root] = Object.entries(contract.anatomy)[0]!;
   // Reset decoration for everything below: it was meant for this component's root only.
-  return h(Decoration.Provider, { value: undefined }, renderPart({ contract, props, tree, parts, decoration }, rootName, root, true));
+  return h(Decoration.Provider, { value: undefined }, renderPart({ contract, props, tree, parts, decoration, elements }, rootName, root, true));
 }
 
-type PartCtx = BodyProps & { decoration?: DomProps };
+type PartCtx = BodyProps & { decoration?: DomProps; elements: Record<string, ElementType> };
 
 function renderPart(ctx: PartCtx, name: string, part: Part, isRoot: boolean): ReactNode {
   const { contract, props, tree, parts } = ctx;
@@ -115,30 +117,37 @@ function renderPart(ctx: PartCtx, name: string, part: Part, isRoot: boolean): Re
 
   const bound = part.element?.match(/^\{(\w+)\}$/);
   const element = bound ? String(props[bound[1]!]) : (part.element ?? "div");
-  return h(element, { key: name, ...attrs }, ...children);
+  return h(ctx.elements[element] ?? element, { key: name, ...attrs }, ...children);
 }
 
 const Fragment = ({ children }: { children?: ReactNode }) => children;
 
 /** Typed convenience wrapper over Render. Scalar props become contract props; React children go to the
- *  first slot; other non-scalar props go to the slot of the same name. */
+ *  first slot; other non-scalar props go to the slot of the same name. Handlers, aria-*, data-*, id, title,
+ *  form and style are DOM props and land on the root element, so a host app can wire a contract component up. */
+const DOM_PROP = /^(on[A-Z]|aria-|data-|id$|title$|form$|style$|list$|defaultValue$|inert$)/;
 export function createComponent<P extends Record<string, unknown>>(id: string) {
   return function Component(p: P & { children?: ReactNode }) {
     const contract = useContract(id);
+    const inherited = useContext(Decoration); // a parent slot may already decorate this root (e.g. a dialog trigger)
     const firstSlot = findFirstSlot(contract.anatomy);
     const props: Record<string, Scalar> = {};
     const slots: Record<string, unknown[]> = {};
+    const dom: DomProps = { ...inherited };
     for (const [k, v] of Object.entries(p)) {
       if (v === undefined) continue;
       if (k === "children") slots[firstSlot ?? "children"] = toArray(v);
+      else if (typeof v === "function" || (DOM_PROP.test(k) && !contract.props.some((p) => p.name === k) && !slotNames(contract.anatomy).includes(k))) dom[k] = v; // a prop or slot named title or list wins
       else if (["string", "number", "boolean"].includes(typeof v)) props[k] = v as Scalar;
       else slots[k] = toArray(v);
     }
-    return h(Render, { tree: { component: id, props, slots } });
+    return h(Decoration.Provider, { value: dom }, h(Render, { tree: { component: id, props, slots } }));
   };
 }
 
 const toArray = (v: unknown): SlotItem[] => (Array.isArray(v) ? v : [v]) as SlotItem[];
+
+const slotNames = (parts: Record<string, Part>): string[] => Object.entries(parts).flatMap(([n, p]) => [...(p.slot ? [n] : []), ...(p.parts ? slotNames(p.parts) : [])]);
 
 function findFirstSlot(parts: Record<string, Part>): string | undefined {
   for (const [name, part] of Object.entries(parts)) {
