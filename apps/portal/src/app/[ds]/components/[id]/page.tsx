@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { contractToMarkdown } from "@elos/core/markdown";
 import { getDraft } from "@/lib/store.ts";
+import { renderMarkdown } from "@/components/markdown.tsx";
 import { ComponentEditor } from "./editor.tsx";
 
 export default async function ComponentPage({ params }: { params: Promise<{ ds: string; id: string }> }) {
@@ -14,7 +15,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ ds: 
       <p className="muted" style={{ fontSize: 13 }}>
         <Link href={`/${ds}/components`}>Components</Link> / {contract.category}
       </p>
-      <ComponentEditor ds={ds} contract={contract} catalog={catalog} markdown={contractToMarkdown(contract)} />
+      <ComponentEditor ds={ds} contract={contract} catalog={catalog} usageHtml={renderMarkdown(contractToMarkdown(contract))} />
     </>
   );
 }

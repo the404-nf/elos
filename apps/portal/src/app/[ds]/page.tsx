@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getDraft, listVersions } from "@/lib/store.ts";
+import { Markdown } from "@/components/markdown.tsx";
 
 export default async function Overview({ params }: { params: Promise<{ ds: string }> }) {
   const { ds } = await params;
@@ -24,9 +25,7 @@ export default async function Overview({ params }: { params: Promise<{ ds: strin
         ))}
       </div>
       <section className="panel">
-        <h2>Brand book</h2>
-        {/* ponytail: the README as preformatted text; a markdown renderer comes with the governance docs. */}
-        <pre style={{ whiteSpace: "pre-wrap", font: "inherit", margin: 0 }}>{readme || "No README.md in this system yet."}</pre>
+        {readme ? <Markdown source={readme} /> : <p className="muted">No README.md in this system yet.</p>}
       </section>
     </>
   );

@@ -16,6 +16,7 @@
     "@elos/react": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.20.0",
     "drizzle-orm": "^0.44.0",
+    "marked": "^18.1.1",
     "next": "^15.5.0",
     "pg": "^8.16.0",
     "react": "^19.0.0",
