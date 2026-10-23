@@ -1,13 +1,18 @@
 import type { ReactNode } from "react";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { emitCss } from "@elos/core/css";
 import { emitComponentsCss } from "@elos/core/catalog";
 import { getDraft } from "@/lib/store.ts";
-import { Elos, ThemeToggle } from "@/components/elos-client.tsx";
+import { Badge, Elos, Link, Stack, Text, ThemeToggle } from "@/components/elos-client.tsx";
 import { SideNav } from "./nav.tsx";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({ params }: { params: Promise<{ ds: string }> }) {
+  const { ds } = await params;
+  const { catalog } = await getDraft(ds).catch(() => ({ catalog: undefined }));
+  return { title: catalog ? `${catalog.system.name} · Elos` : "Elos" };
+}
 
 export default async function SystemLayout({ params, children }: { params: Promise<{ ds: string }>; children: ReactNode }) {
   const { ds } = await params;
@@ -20,17 +25,16 @@ export default async function SystemLayout({ params, children }: { params: Promi
       <style dangerouslySetInnerHTML={{ __html: css }} />
       <div className="shell">
         <aside className="side">
-          <div>
-            <Link href="/" className="muted" style={{ textDecoration: "none", fontSize: 13 }}>
-              Elos
-            </Link>
-            <h2 style={{ margin: 0 }}>{catalog.system.name}</h2>
-            <span className="muted" style={{ fontSize: 13 }}>
-              draft · v{catalog.system.version}
-            </span>
-          </div>
+          <Stack gap="xs" align="start">
+            <Link href="/" label="Elos" tone="inherit" style={{ textDecoration: "none", fontSize: "var(--font-size-sm)", color: "var(--color-text-secondary)" }} />
+            <Text as="h2" variant="heading" text={catalog.system.name} />
+            <Stack direction="row" gap="sm" align="center">
+              <Badge label="draft" />
+              <Text as="span" variant="caption" tone="secondary" text={`v${catalog.system.version}`} />
+            </Stack>
+          </Stack>
           <SideNav ds={ds} />
-          <div style={{ marginTop: "auto" }}>
+          <div className="side-foot">
             <ThemeToggle themes={["light", ...catalog.system.themes.map((t) => t.name)]} />
           </div>
         </aside>

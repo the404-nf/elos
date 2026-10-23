@@ -1,7 +1,8 @@
-import Link from "next/link";
 import { getDraft } from "@/lib/store.ts";
-import { Badge, Render } from "@/components/elos-client.tsx";
+import { Badge, Card, Link, Render, Stack, Text } from "@/components/elos-client.tsx";
+import { PageHead } from "@/components/page-head.tsx";
 
+const n = (count: number, word: string) => `${count} ${word}${count === 1 ? "" : "s"}`;
 const TONE: Record<string, "neutral" | "success" | "danger"> = { draft: "neutral", stable: "success", deprecated: "danger" };
 
 export default async function Components({ params }: { params: Promise<{ ds: string }> }) {
@@ -11,35 +12,34 @@ export default async function Components({ params }: { params: Promise<{ ds: str
   for (const c of catalog.contracts) byCategory.set(c.category, [...(byCategory.get(c.category) ?? []), c]);
   return (
     <>
-      <h1>Components</h1>
-      <p className="muted">{catalog.contracts.length} contracts. Click one to preview, inspect and edit it.</p>
+      <PageHead title="Components" description={`${catalog.contracts.length} contracts in ${byCategory.size} categories. Open one to preview, inspect and edit it.`} />
       {[...byCategory].map(([category, contracts]) => (
-        <section key={category} style={{ marginTop: 20 }}>
-          <h2 style={{ textTransform: "capitalize" }}>{category}</h2>
+        <Stack key={category} gap="sm">
+          <Text as="h2" variant="heading" text={category.replace("-", " ").replace(/^\w/, (c) => c.toUpperCase())} />
           <div className="grid">
-            {contracts.map((c) => (
-              <Link key={c.id} href={`/${ds}/components/${c.id}`} className="panel" style={{ textDecoration: "none", display: "flex", flexDirection: "column", gap: 10 }}>
-                <div className="row" style={{ justifyContent: "space-between" }}>
-                  <strong>{c.name}</strong>
-                  <Badge label={c.status} tone={TONE[c.status]} />
-                </div>
-                <span className="muted" style={{ fontSize: 13 }}>{c.description}</span>
-                <div className="canvas" style={{ minHeight: 72, padding: 12, overflow: "hidden", pointerEvents: "none" }}>
-                  {c.examples[0] ? <Render tree={c.examples[0].tree} /> : <span className="muted" style={{ fontSize: 12 }}>Used inside {c.relationships.within.join(", ") || "other components"}</span>}
-                </div>
-                <div className="row" style={{ justifyContent: "space-between" }}>
-                  <code className="muted" style={{ fontSize: 12 }}>{c.id}</code>
-                  <span className="muted" style={{ fontSize: 12 }}>
-                    {c.props.filter((p) => typeof p.type === "object").reduce((n, p) => n + (p.type as { enum: string[] }).enum.length, 0)} variants · {c.examples.length} examples
-                  </span>
-                </div>
-                <div className="row" style={{ gap: 4 }}>
-                  {Object.entries(c.channels).map(([ch, s]) => <span key={ch} className="chip" data-support={s.support} title={s.as ?? s.support}>{ch}</span>)}
-                </div>
-              </Link>
-            ))}
+            {contracts.map((c) => {
+              const variants = c.props.filter((p) => typeof p.type === "object").reduce((n, p) => n + (p.type as { enum: string[] }).enum.length, 0);
+              const native = Object.entries(c.channels).filter(([, s]) => s.support === "native").map(([ch]) => ch);
+              const rest = Object.entries(c.channels).filter(([, s]) => s.support !== "native").map(([ch, s]) => `${ch} ${s.support}`);
+              return (
+                <Card key={c.id}>
+                  <Stack gap="sm">
+                    <Stack direction="row" gap="sm" align="center">
+                      <Link href={`/${ds}/components/${c.id}`} label={c.name} tone="inherit" style={{ fontWeight: "var(--font-weight-semibold)", textDecoration: "none" }} />
+                      <Badge label={c.status} tone={TONE[c.status]} />
+                    </Stack>
+                    <Text variant="caption" tone="secondary" text={c.description} />
+                    {/* Previews are pictures here: inert keeps their links and controls out of the tab order and the outline. */}
+                    <div className="canvas canvas--thumb" inert aria-hidden="true">
+                      {c.examples[0] ? <Render tree={c.examples[0].tree} /> : <Text as="span" variant="caption" tone="secondary" text={`Used inside ${c.relationships.within.join(", ") || "other components"}`} />}
+                    </div>
+                    <Text as="span" variant="caption" tone="secondary" text={`${n(variants, "variant")} · ${n(c.examples.length, "example")} · native on ${native.join(", ") || "none"}${rest.length ? `; ${rest.join(", ")}` : ""}`} />
+                  </Stack>
+                </Card>
+              );
+            })}
           </div>
-        </section>
+        </Stack>
       ))}
     </>
   );

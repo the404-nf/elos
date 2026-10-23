@@ -1,9 +1,9 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { CompositionNode } from "@elos/contracts";
 import { tokenUsage, treeComponents } from "@elos/core/catalog";
 import { getDraft } from "@/lib/store.ts";
 import { scaleFor } from "@/lib/scale.ts";
+import { PageHead } from "@/components/page-head.tsx";
 import { TokenEditor, type ThemeValue } from "./editor.tsx";
 
 export default async function TokenPage({ params }: { params: Promise<{ ds: string; path: string }> }) {
@@ -41,11 +41,7 @@ export default async function TokenPage({ params }: { params: Promise<{ ds: stri
 
   return (
     <>
-      <p className="muted" style={{ fontSize: 13 }}>
-        <Link href={`/${ds}/tokens`}>Tokens</Link> / {path.split(".").slice(0, -1).join(".")}
-      </p>
-      <h1><code>{path}</code></h1>
-      {base.description && <p className="muted">{base.description}</p>}
+      <PageHead title={path} code description={base.description} crumbs={[{ href: `/${ds}/tokens`, label: "Tokens" }, { href: `/${ds}/tokens/${path}`, label: path.split(".").slice(0, -1).join(".") }]} />
       <TokenEditor ds={ds} token={base} themes={themes} stops={scaleFor(catalog, base)} fedBy={fedBy} feeds={feeds} previews={previews} pages={pages} catalog={catalog} />
     </>
   );

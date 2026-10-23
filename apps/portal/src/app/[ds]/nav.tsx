@@ -1,6 +1,6 @@
 "use client";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Nav, NavItem } from "@/components/elos-client.tsx";
 
 const ITEMS = [
   ["", "Overview"],
@@ -13,16 +13,12 @@ const ITEMS = [
 export function SideNav({ ds }: { ds: string }) {
   const path = usePathname();
   return (
-    <nav>
-      {ITEMS.map(([suffix, label]) => {
+    <Nav
+      label="Areas"
+      list={ITEMS.map(([suffix, label]) => {
         const href = `/${ds}${suffix}`;
-        const current = suffix === "" ? path === href : path.startsWith(href);
-        return (
-          <Link key={href} href={href} aria-current={current ? "page" : undefined}>
-            {label}
-          </Link>
-        );
+        return <NavItem key={href} href={href} label={label} current={suffix === "" ? path === href : path.startsWith(href)} />;
       })}
-    </nav>
+    />
   );
 }

@@ -1,23 +1,26 @@
 import { getDraft } from "@/lib/store.ts";
-import { Render } from "@/components/elos-client.tsx";
+import { Render, Stack, Text } from "@/components/elos-client.tsx";
+import { PageHead } from "@/components/page-head.tsx";
 
 export default async function Pages({ params }: { params: Promise<{ ds: string }> }) {
   const { ds } = await params;
   const { catalog } = await getDraft(ds);
   return (
     <>
-      <h1>Pages</h1>
-      <p className="muted">Composed screens built only from this system's components. Tokens are previewed against them, and agents learn from them.</p>
+      <PageHead title="Pages" description="Composed screens built only from this system's components. Tokens are previewed against them, and agents learn from them." />
       {catalog.pages.map((pg) => (
-        <section key={pg.id} style={{ marginTop: 20 }}>
-          <h2>{pg.name} <code className="muted" style={{ fontWeight: 400, fontSize: 13 }}>{pg.id}</code></h2>
-          <p className="muted" style={{ marginTop: 0 }}>{pg.description}</p>
+        <Stack key={pg.id} gap="sm">
+          <Stack direction="row" gap="sm" align="center">
+            <Text as="h2" variant="heading" text={pg.name} />
+            <Text as="span" variant="caption" tone="secondary" text={pg.id} style={{ fontFamily: "var(--font-family-mono)" }} />
+          </Stack>
+          <Text variant="caption" tone="secondary" text={pg.description} />
           <div className="canvas canvas--overlay">
             <Render tree={pg.tree} />
           </div>
-        </section>
+        </Stack>
       ))}
-      {catalog.pages.length === 0 && <p className="muted">No page examples yet. Add <code>pages/*.page.json</code> to the system.</p>}
+      {catalog.pages.length === 0 && <Text tone="secondary" text="No page examples yet. Add pages/*.page.json to the system." />}
     </>
   );
 }

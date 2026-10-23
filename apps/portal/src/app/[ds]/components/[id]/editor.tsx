@@ -8,12 +8,15 @@ import { StyleKey, type Catalog, type Contract, type Part } from "@elos/contract
 import { emitComponentCss, partClass } from "@elos/core/css";
 import { ElosProvider, Render } from "@elos/react";
 import { zagBehaviors } from "@elos/react/behaviors";
-import { Badge } from "@/components/elos-client.tsx";
+import { Badge, Button, Card, Checkbox, Field, Input, Option, Select, Stack, Text, Textarea, elements, options } from "@/components/elos-client.tsx";
+import { PageHead } from "@/components/page-head.tsx";
 import { saveContract } from "../actions.ts";
 import { ContractForm } from "./contract-form.tsx";
 
 type Bindings = Record<string, string>;
 const STATES = ["hover", "focus-visible", "active", "disabled", "selected", "checked", "open", "invalid"] as const;
+const SUPPORT_TONE = { native: "success", degraded: "warning", unsupported: "danger" } as const;
+const mono = { fontFamily: "var(--font-family-mono)" } as const;
 
 function mapPart(anatomy: Record<string, Part>, name: string, fn: (p: Part) => Part): Record<string, Part> {
   return Object.fromEntries(Object.entries(anatomy).map(([n, p]) => [n, n === name ? fn(p) : p.parts ? { ...p, parts: mapPart(p.parts, name, fn) } : p]));
@@ -32,23 +35,22 @@ function Rows({ label, bindings, onChange, keyList }: { label: string; bindings:
   const entries = Object.entries(bindings);
   const rename = (i: number, key: string) => onChange(Object.fromEntries(entries.map(([k, v], j) => (j === i ? [key, v] : [k, v]))));
   return (
-    <div className="field">
-      <div className="row" style={{ justifyContent: "space-between" }}>
-        <span>{label}</span>
-        <button type="button" className="ds-button__root" data-variant="ghost" data-size="sm" onClick={() => onChange({ ...bindings, "": "" })}>
-          <span className="ds-button__label">Add</span>
-        </button>
-      </div>
+    <Stack gap="xs">
+      <Stack direction="row" gap="sm" align="center" style={{ justifyContent: "space-between" }}>
+        <Text as="span" variant="caption" text={label} style={{ fontWeight: "var(--font-weight-medium)" }} />
+        <Button label="Add" variant="ghost" size="sm" onClick={() => onChange({ ...bindings, "": "" })} />
+      </Stack>
       {entries.map(([k, v], i) => (
-        <div key={i} className="row" style={{ gap: 6, flexWrap: "nowrap" }}>
-          <input list={keyList} value={k} placeholder="css property" style={{ width: 130 }} onChange={(e) => rename(i, e.target.value)} />
-          <input list={keyList ? undefined : "token-refs"} value={v} placeholder={keyList ? "value" : "{token.path}"} style={{ flex: 1 }} onChange={(e) => onChange({ ...bindings, [k]: e.target.value })} />
-          <button type="button" className="ds-button__root" data-variant="ghost" data-size="sm" aria-label="Remove" onClick={() => onChange(Object.fromEntries(entries.filter((_, j) => j !== i)))}>
-            <span className="ds-button__label">×</span>
-          </button>
-        </div>
+        <Stack key={i} direction="row" gap="xs" align="center">
+          <div style={{ width: 130, flex: "none" }}>
+            <Input size="sm" list={keyList} value={k} placeholder="css property" aria-label={`${label} property`} onChange={(e) => rename(i, e.target.value)} />
+          </div>
+          <Input size="sm" list={keyList ? undefined : "token-refs"} value={v} placeholder={keyList ? "value" : "{token.path}"} aria-label={`${label} value`} onChange={(e) => onChange({ ...bindings, [k]: e.target.value })} />
+          <Button label="×" variant="ghost" size="sm" aria-label={`Remove ${k || "row"}`} onClick={() => onChange(Object.fromEntries(entries.filter((_, j) => j !== i)))} />
+        </Stack>
       ))}
-    </div>
+      {entries.length === 0 && <Text as="span" variant="caption" tone="secondary" text="None." />}
+    </Stack>
   );
 }
 
@@ -63,12 +65,7 @@ function rulesFor(c: Contract, tree: { props?: Record<string, unknown> } | undef
 
 function CopyButton({ label, text }: { label: string; text: string }) {
   const [done, setDone] = useState(false);
-  return (
-    <button type="button" className="ds-button__root" data-variant="ghost" data-size="sm"
-      onClick={() => navigator.clipboard.writeText(text).then(() => { setDone(true); setTimeout(() => setDone(false), 1500); })}>
-      <span className="ds-button__label">{done ? "Copied" : label}</span>
-    </button>
-  );
+  return <Button label={done ? "Copied" : label} variant="ghost" size="sm" onClick={() => navigator.clipboard.writeText(text).then(() => { setDone(true); setTimeout(() => setDone(false), 1500); })} />;
 }
 
 export function ComponentEditor({ ds, contract, catalog, markdown, usageHtml }: { ds: string; contract: Contract; catalog: Catalog; markdown: string; usageHtml: string }) {
@@ -89,7 +86,8 @@ export function ComponentEditor({ ds, contract, catalog, markdown, usageHtml }: 
   const modified = useMemo<Catalog>(() => ({ ...catalog, contracts: catalog.contracts.map((c) => (c.id === draft.id ? draft : c)) }), [catalog, draft]);
   const css = useMemo(() => {
     try {
-      return emitComponentCss(draft) + (selected ? `\n.${partClass(draft.id, selected)} { outline: 2px dashed var(--color-border-focus); outline-offset: 3px; }` : "");
+      // Scoped to the canvas: the chrome around it is built from the same contracts and must not light up.
+      return emitComponentCss(draft) + (selected ? `\n.canvas .${partClass(draft.id, selected)} { outline: 2px dashed var(--color-border-focus); outline-offset: 3px; }` : "");
     } catch {
       return "";
     }
@@ -126,136 +124,128 @@ export function ComponentEditor({ ds, contract, catalog, markdown, usageHtml }: 
 
   const previewPanel = (
     <div className="editor">
-      <div>
-        <div className="row" style={{ justifyContent: "space-between", marginBottom: 8 }}>
-          <label className="field" style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-            Example
-            <select value={example} onChange={(e) => setExample(Number(e.target.value))}>
-              {draft.examples.map((ex, i) => <option key={ex.name} value={i}>{ex.name}</option>)}
-            </select>
-          </label>
-          <label className="field" style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-            <input type="checkbox" checked={selectMode} onChange={(e) => setSelectMode(e.target.checked)} /> Select parts
-          </label>
-        </div>
+      <Stack gap="sm">
+        <Stack direction="row" gap="md" align="end" style={{ justifyContent: "space-between" }}>
+          <Field label="Example">
+            <Select size="sm" value={String(example)} onChange={(e) => setExample(Number(e.target.value))}>
+              {draft.examples.map((ex, i) => <Option key={ex.name} value={String(i)} label={ex.name} />)}
+            </Select>
+          </Field>
+          <Checkbox label="Select parts" checked={selectMode} onChange={(e) => setSelectMode(e.target.checked)} />
+        </Stack>
         <div className={`canvas${draft.category === "overlay" ? " canvas--overlay" : ""}`} onClickCapture={pick} style={{ cursor: selectMode ? "crosshair" : undefined }}>
-          {previewTree ? <Render tree={previewTree} /> : <span className="muted">This component has no standalone example; it renders inside {draft.relationships.within.join(", ")}.</span>}
+          {previewTree ? <Render tree={previewTree} /> : <Text tone="secondary" text={`This component has no standalone example; it renders inside ${draft.relationships.within.join(", ")}.`} />}
         </div>
         {tree && (
           <>
-            <div className="row" style={{ marginTop: 8, justifyContent: "space-between" }}>
+            <Stack direction="row" gap="md" align="start" style={{ justifyContent: "space-between" }}>
               <ul className="rules">
                 {rulesFor(draft, tree).map((r) => <li key={r.text} data-kind={r.kind}>{r.text}</li>)}
               </ul>
-              <div className="row" style={{ gap: 4, flexWrap: "nowrap" }}>
-                <button type="button" className="ds-button__root" data-variant="ghost" data-size="sm" onClick={() => setShowTree(!showTree)}>
-                  <span className="ds-button__label">{showTree ? "Hide tree" : "Tree"}</span>
-                </button>
+              <Stack direction="row" gap="xs">
+                <Button label={showTree ? "Hide tree" : "Tree"} variant="ghost" size="sm" onClick={() => setShowTree(!showTree)} />
                 <CopyButton label="Copy tree" text={JSON.stringify(tree, null, 2)} />
                 <CopyButton label="Copy contract" text={JSON.stringify(draft, null, 2)} />
                 <CopyButton label="Copy guidelines" text={markdown} />
-              </div>
-            </div>
-            {showTree && <pre className="panel" style={{ fontSize: 12, overflow: "auto", marginTop: 8 }}>{JSON.stringify(tree, null, 2)}</pre>}
+              </Stack>
+            </Stack>
+            {showTree && <pre className="code">{JSON.stringify(tree, null, 2)}</pre>}
           </>
         )}
-        <p className="muted" style={{ fontSize: 13 }}>
-          Parts:{" "}
+        <Stack direction="row" gap="xs" align="center">
+          <Text as="span" variant="caption" tone="secondary" text="Parts" />
           {partNames(draft.anatomy).map((n) => (
-            <button key={n} type="button" onClick={() => setSelected(n)} style={{ font: "inherit", background: "none", border: 0, padding: "0 6px", cursor: "pointer", color: n === selected ? "var(--color-text-primary)" : "inherit", textDecoration: n === selected ? "underline" : "none" }}>{n}</button>
+            <Button key={n} label={n} size="sm" variant={n === selected ? "secondary" : "ghost"} aria-pressed={n === selected} onClick={() => setSelected(n)} />
           ))}
-        </p>
-      </div>
+        </Stack>
+      </Stack>
 
-      <aside className="panel" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        {part && selected ? (
-          <>
-            <div className="row" style={{ justifyContent: "space-between" }}>
-              <h2 style={{ margin: 0 }}>{selected}</h2>
-              <label className="field" style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-                <input type="checkbox" checked={partAsJson} onChange={(e) => setPartAsJson(e.target.checked)} /> JSON
-              </label>
-            </div>
-            <p className="muted" style={{ margin: 0, fontSize: 13 }}><code>{part.element ?? "div"}</code>{part.description ? ` · ${part.description}` : ""}</p>
-            {partAsJson ? (
-              <textarea className="field" rows={18} style={{ fontFamily: "ui-monospace, monospace", fontSize: 12 }} defaultValue={JSON.stringify(part, null, 2)} key={selected}
-                onBlur={(e) => { try { const p = JSON.parse(e.target.value); setError(null); update(() => p); } catch (err) { setError(`Invalid JSON: ${(err as Error).message}`); } }} />
+      <aside>
+        <Card>
+          <Stack gap="md">
+            {part && selected ? (
+              <>
+                <Stack direction="row" gap="sm" align="center" style={{ justifyContent: "space-between" }}>
+                  <Text as="h2" variant="heading" text={selected} />
+                  <Checkbox label="JSON" checked={partAsJson} onChange={(e) => setPartAsJson(e.target.checked)} />
+                </Stack>
+                <Text variant="caption" tone="secondary" text={`${part.element ?? "div"}${part.description ? ` · ${part.description}` : ""}`} />
+                {partAsJson ? (
+                  <Textarea key={selected} rows={18} style={mono} aria-label={`${selected} as JSON`} defaultValue={JSON.stringify(part, null, 2)}
+                    onBlur={(e) => { try { const p = JSON.parse(e.target.value); setError(null); update(() => p); } catch (err) { setError(`Invalid JSON: ${(err as Error).message}`); } }} />
+                ) : (
+                  <>
+                    <Rows label="Token bindings" bindings={part.tokens ?? {}} onChange={(tokens) => update((p) => ({ ...p, tokens }))} />
+                    {Object.entries(part.states ?? {}).map(([state, b]) => (
+                      <Rows key={state} label={`State: ${state}`} bindings={b} onChange={(nb) => update((p) => ({ ...p, states: { ...p.states, [state]: nb } }))} />
+                    ))}
+                    <Field label="Add state">
+                      <Select size="sm" value="" onChange={(e) => e.target.value && update((p) => ({ ...p, states: { ...p.states, [e.target.value]: {} } }))}>
+                        <Option value="" label="Choose a state" />
+                        {STATES.filter((s) => !(part.states && s in part.states)).map((s) => <Option key={s} value={s} label={s} />)}
+                      </Select>
+                    </Field>
+                    <Rows label="Literal styles" bindings={(part.styles ?? {}) as Bindings} onChange={(styles) => update((p) => ({ ...p, styles }))} keyList="style-keys" />
+                  </>
+                )}
+              </>
             ) : (
               <>
-                <Rows label="Token bindings" bindings={part.tokens ?? {}} onChange={(tokens) => update((p) => ({ ...p, tokens }))} />
-                {Object.entries(part.states ?? {}).map(([state, b]) => (
-                  <Rows key={state} label={`State: ${state}`} bindings={b} onChange={(nb) => update((p) => ({ ...p, states: { ...p.states, [state]: nb } }))} />
-                ))}
-                <label className="field">
-                  Add state
-                  <select value="" onChange={(e) => e.target.value && update((p) => ({ ...p, states: { ...p.states, [e.target.value]: {} } }))}>
-                    <option value="">…</option>
-                    {STATES.filter((s) => !(part.states && s in part.states)).map((s) => <option key={s}>{s}</option>)}
-                  </select>
-                </label>
-                <Rows label="Literal styles" bindings={(part.styles ?? {}) as Bindings} onChange={(styles) => update((p) => ({ ...p, styles }))} keyList="style-keys" />
+                <Text as="h2" variant="heading" text="Anatomy" />
+                <Text variant="caption" tone="secondary" text="Click a part in the preview, or pick one from the list under it, to edit its token bindings, states and styles. Props, usage and guidelines are on the Contract tab." />
               </>
             )}
-          </>
-        ) : (
-          <>
-            <h2 style={{ margin: 0 }}>Anatomy</h2>
-            <p className="muted" style={{ margin: 0, fontSize: 13 }}>Click a part in the preview, or pick one from the list under it, to edit its token bindings, states and styles. Props, usage and guidelines are on the Contract tab.</p>
-          </>
-        )}
-        {error && <div className="error">{error}</div>}
+            {error && <div className="error">{error}</div>}
+          </Stack>
+        </Card>
       </aside>
     </div>
   );
 
   const contractPanel = (
-    <div>
-      <div className="row" style={{ justifyContent: "flex-end", marginBottom: 10 }}>
-        <label className="field" style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-          View
-          <select value={contractView} onChange={(e) => setContractView(e.target.value as "form" | "code")}><option value="form">form</option><option value="code">code</option></select>
-        </label>
-      </div>
+    <Stack gap="md">
+      <Stack direction="row" gap="sm" style={{ justifyContent: "flex-end" }}>
+        <Field label="View">
+          <Select size="sm" value={contractView} onChange={(e) => setContractView(e.target.value as "form" | "code")}>{options(["form", "code"])}</Select>
+        </Field>
+      </Stack>
       {contractView === "form" ? (
         <ContractForm draft={draft} onChange={change} />
       ) : (
-        <textarea className="field panel" rows={40} style={{ width: "100%", fontFamily: "ui-monospace, monospace", fontSize: 12 }} key={JSON.stringify(baseline)} defaultValue={JSON.stringify(draft, null, 2)}
+        <Textarea rows={40} style={mono} aria-label="Contract as JSON" key={JSON.stringify(baseline)} defaultValue={JSON.stringify(draft, null, 2)}
           onBlur={(e) => { try { change(JSON.parse(e.target.value)); setError(null); } catch (err) { setError(`Invalid JSON: ${(err as Error).message}`); } }} />
       )}
-      {error && <div className="error" style={{ marginTop: 8 }}>{error}</div>}
-    </div>
+      {error && <div className="error">{error}</div>}
+    </Stack>
   );
 
   return (
-    <ElosProvider catalog={modified} behaviors={zagBehaviors}>
+    <ElosProvider catalog={modified} behaviors={zagBehaviors} elements={elements}>
       <style>{css}</style>
       <datalist id="token-refs">{tokenPaths.map((p) => <option key={p} value={`{${p}}`} />)}</datalist>
       <datalist id="style-keys">{StyleKey.options.map((k) => <option key={k} value={k} />)}</datalist>
 
-      <div className="row" style={{ justifyContent: "space-between", marginBottom: 12 }}>
-        <div className="row">
-          <h1 style={{ margin: 0 }}>{draft.name}</h1>
-          <Badge label={draft.status} tone={draft.status === "stable" ? "success" : draft.status === "deprecated" ? "danger" : "neutral"} />
-          <code className="muted">{draft.id}</code>
-          <span className="row" style={{ gap: 4 }}>
-            {Object.entries(draft.channels).map(([ch, s]) => (
-              <span key={ch} className="chip" data-support={s.support} title={`${s.support}${s.as ? ` as ${s.as}` : ""}${s.note ? ` · ${s.note}` : ""}`}>{ch}</span>
-            ))}
-          </span>
-        </div>
-        <div className="row">
-          {error && <span className="error">{error.split("\n")[0]}</span>}
-          {saved && !dirty && <span className="muted" style={{ fontSize: 13 }}>Saved.</span>}
-          {dirty && (
-            <button type="button" className="ds-button__root" data-variant="ghost" data-size="md" onClick={() => change(baseline)}>
-              <span className="ds-button__label">Discard</span>
-            </button>
-          )}
-          <button type="button" className="ds-button__root" data-variant="primary" data-size="md" disabled={!dirty || pending} onClick={save}>
-            <span className="ds-button__label">{pending ? "Saving…" : "Save to draft"}</span>
-          </button>
-        </div>
-      </div>
+      <PageHead
+        title={draft.name}
+        crumbs={[{ href: `/${ds}/components`, label: "Components" }, { href: `/${ds}/components/${draft.id}`, label: draft.name }]}
+        actions={
+          <>
+            {error && <span className="error">{error.split("\n")[0]}</span>}
+            {saved && !dirty && <Text as="span" variant="caption" tone="secondary" text="Saved." />}
+            {dirty && <Button label="Discard" variant="ghost" onClick={() => change(baseline)} />}
+            <Button label={pending ? "Saving…" : "Save to draft"} disabled={!dirty || pending} onClick={save} />
+          </>
+        }
+      >
+        <Badge label={draft.status} tone={draft.status === "stable" ? "success" : draft.status === "deprecated" ? "danger" : "neutral"} />
+        <Text as="span" variant="caption" tone="secondary" text={draft.id} style={mono} />
+      </PageHead>
+      <Stack direction="row" gap="xs" align="center">
+        <Text as="span" variant="caption" tone="secondary" text="Channels" />
+        {Object.entries(draft.channels).map(([ch, s]) => (
+          <Badge key={ch} label={`${ch} ${s.support}`} tone={SUPPORT_TONE[s.support]} title={`${s.as ? `as ${s.as}` : s.support}${s.note ? ` · ${s.note}` : ""}`} />
+        ))}
+      </Stack>
 
       <Render
         tree={{
@@ -270,7 +260,7 @@ export function ComponentEditor({ ds, contract, catalog, markdown, usageHtml }: 
             panels: [
               { component: "ds.tab-panel", props: { value: "preview" }, slots: { root: [<div key="p">{previewPanel}</div>] } },
               { component: "ds.tab-panel", props: { value: "contract" }, slots: { root: [<div key="c">{contractPanel}</div>] } },
-              { component: "ds.tab-panel", props: { value: "usage" }, slots: { root: [<div key="u" className="panel prose" dangerouslySetInnerHTML={{ __html: usageHtml }} />] } },
+              { component: "ds.tab-panel", props: { value: "usage" }, slots: { root: [<Card key="u" padding="lg"><div className="prose" dangerouslySetInnerHTML={{ __html: usageHtml }} /></Card>] } },
             ],
           },
         }}
