@@ -25,6 +25,8 @@
         "input": {
           "description": "Native checkbox, tinted with the primary action color.",
           "element": "input",
+          "attributes": { "type": "checkbox" },
+          "attrs": { "name": "name", "defaultChecked": "checked", "disabled": "disabled" },
           "tokens": { "accent-color": "{color.action.primary.background}", "width": "{space.4}", "height": "{space.4}" },
           "styles": { "margin": "0" }
         },

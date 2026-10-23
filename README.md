@@ -4,7 +4,7 @@ Elos stores design systems and makes them usable by humans and AI agents alike. 
 
 - [Vision](docs/vision.md): the official direction. Four areas: Design Systems, Marketplace, Canvas, Serve.
 - [Roadmap](docs/roadmap.md): phases with exit criteria.
-- [Design doc](docs/design.md): architecture, layers, data model, channels, milestones.
+- [Architecture doc](docs/architecture.md): architecture, layers, data model, channels, milestones.
 - [Decision records](docs/adr/): one file per decision, numbered in the order taken.
 - [UX references](docs/research/ux-references.md): what fifteen design system sites do well, and what the portal takes from them.
 

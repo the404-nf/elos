@@ -78,6 +78,7 @@ export type Part = {
   description?: string;
   element?: string; // HTML element, or "{prop}" to take it from an enum prop (e.g. Text's "as")
   attrs?: Record<string, string>; // HTML attribute -> prop name, for parts below the root (e.g. an anchor's href)
+  attributes?: Record<string, string>; // constant HTML attributes (e.g. type="checkbox")
   tokens?: Record<string, string>;
   motion?: Motion;
   states?: Partial<Record<State, Record<string, string>>>;
@@ -97,6 +98,7 @@ export const Part: z.ZodType<Part> = z.lazy(() =>
     description: z.string().optional(),
     element: z.string().optional(),
     attrs: z.record(z.string(), z.string()).optional(),
+    attributes: z.record(z.string(), z.string()).optional(),
     tokens: TokenBindings.optional(),
     motion: Motion.optional(),
     states: z.partialRecord(State, TokenBindings).optional(),

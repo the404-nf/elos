@@ -23,7 +23,7 @@
       "styles": { "cursor": "pointer" },
       "states": { "disabled": { "opacity": "{opacity.disabled}" } },
       "parts": {
-        "input": { "description": "Native radio.", "element": "input", "tokens": { "accent-color": "{color.action.primary.background}", "width": "{space.4}", "height": "{space.4}" }, "styles": { "margin": "0" } },
+        "input": { "description": "Native radio.", "element": "input", "attributes": { "type": "radio" }, "attrs": { "name": "name", "value": "value", "defaultChecked": "checked", "disabled": "disabled" }, "tokens": { "accent-color": "{color.action.primary.background}", "width": "{space.4}", "height": "{space.4}" }, "styles": { "margin": "0" } },
         "label": { "description": "Visible option text.", "element": "span", "content": { "prop": "label" } }
       }
     }

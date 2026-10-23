@@ -90,7 +90,7 @@ function renderPart(ctx: PartCtx, name: string, part: Part, isRoot: boolean): Re
   for (const [childName, child] of Object.entries(part.parts ?? {}))
     children.push(h(Fragment, { key: childName }, renderPart(ctx, childName, child, false)));
 
-  const attrs: DomProps = { className: partClass(contract.id, name) };
+  const attrs: DomProps = { className: partClass(contract.id, name), ...part.attributes };
   for (const [attr, propName] of Object.entries(part.attrs ?? {})) {
     const v = props[propName];
     if (v === undefined || v === false || v === "") continue;

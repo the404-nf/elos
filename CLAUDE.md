@@ -1,6 +1,6 @@
 # Elos
 
-Elos stores design systems in a form people and AI agents use deterministically. Resonant DS is its own design system and its first customer. Read in this order when starting a session: this file, `docs/vision.md`, `docs/roadmap.md`, `docs/design.md`, then the ADR that covers the area you touch (`docs/adr/`). `docs/research/ux-references.md` holds the UX patterns the portal follows.
+Elos stores design systems in a form people and AI agents use deterministically. Resonant DS is its own design system and its first customer. Read in this order when starting a session: this file, `docs/vision.md`, `docs/roadmap.md`, `docs/architecture.md`, then the ADR that covers the area you touch (`docs/adr/`). `docs/research/ux-references.md` holds the UX patterns the portal follows.
 
 ## Non-negotiables
 
@@ -48,4 +48,4 @@ Node 24 runs the TypeScript directly: explicit `.ts` import extensions, no enums
 
 ## Current state (update when it changes)
 
-Phase 0 of the roadmap is done. Phase 1 is in progress: the next item is the visual pass on the portal, to be done with the Impeccable design skills once installed, building the chrome from Resonant tokens and tuning Resonant inside the portal. Motion tokens and per-part motion specs are agreed and not yet built; see roadmap Phase 1.
+Phase 0 of the roadmap is done. Phase 1 is in progress. Resonant has 34 contracts (forms, navigation, layout, data display, feedback, overlays) and motion tokens with per-part transition bindings. The next item is the visual pass on the portal, to be done with the Impeccable design skills once installed, building the chrome from Resonant tokens and components and tuning Resonant inside the portal. After adding contracts, delete `apps/portal/.data` so the portal draft reseeds.

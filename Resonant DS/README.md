@@ -27,9 +27,11 @@ One family, Inter, in four roles: title, heading, body, caption. Weight does the
 
 ## Components
 
-Action: Button. Form: Input, Select, Switch. Navigation: Tabs. Layout: Card, Stack. Overlay: Dialog. Feedback: Badge. Data display: Text. Dialog, Tabs and Switch get their behavior from Zag.js state machines behind Resonant's own API; everything else is a native element styled by its contract.
+Action: Button. Form: Field, Input, Textarea, Select and Option, Checkbox, Radio group and Radio, Switch. Navigation: Link, Tabs with Tab and Tab panel, Breadcrumb with Breadcrumb item. Layout: Card, Stack, Separator. Data display: Text, Avatar, Table with Table row and Table cell. Feedback: Badge, Alert, Toast, Progress, Skeleton. Overlay: Dialog, Tooltip, Popover, Menu with Menu item.
 
-Composition rules live in the contracts: a Card's actions take at most three Buttons, a Dialog's trigger is exactly one Button, Tabs contain Tab and Tab panel only.
+Dialog, Tabs, Switch, Tooltip, Popover and Menu get their behavior from Zag.js state machines behind Resonant's own API; everything else is a native element styled by its contract. State changes animate with the motion tokens: fast for hover and focus, base for layout, instant for highlights, and nothing when the user prefers reduced motion.
+
+Composition rules live in the contracts: a Card's actions take at most three Buttons, a Dialog's trigger is exactly one Button, Tabs contain Tab and Tab panel only, a Menu takes Menu items and Separators, a Field wraps exactly one control.
 
 ## Using this system
 

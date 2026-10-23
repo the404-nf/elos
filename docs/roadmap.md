@@ -15,7 +15,8 @@ Phases, not dates. Each phase has exit criteria that are observable in the produ
 Exit: a designer can shape Resonant entirely inside the portal, and the portal looks like a product.
 
 1. **Visual pass on the portal.** Build the portal chrome from Resonant tokens and components, then tune Resonant itself in the portal. Use the Impeccable design skills for the pass. This is the next item.
-2. **Motion.** Motion tokens as a DTCG family (`motion.duration.*`, `motion.easing.*`), a per-part `motion` field in contracts binding CSS properties to a duration and easing token, the CSS emitter writing `transition` with a `prefers-reduced-motion` guard, and the Zag adapters exposing `data-state` so enter and leave animate from CSS. Enumerable like everything else, so agents and channels can read it.
+2. **Motion.** Done: motion tokens (`motion.duration.*`, `motion.easing.*`), a per-part `motion` field binding CSS properties to a duration and easing token, the emitter writing `transition` with a `prefers-reduced-motion` guard. Not yet: enter and leave animation of overlays, which needs `transition-behavior: allow-discrete` and `@starting-style` in the emitter.
+2b. **Core component set.** Done: 34 contracts covering forms, navigation, layout, data display, feedback and overlays, with Tooltip, Popover and Menu on Zag.js. Not yet: Combobox, Date picker, Data grid, Command palette, Carousel, File upload, Rich text, and a toaster region that stacks and times Toasts.
 3. Scale sliders on the canvas panel for padding, gap, radius and size bindings.
 4. Component cards with static scaled renders and counts.
 5. Themes page: list overlays, re-theme a page per theme, clone into a brand overlay, generate a starting overlay from one brand color.
