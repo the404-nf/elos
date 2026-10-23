@@ -18,3 +18,4 @@ Format: Status, Context, Decision, Consequences. Keep each under a page.
 | [0010](0010-tenancy-and-api-keys-first.md) | Tenancy from day one, API keys before OAuth | Accepted |
 | [0011](0011-portal-is-the-storybook.md) | The portal is the Storybook | Accepted |
 | [0012](0012-deferred-with-room-left.md) | Deferred: Figma, import, multiplayer, structured governance docs | Accepted |
+| [0013](0013-platform-areas.md) | Platform areas: Design Systems, Marketplace, Canvas, Serve | Accepted |

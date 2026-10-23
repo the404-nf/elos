@@ -2,8 +2,11 @@
 
 Elos stores design systems and makes them usable by humans and AI agents alike. A design system in Elos has three layers: contracts (the source of truth), logic (headless behavior and channel adaptation) and render (tokens and components per target). Resonant DS is Elos's own design system and the first one it stores.
 
+- [Vision](docs/vision.md): the official direction. Four areas: Design Systems, Marketplace, Canvas, Serve.
+- [Roadmap](docs/roadmap.md): phases with exit criteria.
 - [Design doc](docs/design.md): architecture, layers, data model, channels, milestones.
 - [Decision records](docs/adr/): one file per decision, numbered in the order taken.
+- [UX references](docs/research/ux-references.md): what fifteen design system sites do well, and what the portal takes from them.
 
 ## Layout
 

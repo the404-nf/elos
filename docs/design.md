@@ -1,6 +1,6 @@
 # Elos design doc
 
-Status: living document. Decisions are recorded individually in [adr/](adr/); this doc explains how they fit together.
+Status: living document. The direction is set in [vision.md](vision.md) and the phases in [roadmap.md](roadmap.md). Decisions are recorded individually in [adr/](adr/); this doc explains how they fit together.
 
 ## What Elos is
 
