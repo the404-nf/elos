@@ -78,9 +78,10 @@ API keys for the MVP. OAuth for the remote MCP server once ChatGPT and Claude De
 1. Foundation: contracts, tokens, catalog build. Done.
 2. React renderer, data-driven from the catalog, Button and Card first. Done.
 3. MCP server over the catalog (stdio). Done. REST and HTTP transport arrive with the portal.
-4. Portal skeleton: editing, multi-channel preview, versions.
-5. Slack and Markdown emitters, HTML widget bundle.
-6. Composition language adapters (OpenUI Lang, A2UI), OAuth, client onboarding.
+4. Grow Resonant to what the portal needs: Dialog, Tabs and Switch on Zag.js, Input, Select, Text, Stack, Badge, a Vite playground, and the export of the catalog as a Design System artifact that design mode builds on. Done.
+5. Portal skeleton: editing, multi-channel preview, versions. Screens designed in design mode on the exported artifact, implemented with the React renderer.
+6. Slack emitter, HTML widget bundle. The Markdown emitter exists as `contractToMarkdown`.
+7. Composition language adapters (OpenUI Lang, A2UI), OAuth, client onboarding.
 
 ## Deferred with room left
 

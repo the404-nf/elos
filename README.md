@@ -23,6 +23,7 @@ pnpm install
 pnpm run build:resonant   # emits Resonant DS/dist
 pnpm run preview:resonant # emits Resonant DS/dist/preview.html, static, every example in every theme
 pnpm run playground       # builds the catalog and serves the interactive playground on :5173
+pnpm run export:resonant <out-dir> --by <name>   # Design System artifact file tree for Claude's design mode
 pnpm test
 pnpm run typecheck
 ```
