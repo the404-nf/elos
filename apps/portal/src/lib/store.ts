@@ -10,15 +10,23 @@ import { designSystems, drafts, organizations, versions } from "./schema.ts";
 
 const RESONANT_DIR = process.env.RESONANT_DIR ?? join(process.cwd(), "..", "..", "Resonant DS");
 
-/** First run: one organization (Elos) with Resonant as its draft, read from the repository directory. */
-async function seed() {
-  const d = await db();
-  if ((await d.select().from(designSystems).limit(1)).length) return;
-  const files = readSystemFiles(RESONANT_DIR);
-  const system = files["system.json"] as { id: string; name: string };
-  await d.insert(organizations).values({ id: "elos", name: "Elos" });
-  await d.insert(designSystems).values({ id: system.id, orgId: "elos", name: system.name });
-  await d.insert(drafts).values({ designSystemId: system.id, files });
+/** First run: one organization (Elos) with Resonant as its draft, read from the repository directory.
+ *  Idempotent and memoized per process: concurrent first requests must not race each other. */
+const g = globalThis as unknown as { __elosSeed?: Promise<void> };
+function seed(): Promise<void> {
+  g.__elosSeed ??= (async () => {
+    const d = await db();
+    if ((await d.select().from(designSystems).limit(1)).length) return;
+    const files = readSystemFiles(RESONANT_DIR);
+    const system = files["system.json"] as { id: string; name: string };
+    await d.insert(organizations).values({ id: "elos", name: "Elos" }).onConflictDoNothing();
+    await d.insert(designSystems).values({ id: system.id, orgId: "elos", name: system.name }).onConflictDoNothing();
+    await d.insert(drafts).values({ designSystemId: system.id, files }).onConflictDoNothing();
+  })().catch((e) => {
+    g.__elosSeed = undefined;
+    throw e;
+  });
+  return g.__elosSeed;
 }
 
 export async function listSystems() {

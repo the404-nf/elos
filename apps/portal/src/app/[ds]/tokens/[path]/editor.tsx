@@ -1,34 +1,39 @@
 "use client";
-// Edit a token and see it applied, in every theme at once, in the components that bind to it.
+// Edit a token and see it applied, in every theme at once, in the components and pages that bind to it.
 // Each theme's preview overrides one CSS variable; aliases are emitted as var() so dependents follow.
 import { useState, useTransition, type CSSProperties } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import type { Catalog, CompositionNode } from "@elos/contracts";
+import type { Catalog, CompositionNode, PageExample, ResolvedToken } from "@elos/contracts";
 import { cssVar } from "@elos/core/css";
 import { Render } from "@/components/elos-client.tsx";
 import { TokenPreview } from "@/components/token-preview.tsx";
+import { TokenControl, type Stop } from "@/components/token-control.tsx";
 import { saveToken } from "../actions.ts";
 
 export type ThemeValue = { theme: string; raw: string; resolved: string };
+type Chain = { path: string; value: string; direct?: boolean };
 
-export function TokenEditor({ ds, path, type, themes, dependents, previews, catalog }: {
+export function TokenEditor({ ds, token, themes, stops, fedBy, feeds, previews, pages, catalog }: {
   ds: string;
-  path: string;
-  type?: string;
+  token: ResolvedToken;
   themes: ThemeValue[];
-  dependents: string[];
+  stops: Stop[];
+  fedBy: Chain[];
+  feeds: Chain[];
   previews: { id: string; name: string; tree: CompositionNode }[];
+  pages: PageExample[];
   catalog: Catalog;
 }) {
+  const path = token.path;
   const initial = Object.fromEntries(themes.map((t) => [t.theme, t.raw]));
   const [values, setValues] = useState(initial);
-  const [baseline, setBaseline] = useState(initial); // what the draft holds, updated on save so "dirty" stays truthful
+  const [baseline, setBaseline] = useState(initial);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [pending, start] = useTransition();
   const router = useRouter();
 
-  // What the user typed, resolved against the catalog of that theme, so the override is a real CSS value.
   const resolve = (theme: string, input: string): string => {
     const m = input.trim().match(/^\{([^{}]+)\}$/);
     if (!m) return input.trim();
@@ -37,7 +42,7 @@ export function TokenEditor({ ds, path, type, themes, dependents, previews, cata
   };
   const tokenPaths = catalog.tokens.base.filter((t) => t.path !== path).map((t) => t.path);
   const dirty = themes.some((t) => (values[t.theme] ?? "").trim() !== baseline[t.theme]);
-  const hasDialog = previews.some((p) => p.id === "ds.dialog");
+  const hasOverlay = previews.some((p) => p.id === "ds.dialog") || pages.some((p) => p.id === "page.confirm-delete");
 
   const save = () =>
     start(async () => {
@@ -53,8 +58,27 @@ export function TokenEditor({ ds, path, type, themes, dependents, previews, cata
       setBaseline(next);
       setValues(next);
       setSaved(true);
-      router.refresh(); // pull the new draft into the server-rendered parts of the page
+      router.refresh();
     });
+
+  const ChainList = ({ title, items, empty }: { title: string; items: Chain[]; empty: string }) => (
+    <div className="field">
+      <span>{title}</span>
+      {items.length === 0 ? (
+        <span className="muted" style={{ fontSize: 12 }}>{empty}</span>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          {items.slice(0, 8).map((c) => (
+            <Link key={c.path} href={`/${ds}/tokens/${c.path}`} className="row" style={{ gap: 8, textDecoration: "none", fontSize: 13, opacity: c.direct === false ? 0.7 : 1 }}>
+              <TokenPreview token={{ path: c.path, type: token.type, value: c.value }} size={18} />
+              <code>{c.path}</code>
+            </Link>
+          ))}
+          {items.length > 8 && <span className="muted" style={{ fontSize: 12 }}>and {items.length - 8} more</span>}
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <div className="editor">
@@ -65,16 +89,20 @@ export function TokenEditor({ ds, path, type, themes, dependents, previews, cata
             <div key={t.theme}>
               <div className="row" style={{ justifyContent: "space-between", marginBottom: 6 }}>
                 <h2 style={{ margin: 0, textTransform: "capitalize" }}>{t.theme}</h2>
-                <span className="muted" style={{ fontSize: 13 }}>
-                  previewing <code>{resolved || "unresolved"}</code>
-                </span>
+                <span className="muted" style={{ fontSize: 13 }}>previewing <code>{resolved || "unresolved"}</code></span>
               </div>
-              <div
-                className={`canvas${hasDialog ? " canvas--overlay" : ""}`}
-                data-theme={t.theme}
-                style={{ [cssVar(path)]: resolved || undefined } as CSSProperties}
-              >
-                {previews.length === 0 && <p className="muted">No component binds to this token yet.</p>}
+              <div className={`canvas${hasOverlay ? " canvas--overlay" : ""}`} data-theme={t.theme} style={{ [cssVar(path)]: resolved || undefined } as CSSProperties}>
+                {previews.length === 0 && pages.length === 0 && <p className="muted">No component binds to this token yet.</p>}
+                {pages.length > 0 && (
+                  <div style={{ display: "grid", gap: 20, gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))", marginBottom: previews.length ? 24 : 0 }}>
+                    {pages.map((pg) => (
+                      <figure key={pg.id} style={{ margin: 0, minWidth: 0 }}>
+                        <Render tree={pg.tree} />
+                        <figcaption className="muted" style={{ fontSize: 12, marginTop: 6 }}>{pg.name}</figcaption>
+                      </figure>
+                    ))}
+                  </div>
+                )}
                 <div className="row" style={{ gap: 24, alignItems: "flex-start" }}>
                   {previews.map((p) => (
                     <figure key={p.name} style={{ margin: 0 }}>
@@ -87,55 +115,42 @@ export function TokenEditor({ ds, path, type, themes, dependents, previews, cata
             </div>
           );
         })}
-        {dependents.length > 0 && (
-          <p className="muted" style={{ fontSize: 13, margin: 0 }}>
-            Also changes: {dependents.map((d) => <code key={d} style={{ marginRight: 8 }}>{d}</code>)}
-          </p>
-        )}
       </section>
 
-      <aside className="panel" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        <h2 style={{ margin: 0 }}>Value</h2>
-        <p className="muted" style={{ margin: 0, fontSize: 13 }}>
-          Type a value, or an alias like <code>{"{color.blue.500}"}</code>. Semantic tokens should alias, not hold raw values. The previews update as you type.
-        </p>
-        {themes.map((t) => {
-          const v = values[t.theme] ?? "";
-          const resolved = resolve(t.theme, v);
-          const isHex = /^#[0-9a-f]{6}$/i.test(resolved);
-          const set = (next: string) => {
-            setSaved(false);
-            setValues({ ...values, [t.theme]: next });
-          };
-          return (
-            <div key={t.theme} className="field">
-              <span style={{ textTransform: "capitalize" }}>{t.theme}</span>
-              <div className="row" style={{ gap: 8, flexWrap: "nowrap" }}>
-                <TokenPreview token={{ path, type, value: resolved }} size={32} />
-                {type === "color" && (
-                  <input type="color" value={isHex ? resolved.toLowerCase() : "#000000"} onChange={(e) => set(e.target.value)} aria-label={`${t.theme} color`}
-                    style={{ width: 36, height: 32, padding: 0, border: 0, background: "none", cursor: "pointer" }} />
-                )}
-                <input list="token-paths" value={v} onChange={(e) => set(e.target.value)} style={{ flex: 1 }} aria-label={`${t.theme} value`} />
+      <aside style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        <div className="panel" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <h2 style={{ margin: 0 }}>Value</h2>
+          <p className="muted" style={{ margin: 0, fontSize: 13 }}>
+            {stops.length > 1 ? "Pick a stop on the scale to bind to a token, or type a value or alias." : <>Type a value, or an alias like <code>{"{color.blue.500}"}</code>.</>} The previews update as you change it.
+          </p>
+          {themes.map((t) => {
+            const raw = values[t.theme] ?? "";
+            return (
+              <div key={t.theme} className="field">
+                <span style={{ textTransform: "capitalize" }}>{t.theme}</span>
+                <TokenControl token={token} raw={raw} resolved={resolve(t.theme, raw)} theme={t.theme} stops={stops} tokenPaths={tokenPaths}
+                  onChange={(next) => { setSaved(false); setValues({ ...values, [t.theme]: next }); }} />
               </div>
-              <span style={{ fontSize: 12 }}>→ {resolved || "unresolved"}</span>
-            </div>
-          );
-        })}
-        <datalist id="token-paths">
-          {tokenPaths.map((p) => <option key={p} value={`{${p}}`} />)}
-        </datalist>
-        {error && <div className="error">{error}</div>}
-        <div className="row">
-          <button type="button" className="ds-button__root" data-variant="primary" data-size="md" disabled={!dirty || pending} onClick={save}>
-            <span className="ds-button__label">{pending ? "Saving…" : "Save to draft"}</span>
-          </button>
-          {dirty && !pending && (
-            <button type="button" className="ds-button__root" data-variant="ghost" data-size="md" onClick={() => setValues(baseline)}>
-              <span className="ds-button__label">Discard</span>
+            );
+          })}
+          {error && <div className="error">{error}</div>}
+          <div className="row">
+            <button type="button" className="ds-button__root" data-variant="primary" data-size="md" disabled={!dirty || pending} onClick={save}>
+              <span className="ds-button__label">{pending ? "Saving…" : "Save to draft"}</span>
             </button>
-          )}
-          {saved && !dirty && <span className="muted" style={{ fontSize: 13 }}>Saved.</span>}
+            {dirty && !pending && (
+              <button type="button" className="ds-button__root" data-variant="ghost" data-size="md" onClick={() => setValues(baseline)}>
+                <span className="ds-button__label">Discard</span>
+              </button>
+            )}
+            {saved && !dirty && <span className="muted" style={{ fontSize: 13 }}>Saved.</span>}
+          </div>
+        </div>
+
+        <div className="panel" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <h2 style={{ margin: 0 }}>Chain</h2>
+          <ChainList title="Built from" items={fedBy} empty="A primitive: holds a raw value." />
+          <ChainList title="Feeds" items={feeds} empty="Nothing aliases this token." />
         </div>
       </aside>
     </div>

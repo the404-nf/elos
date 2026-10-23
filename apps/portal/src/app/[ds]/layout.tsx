@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { emitCss } from "@elos/core/css";
 import { emitComponentsCss } from "@elos/core/catalog";
 import { getDraft } from "@/lib/store.ts";
@@ -10,7 +11,7 @@ export const dynamic = "force-dynamic";
 
 export default async function SystemLayout({ params, children }: { params: Promise<{ ds: string }>; children: ReactNode }) {
   const { ds } = await params;
-  const { catalog } = await getDraft(ds);
+  const { catalog } = await getDraft(ds).catch(() => notFound());
   // ponytail: the viewed system's tokens style the whole portal, which is the point while Elos shows only Resonant;
   // scope the variables to the preview area once a second system is stored.
   const css = emitCss(catalog) + "\n" + emitComponentsCss(catalog);

@@ -52,8 +52,28 @@ function Rows({ label, bindings, onChange, keyList }: { label: string; bindings:
   );
 }
 
-export function ComponentEditor({ ds, contract, catalog, usageHtml }: { ds: string; contract: Contract; catalog: Catalog; usageHtml: string }) {
+/** Usage lines and guidelines that mention a value used by the example (variant names, prop values, prop names). */
+function rulesFor(c: Contract, tree: { props?: Record<string, unknown> } | undefined) {
+  const words = new Set([...Object.values(tree?.props ?? {}).map((v) => String(v).toLowerCase()), ...Object.keys(tree?.props ?? {}).map((k) => k.toLowerCase())]);
+  const hit = (s: string) => [...words].some((w) => w.length > 2 && new RegExp(`\\b${w}\\b`, "i").test(s));
+  const pick = (lines: string[], kind: string) => lines.filter(hit).map((text) => ({ text, kind }));
+  const specific = [...pick(c.usage.whenNot, "dont"), ...pick(c.guidelines.dont, "dont"), ...pick(c.usage.when, "do"), ...pick(c.guidelines.do, "do")];
+  return specific.length ? specific.slice(0, 5) : [...c.guidelines.do.slice(0, 1).map((text) => ({ text, kind: "do" })), ...c.guidelines.dont.slice(0, 1).map((text) => ({ text, kind: "dont" }))];
+}
+
+function CopyButton({ label, text }: { label: string; text: string }) {
+  const [done, setDone] = useState(false);
+  return (
+    <button type="button" className="ds-button__root" data-variant="ghost" data-size="sm"
+      onClick={() => navigator.clipboard.writeText(text).then(() => { setDone(true); setTimeout(() => setDone(false), 1500); })}>
+      <span className="ds-button__label">{done ? "Copied" : label}</span>
+    </button>
+  );
+}
+
+export function ComponentEditor({ ds, contract, catalog, markdown, usageHtml }: { ds: string; contract: Contract; catalog: Catalog; markdown: string; usageHtml: string }) {
   const [draft, setDraft] = useState<Contract>(contract);
+  const [showTree, setShowTree] = useState(false);
   const [baseline, setBaseline] = useState<Contract>(contract); // what the draft holds, updated on save
   const router = useRouter();
   const [selected, setSelected] = useState<string | null>(null);
@@ -121,6 +141,24 @@ export function ComponentEditor({ ds, contract, catalog, usageHtml }: { ds: stri
         <div className={`canvas${draft.category === "overlay" ? " canvas--overlay" : ""}`} onClickCapture={pick} style={{ cursor: selectMode ? "crosshair" : undefined }}>
           {previewTree ? <Render tree={previewTree} /> : <span className="muted">This component has no standalone example; it renders inside {draft.relationships.within.join(", ")}.</span>}
         </div>
+        {tree && (
+          <>
+            <div className="row" style={{ marginTop: 8, justifyContent: "space-between" }}>
+              <ul className="rules">
+                {rulesFor(draft, tree).map((r) => <li key={r.text} data-kind={r.kind}>{r.text}</li>)}
+              </ul>
+              <div className="row" style={{ gap: 4, flexWrap: "nowrap" }}>
+                <button type="button" className="ds-button__root" data-variant="ghost" data-size="sm" onClick={() => setShowTree(!showTree)}>
+                  <span className="ds-button__label">{showTree ? "Hide tree" : "Tree"}</span>
+                </button>
+                <CopyButton label="Copy tree" text={JSON.stringify(tree, null, 2)} />
+                <CopyButton label="Copy contract" text={JSON.stringify(draft, null, 2)} />
+                <CopyButton label="Copy guidelines" text={markdown} />
+              </div>
+            </div>
+            {showTree && <pre className="panel" style={{ fontSize: 12, overflow: "auto", marginTop: 8 }}>{JSON.stringify(tree, null, 2)}</pre>}
+          </>
+        )}
         <p className="muted" style={{ fontSize: 13 }}>
           Parts:{" "}
           {partNames(draft.anatomy).map((n) => (
@@ -199,6 +237,11 @@ export function ComponentEditor({ ds, contract, catalog, usageHtml }: { ds: stri
           <h1 style={{ margin: 0 }}>{draft.name}</h1>
           <Badge label={draft.status} tone={draft.status === "stable" ? "success" : draft.status === "deprecated" ? "danger" : "neutral"} />
           <code className="muted">{draft.id}</code>
+          <span className="row" style={{ gap: 4 }}>
+            {Object.entries(draft.channels).map(([ch, s]) => (
+              <span key={ch} className="chip" data-support={s.support} title={`${s.support}${s.as ? ` as ${s.as}` : ""}${s.note ? ` · ${s.note}` : ""}`}>{ch}</span>
+            ))}
+          </span>
         </div>
         <div className="row">
           {error && <span className="error">{error.split("\n")[0]}</span>}

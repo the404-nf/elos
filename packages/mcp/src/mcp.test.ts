@@ -23,7 +23,8 @@ async function connect() {
 test("tools expose the menu, contracts, tokens and validation over MCP", async () => {
   const { client, call } = await connect();
   const tools = (await client.listTools()).tools.map((t) => t.name).sort();
-  assert.deepEqual(tools, ["find_component", "get_component", "list_components", "list_tokens", "validate_composition"]);
+  assert.deepEqual(tools, ["find_component", "get_component", "list_components", "list_pages", "list_tokens", "validate_composition"]);
+  assert.equal((await call("list_pages")).data.length, 3);
 
   const menu = await call("list_components", { category: "action" });
   assert.deepEqual(menu.data.map((c: { id: string }) => c.id), ["ds.button"]);

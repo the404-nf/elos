@@ -1,7 +1,8 @@
 // Pure catalog build: a design system as a map of files (path -> parsed JSON or text) in, a Catalog out.
 // Browser-safe and database-friendly. The portal stores exactly this map per draft and per version.
-import { Catalog, Contract, SystemManifest, TokenGroup, type Part, type ResolvedToken } from "@elos/contracts";
+import { Catalog, Contract, PageExample, SystemManifest, TokenGroup, type Part, type ResolvedToken } from "@elos/contracts";
 import { emitComponentCss } from "./css.ts";
+import { validateComposition } from "./composition.ts";
 
 export type SystemFiles = Record<string, unknown>;
 
@@ -120,7 +121,24 @@ export function buildCatalog(files: SystemFiles): Catalog {
   const errors = validateContracts(contracts, new Set(tokens.base.map((t) => t.path)));
   if (errors.length) throw new Error(`Invalid design system:\n  ${errors.join("\n  ")}`);
 
-  return Catalog.parse({ system, builtAt: new Date().toISOString(), tokens, contracts });
+  const catalog = Catalog.parse({ system, builtAt: new Date().toISOString(), tokens, contracts, pages: [] });
+  const pagePrefix = `${system.pages}/`;
+  catalog.pages = Object.keys(files)
+    .filter((p) => p.startsWith(pagePrefix) && p.endsWith(".page.json"))
+    .sort()
+    .map((p) => PageExample.parse(files[p]));
+  const pageErrors = catalog.pages.flatMap((pg) => validateComposition(catalog, pg.tree).map((e) => `${pg.id}: ${e}`));
+  if (pageErrors.length) throw new Error(`Invalid page examples:\n  ${pageErrors.join("\n  ")}`);
+  return catalog;
+}
+
+/** Component ids used anywhere in a composition tree. */
+export function treeComponents(tree: { component: string; slots?: Record<string, unknown[]> }): Set<string> {
+  const out = new Set<string>([tree.component]);
+  for (const items of Object.values(tree.slots ?? {}))
+    for (const item of items)
+      if (typeof item === "object" && item && "component" in item) for (const id of treeComponents(item as never)) out.add(id);
+  return out;
 }
 
 // Behaviors toggle `hidden`; it must win over any emitted display value.

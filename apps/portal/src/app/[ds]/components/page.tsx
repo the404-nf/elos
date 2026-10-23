@@ -27,7 +27,15 @@ export default async function Components({ params }: { params: Promise<{ ds: str
                 <div className="canvas" style={{ minHeight: 72, padding: 12, overflow: "hidden", pointerEvents: "none" }}>
                   {c.examples[0] ? <Render tree={c.examples[0].tree} /> : <span className="muted" style={{ fontSize: 12 }}>Used inside {c.relationships.within.join(", ") || "other components"}</span>}
                 </div>
-                <code className="muted" style={{ fontSize: 12 }}>{c.id}</code>
+                <div className="row" style={{ justifyContent: "space-between" }}>
+                  <code className="muted" style={{ fontSize: 12 }}>{c.id}</code>
+                  <span className="muted" style={{ fontSize: 12 }}>
+                    {c.props.filter((p) => typeof p.type === "object").reduce((n, p) => n + (p.type as { enum: string[] }).enum.length, 0)} variants · {c.examples.length} examples
+                  </span>
+                </div>
+                <div className="row" style={{ gap: 4 }}>
+                  {Object.entries(c.channels).map(([ch, s]) => <span key={ch} className="chip" data-support={s.support} title={s.as ?? s.support}>{ch}</span>)}
+                </div>
               </Link>
             ))}
           </div>

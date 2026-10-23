@@ -169,6 +169,16 @@ export const Contract = z.object({
 });
 export type Contract = z.infer<typeof Contract>;
 
+// ---------- page examples: composed screens built from the system's own components ----------
+// They are what tokens are previewed against, and few-shot material for agents.
+export const PageExample = z.object({
+  id: z.string().regex(/^page\.[a-z][a-z0-9-]*$/),
+  name: z.string(),
+  description: z.string(),
+  tree: CompositionNode,
+});
+export type PageExample = z.infer<typeof PageExample>;
+
 // ---------- system manifest ----------
 export const Theme = z.object({
   name: z.string(),
@@ -185,6 +195,7 @@ export const SystemManifest = z.object({
   tokens: z.array(z.string()).min(1), // base token files, merged in order. The base IS the default theme (light).
   themes: z.array(Theme).default([]),
   contracts: z.string().default("contracts"), // folder of *.contract.json
+  pages: z.string().default("pages"), // folder of *.page.json
 });
 export type SystemManifest = z.infer<typeof SystemManifest>;
 
@@ -203,6 +214,7 @@ export const Catalog = z.object({
   builtAt: z.string(),
   tokens: z.record(z.string(), z.array(ResolvedToken)), // "base" and each theme name -> flat resolved tokens
   contracts: z.array(Contract),
+  pages: z.array(PageExample).default([]),
 });
 export type Catalog = z.infer<typeof Catalog>;
 

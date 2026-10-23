@@ -60,7 +60,7 @@ export function createServer(catalog: Catalog): McpServer {
     {
       instructions: [
         `Design system "${system.name}" v${system.version}, served by Elos.`,
-        "Workflow: find_component (by intent) -> get_component (full contract) -> compose a tree -> validate_composition.",
+        "Workflow: find_component (by intent) -> get_component (full contract) -> compose a tree -> validate_composition. list_pages has complete example screens.",
         "Only components in this catalog exist. Never invent components, props or variants; if nothing fits, say so.",
         "Respect usage.whenNot, guidelines.dont and slot restrictions. Use design tokens, never raw values.",
       ].join("\n"),
@@ -113,6 +113,16 @@ export function createServer(catalog: Catalog): McpServer {
       if (!tokens) return { ...text({ error: `Unknown theme ${theme}`, available: Object.keys(catalog.tokens) }), isError: true };
       return text(tokens.filter((t) => !prefix || t.path.startsWith(prefix)).map((t) => ({ path: t.path, cssVar: `--${t.path.replace(/\./g, "-")}`, type: t.type, value: t.value })));
     },
+  );
+
+  server.registerTool(
+    "list_pages",
+    {
+      title: "List page examples",
+      description: "Composed screens built from this system's components: complete, validated composition trees to learn from or adapt.",
+      inputSchema: {},
+    },
+    async () => text(catalog.pages),
   );
 
   server.registerTool(

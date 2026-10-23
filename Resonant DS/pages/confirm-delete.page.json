@@ -1,0 +1,59 @@
+{
+  "id": "page.confirm-delete",
+  "name": "List with a destructive action",
+  "description": "A list card whose danger action opens a confirmation dialog. Previews the overlay, backdrop and the danger pair.",
+  "tree": {
+    "component": "ds.card",
+    "props": { "title": "Projects" },
+    "slots": {
+      "body": [
+        {
+          "component": "ds.stack",
+          "props": { "gap": "sm" },
+          "slots": {
+            "root": [
+              {
+                "component": "ds.stack",
+                "props": { "direction": "row", "gap": "md", "align": "center" },
+                "slots": {
+                  "root": [
+                    { "component": "ds.text", "props": { "as": "span", "text": "Resonant DS" } },
+                    { "component": "ds.badge", "props": { "label": "draft" } }
+                  ]
+                }
+              },
+              {
+                "component": "ds.stack",
+                "props": { "direction": "row", "gap": "md", "align": "center" },
+                "slots": {
+                  "root": [
+                    { "component": "ds.text", "props": { "as": "span", "text": "Acme Web" } },
+                    { "component": "ds.badge", "props": { "label": "stable", "tone": "success" } }
+                  ]
+                }
+              },
+              {
+                "component": "ds.stack",
+                "props": { "direction": "row", "gap": "sm", "align": "center" },
+                "slots": {
+                  "root": [
+                    { "component": "ds.text", "props": { "as": "span", "tone": "secondary", "variant": "caption", "text": "Deleting a project removes all of its versions." } },
+                    {
+                      "component": "ds.dialog",
+                      "props": { "title": "Delete Acme Web?", "description": "Every version is removed. This cannot be undone." },
+                      "slots": {
+                        "trigger": [{ "component": "ds.button", "props": { "label": "Delete", "variant": "danger", "size": "sm" } }],
+                        "actions": [{ "component": "ds.button", "props": { "label": "Delete project", "variant": "danger" } }]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "actions": [{ "component": "ds.button", "props": { "label": "New project" } }]
+    }
+  }
+}

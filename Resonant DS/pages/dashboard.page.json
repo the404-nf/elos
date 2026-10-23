@@ -1,0 +1,88 @@
+{
+  "id": "page.dashboard",
+  "name": "Dashboard cards",
+  "description": "A row of summary cards with status badges and a tabbed detail. Previews surfaces, status colors, type roles and spacing.",
+  "tree": {
+    "component": "ds.stack",
+    "props": { "gap": "lg" },
+    "slots": {
+      "root": [
+        {
+          "component": "ds.stack",
+          "props": { "direction": "row", "gap": "md", "align": "stretch" },
+          "slots": {
+            "root": [
+              {
+                "component": "ds.card",
+                "props": { "title": "Components" },
+                "slots": {
+                  "body": [
+                    { "component": "ds.text", "props": { "as": "span", "variant": "title", "text": "13" } },
+                    { "component": "ds.badge", "props": { "label": "stable", "tone": "success" } }
+                  ]
+                }
+              },
+              {
+                "component": "ds.card",
+                "props": { "title": "Tokens" },
+                "slots": {
+                  "body": [
+                    { "component": "ds.text", "props": { "as": "span", "variant": "title", "text": "97" } },
+                    { "component": "ds.badge", "props": { "label": "2 themes", "tone": "info" } }
+                  ]
+                }
+              },
+              {
+                "component": "ds.card",
+                "props": { "title": "Open issues" },
+                "slots": {
+                  "body": [
+                    { "component": "ds.text", "props": { "as": "span", "variant": "title", "text": "4" } },
+                    { "component": "ds.badge", "props": { "label": "needs review", "tone": "warning" } }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "component": "ds.tabs",
+          "props": { "defaultValue": "activity" },
+          "slots": {
+            "list": [
+              { "component": "ds.tab", "props": { "value": "activity", "label": "Activity" } },
+              { "component": "ds.tab", "props": { "value": "versions", "label": "Versions" } }
+            ],
+            "panels": [
+              {
+                "component": "ds.tab-panel",
+                "props": { "value": "activity" },
+                "slots": {
+                  "root": [
+                    {
+                      "component": "ds.stack",
+                      "props": { "gap": "sm" },
+                      "slots": {
+                        "root": [
+                          { "component": "ds.text", "props": { "text": "Button: hover color changed to color.action.primary.background-hover." } },
+                          { "component": "ds.text", "props": { "tone": "secondary", "variant": "caption", "text": "2 minutes ago by Lê" } },
+                          { "component": "ds.text", "props": { "text": "Dialog: added the description part." } },
+                          { "component": "ds.text", "props": { "tone": "secondary", "variant": "caption", "text": "Yesterday by an agent" } }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "component": "ds.tab-panel",
+                "props": { "value": "versions" },
+                "slots": { "root": [{ "component": "ds.text", "props": { "tone": "secondary", "text": "v0.1.1 published yesterday." } }] }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

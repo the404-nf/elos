@@ -1,0 +1,68 @@
+{
+  "id": "page.settings",
+  "name": "Settings form",
+  "description": "A card with text fields, a select, switches and actions. Previews inputs, labels and the action pair.",
+  "tree": {
+    "component": "ds.card",
+    "props": { "title": "Workspace settings", "padding": "lg" },
+    "slots": {
+      "body": [
+        {
+          "component": "ds.stack",
+          "props": { "gap": "md" },
+          "slots": {
+            "root": [
+              { "component": "ds.text", "props": { "tone": "secondary", "text": "Changes apply to everyone in the workspace." } },
+              {
+                "component": "ds.stack",
+                "props": { "gap": "sm" },
+                "slots": {
+                  "root": [
+                    { "component": "ds.text", "props": { "as": "span", "variant": "caption", "text": "Workspace name" } },
+                    { "component": "ds.input", "props": { "placeholder": "Acme Design" } }
+                  ]
+                }
+              },
+              {
+                "component": "ds.stack",
+                "props": { "gap": "sm" },
+                "slots": {
+                  "root": [
+                    { "component": "ds.text", "props": { "as": "span", "variant": "caption", "text": "Billing email" } },
+                    { "component": "ds.input", "props": { "type": "email", "placeholder": "billing@acme.com", "invalid": true } },
+                    { "component": "ds.text", "props": { "as": "span", "variant": "caption", "tone": "secondary", "text": "Enter a valid email address." } }
+                  ]
+                }
+              },
+              {
+                "component": "ds.stack",
+                "props": { "gap": "sm" },
+                "slots": {
+                  "root": [
+                    { "component": "ds.text", "props": { "as": "span", "variant": "caption", "text": "Default visibility" } },
+                    {
+                      "component": "ds.select",
+                      "slots": {
+                        "root": [
+                          { "component": "ds.option", "props": { "value": "private", "label": "Private" } },
+                          { "component": "ds.option", "props": { "value": "team", "label": "Team" } },
+                          { "component": "ds.option", "props": { "value": "public", "label": "Public" } }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              { "component": "ds.switch", "props": { "label": "Email me about new versions", "checked": true } },
+              { "component": "ds.switch", "props": { "label": "Allow agents to publish drafts" } }
+            ]
+          }
+        }
+      ],
+      "actions": [
+        { "component": "ds.button", "props": { "label": "Cancel", "variant": "ghost" } },
+        { "component": "ds.button", "props": { "label": "Save changes" } }
+      ]
+    }
+  }
+}

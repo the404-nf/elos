@@ -35,6 +35,10 @@ contracts/*.contract.json
 
 This directory is the storage format in the portal's database, the export format on deploy, the self-hosting format, and the target format for a future importer of existing component libraries.
 
+## Page examples
+
+`pages/*.page.json` are composed screens built only from the system's components, validated against the catalog at build time like any composition. They are what token edits are previewed against in the portal, few-shot material served to agents through the `list_pages` MCP tool, and the seed of the blocks area.
+
 ## Themes
 
 A theme is an overlay. Overlays compose in order, so a brand overlay plus a dark-mode overlay is two files, no special casing. The CSS emitter writes the base under `:root` and only the differing variables under each theme's selector.

@@ -10,6 +10,7 @@ const RESONANT = join(import.meta.dirname, "../../../Resonant DS");
 test("Resonant builds: tokens resolve, themes diff, contracts validate", () => {
   const catalog = build(RESONANT, mkdtempSync(join(tmpdir(), "elos-")));
   assert.equal(catalog.contracts.length, 13);
+  assert.deepEqual(catalog.pages.map((p) => p.id), ["page.confirm-delete", "page.dashboard", "page.settings"]); // validated against the contracts
   const base = Object.fromEntries(catalog.tokens.base.map((t) => [t.path, t.value]));
   assert.equal(base["color.action.primary.background"], "#3161ff"); // alias resolved through semantic -> primitive
   assert.equal(base["space.inset.md"], "12px"); // dimension object -> css string
