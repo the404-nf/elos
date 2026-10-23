@@ -189,7 +189,7 @@ export const SystemManifest = z.object({
 export type SystemManifest = z.infer<typeof SystemManifest>;
 
 // ---------- built catalog (what MCP, REST and every renderer consume) ----------
-export const ResolvedToken = z.object({ path: z.string(), type: z.string().optional(), value: z.string() });
+export const ResolvedToken = z.object({ path: z.string(), type: z.string().optional(), value: z.string(), description: z.string().optional() });
 export type ResolvedToken = z.infer<typeof ResolvedToken>;
 
 export const Catalog = z.object({

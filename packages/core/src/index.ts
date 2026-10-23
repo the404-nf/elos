@@ -15,12 +15,13 @@ import {
 import { cssVar, emitComponentCss } from "./css.ts";
 export { cssVar, emitComponentCss, partClass } from "./css.ts";
 export * from "./composition.ts";
+export { contractToMarkdown } from "./markdown.ts";
 
-type Raw = { type?: string; raw: unknown };
+type Raw = { type?: string; raw: unknown; description?: string };
 type Flat = Map<string, Raw>;
 
 const readJson = (p: string) => JSON.parse(readFileSync(p, "utf8"));
-const isToken = (v: unknown): v is { $value: unknown; $type?: string } =>
+const isToken = (v: unknown): v is { $value: unknown; $type?: string; $description?: string } =>
   typeof v === "object" && v !== null && "$value" in v;
 
 export function flattenTokens(group: TokenGroup, out: Flat = new Map(), prefix = "", inherited?: string): Flat {
@@ -28,7 +29,7 @@ export function flattenTokens(group: TokenGroup, out: Flat = new Map(), prefix =
   for (const [key, value] of Object.entries(group)) {
     if (key.startsWith("$") || value === undefined || typeof value === "string") continue;
     const path = prefix ? `${prefix}.${key}` : key;
-    if (isToken(value)) out.set(path, { type: value.$type ?? groupType, raw: value.$value });
+    if (isToken(value)) out.set(path, { type: value.$type ?? groupType, raw: value.$value, description: value.$description });
     else flattenTokens(value as TokenGroup, out, path, groupType);
   }
   return out;
@@ -59,7 +60,7 @@ export function resolveTokens(flat: Flat): ResolvedToken[] {
     if (typeof raw === "object" && raw && "value" in raw && "unit" in raw) return `${(raw as any).value}${(raw as any).unit}`;
     return JSON.stringify(raw);
   };
-  return [...flat].map(([path, { type, raw }]) => ({ path, type, value: resolve(raw, [path]) }));
+  return [...flat].map(([path, { type, raw, description }]) => ({ path, type, value: resolve(raw, [path]), description }));
 }
 
 // Every token ref in a contract must resolve for every value of the props it substitutes.

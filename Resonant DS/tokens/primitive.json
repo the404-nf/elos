@@ -35,7 +35,7 @@
     "alpha": {
       "black-60": { "$value": "#0b0b0d99" }
     },
-    "transparent": { "$value": "transparent" }
+    "transparent": { "$value": "#00000000" }
   },
   "space": {
     "$type": "dimension",

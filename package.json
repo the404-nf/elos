@@ -3,13 +3,16 @@
   "private": true,
   "type": "module",
   "packageManager": "pnpm@11.13.0",
-  "engines": { "node": ">=24" },
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
     "build:resonant": "node packages/core/src/cli.ts \"Resonant DS\"",
     "preview:resonant": "node packages/react/src/preview.ts \"Resonant DS\"",
     "playground": "pnpm run build:resonant && pnpm --filter playground dev",
     "test": "node --test packages/*/src/*.test.ts",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "export:resonant": "node packages/react/src/export-design-system.ts \"Resonant DS\""
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
