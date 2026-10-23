@@ -1,0 +1,85 @@
+# Elos design doc
+
+Status: living document. Decisions are recorded individually in [adr/](adr/); this doc explains how they fit together.
+
+## What Elos is
+
+A platform that stores design systems like a CMS and serves them to humans and AI agents. A design system in Elos is consumed through a web portal, a REST API and an MCP server, and rendered on several channels. Resonant DS is Elos's own design system. The portal is built with it, so Elos is its own first customer.
+
+Elos is closed source and offered to clients as a base, the way Radix is offered as a base, with the difference that clients get a governed, versioned, AI-readable system rather than a component package.
+
+## The three layers
+
+| Layer | Holds | Form | Owner |
+|---|---|---|---|
+| Contracts | What each component and token means: props, anatomy, token bindings, slots, accessibility, usage rules, relationships, channel support | JSON validated by Zod, one file per component | Elos, stack-agnostic |
+| Logic | Headless behavior and adaptation: state machines, composition evaluation, prompt generation, channel degradation | TypeScript runtime over the catalog | Elos, stack-agnostic |
+| Render | Tokens as CSS variables and components per target | React renderer first, more targets later | Per target |
+
+The contracts are the only source of truth. The logic layer derives everything else from them. The render layer is a set of emitters that consume the built catalog. Nothing is inferred from component source code.
+
+## The catalog
+
+`packages/core` reads a design system directory and emits `catalog.json`: the manifest, every contract, and every token resolved per theme. REST, MCP, the portal preview and every renderer read this one artifact, so they cannot drift from each other. The build refuses a token reference that does not resolve for every variant, and any reference to an unknown contract.
+
+## A design system on disk
+
+```
+system.json              manifest: id, name, version, token files, themes, contracts folder
+tokens/*.json            DTCG token files, merged in order; the base is the default (light) theme
+themes/*.json            partial token overlays, each with a kind (mode or brand) and a CSS selector
+contracts/*.contract.json
+```
+
+This directory is the storage format in the portal's database, the export format on deploy, the self-hosting format, and the target format for a future importer of existing component libraries.
+
+## Themes
+
+A theme is an overlay. Overlays compose in order, so a brand overlay plus a dark-mode overlay is two files, no special casing. The CSS emitter writes the base under `:root` and only the differing variables under each theme's selector.
+
+## Composition
+
+An agent never emits markup. It emits a composition tree: a node names a contract id, canonical prop values and slot contents. Every channel renders that tree with real components. Anything not in the catalog is refused. OpenUI Lang and A2UI are adapters that produce this tree, planned for milestone two.
+
+## Channels
+
+The listed channels collapse into three emitters:
+
+| Emitter | Serves |
+|---|---|
+| HTML | Web portal, and the HTML widget that ChatGPT Apps and Claude Desktop MCP Apps render in an iframe |
+| Slack Block Kit | Slack as an output channel, including rendered reports |
+| Markdown | Claude Code and Codex, which have no UI; the contract itself is the render |
+
+Each contract declares, per channel, whether support is native, degraded or unsupported, and what the component becomes. The portal preview runs every emitter on the draft contract and shows them side by side, so an editor sees what a change does on every channel.
+
+## Portal
+
+Next.js with the App Router, Postgres through Drizzle, Better Auth, and the official TypeScript MCP SDK over stateless Streamable HTTP, all in one deploy. The portal is the Storybook: it renders tokens and components from the draft catalog at runtime, so edits preview without a rebuild. Editing works on contracts through forms, not on component source code.
+
+Self-hosting is a requirement, so the portal depends on Postgres only. No vendor-specific storage, queues or functions.
+
+## Data model
+
+Organization, design system, draft, version. Tenancy exists from the first migration. A version is an immutable full snapshot of the directory format. Diffs between versions are computed on demand. Publishing can happen per change or as a bundle; both only decide when a snapshot is cut. Rolling back a component copies its contract from an older snapshot into the draft. Rolling back the system republishes an older snapshot as a new version. History is never rewritten and clients pin versions.
+
+## Access
+
+API keys for the MVP. OAuth for the remote MCP server once ChatGPT and Claude Desktop connect to private systems.
+
+## Milestones
+
+1. Foundation: contracts, tokens, catalog build. Done.
+2. React renderer on Zag.js behind Resonant's own API, Button and Card first.
+3. MCP server and REST read endpoints over the catalog.
+4. Portal skeleton: editing, multi-channel preview, versions.
+5. Slack and Markdown emitters, HTML widget bundle.
+6. Composition language adapters (OpenUI Lang, A2UI), OAuth, client onboarding.
+
+## Deferred with room left
+
+Figma sync (tokens are DTCG so plugins can read them), importing existing component libraries (the directory format is the target), multiplayer editing, and structured schemas for principles, DDRs and skills, which will become more files in the same directory.
+
+## Glossary
+
+ADR: an architecture decision record for building Elos, kept in `docs/adr/`. DDR: a design decision record, a product feature where clients record their own design decisions. The two are different things.

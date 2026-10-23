@@ -1,0 +1,57 @@
+{
+  "color": {
+    "$type": "color",
+    "surface": {
+      "canvas": { "$value": "{color.gray.50}", "$description": "Page background" },
+      "raised": { "$value": "{color.white}", "$description": "Cards, panels" }
+    },
+    "text": {
+      "primary": { "$value": "{color.gray.900}" },
+      "secondary": { "$value": "{color.gray.600}" },
+      "inverse": { "$value": "{color.white}" }
+    },
+    "border": {
+      "subtle": { "$value": "{color.gray.200}" },
+      "focus": { "$value": "{color.blue.500}" }
+    },
+    "action": {
+      "primary": {
+        "background": { "$value": "{color.blue.500}" },
+        "background-hover": { "$value": "{color.blue.600}" },
+        "foreground": { "$value": "{color.white}" }
+      },
+      "secondary": {
+        "background": { "$value": "{color.gray.100}" },
+        "background-hover": { "$value": "{color.gray.200}" },
+        "foreground": { "$value": "{color.gray.900}" }
+      },
+      "ghost": {
+        "background": { "$value": "{color.transparent}" },
+        "background-hover": { "$value": "{color.gray.100}" },
+        "foreground": { "$value": "{color.gray.900}" }
+      },
+      "danger": {
+        "background": { "$value": "{color.red.500}" },
+        "background-hover": { "$value": "{color.red.600}" },
+        "foreground": { "$value": "{color.white}" }
+      }
+    }
+  },
+  "space": {
+    "$type": "dimension",
+    "inset": {
+      "sm": { "$value": "{space.2}" },
+      "md": { "$value": "{space.3}" },
+      "lg": { "$value": "{space.4}" }
+    },
+    "stack": {
+      "sm": { "$value": "{space.2}" },
+      "md": { "$value": "{space.4}" }
+    }
+  },
+  "radius": {
+    "$type": "dimension",
+    "control": { "$value": "{radius.md}", "$description": "Buttons, inputs" },
+    "container": { "$value": "{radius.lg}", "$description": "Cards, dialogs" }
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "id": "ds.card",
+  "name": "Card",
+  "version": "0.1.0",
+  "status": "draft",
+  "description": "Groups related content and actions on a raised surface.",
+  "semantics": { "element": "article" },
+  "props": [
+    { "name": "title", "description": "Heading shown in the header.", "type": "text" },
+    { "name": "padding", "description": "Inner spacing.", "type": { "enum": ["md", "lg"] }, "default": "md" }
+  ],
+  "states": [],
+  "anatomy": {
+    "root": {
+      "element": "article",
+      "layout": { "display": "flex", "direction": "column", "gap": "{space.stack.md}" },
+      "tokens": {
+        "background-color": "{color.surface.raised}",
+        "color": "{color.text.primary}",
+        "border-color": "{color.border.subtle}",
+        "border-width": "{border.width}",
+        "border-radius": "{radius.container}",
+        "padding": "{space.inset.{padding}}",
+        "font-family": "{font.family.sans}"
+      },
+      "parts": {
+        "header": {
+          "element": "h3",
+          "optional": true,
+          "content": { "prop": "title" },
+          "tokens": { "font-size": "{font.size.lg}", "font-weight": "{font.weight.semibold}" }
+        },
+        "body": {
+          "element": "div",
+          "slot": { "acceptsMode": "open" },
+          "tokens": { "font-size": "{font.size.md}", "color": "{color.text.secondary}" }
+        },
+        "actions": {
+          "element": "footer",
+          "optional": true,
+          "layout": { "display": "flex", "direction": "row", "gap": "{space.inset.sm}", "justify": "end" },
+          "slot": { "accepts": ["ds.button"], "acceptsMode": "restrict", "max": 3 }
+        }
+      }
+    }
+  },
+  "a11y": { "focusVisible": false, "contrast": "AA" },
+  "usage": {
+    "when": ["grouping a summary with its actions", "showing one item of a collection", "a report section"],
+    "whenNot": ["wrapping an entire page", "nesting cards inside cards"],
+    "intents": ["summarize", "report", "list-item", "detail"]
+  },
+  "relationships": {
+    "pairsWith": [],
+    "excludes": ["ds.card"],
+    "contains": ["ds.button"],
+    "within": []
+  },
+  "channels": {
+    "web": { "support": "native" },
+    "widget": { "support": "native" },
+    "slack": { "support": "degraded", "as": "header + section + actions blocks", "note": "no surface or border; title becomes a header block" },
+    "markdown": { "support": "degraded", "as": "heading + paragraph + options", "note": "actions become a numbered list" }
+  },
+  "examples": [
+    {
+      "name": "Report summary",
+      "tree": {
+        "component": "ds.card",
+        "props": { "title": "Weekly report" },
+        "slots": {
+          "body": ["12 components changed, 3 tokens added."],
+          "actions": [
+            { "component": "ds.button", "props": { "label": "Open report" } },
+            { "component": "ds.button", "props": { "label": "Dismiss", "variant": "ghost" } }
+          ]
+        }
+      }
+    }
+  ]
+}

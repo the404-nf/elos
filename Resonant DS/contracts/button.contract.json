@@ -1,0 +1,62 @@
+{
+  "id": "ds.button",
+  "name": "Button",
+  "version": "0.1.0",
+  "status": "draft",
+  "description": "Triggers an action. One primary button per context.",
+  "semantics": { "element": "button", "role": "button" },
+  "behavior": "pressable",
+  "props": [
+    { "name": "variant", "description": "Visual prominence of the action.", "type": { "enum": ["primary", "secondary", "ghost", "danger"] }, "default": "primary" },
+    { "name": "size", "description": "Control size.", "type": { "enum": ["sm", "md", "lg"] }, "default": "md" },
+    { "name": "disabled", "description": "Prevents interaction.", "type": "boolean", "default": false },
+    { "name": "label", "description": "Visible text.", "type": "text", "required": true }
+  ],
+  "states": ["hover", "focus-visible", "disabled"],
+  "anatomy": {
+    "root": {
+      "element": "button",
+      "layout": { "display": "inline-flex", "align": "center", "justify": "center", "gap": "{space.inset.sm}" },
+      "tokens": {
+        "background-color": "{color.action.{variant}.background}",
+        "color": "{color.action.{variant}.foreground}",
+        "padding-inline": "{space.inset.{size}}",
+        "padding-block": "{space.inset.sm}",
+        "border-radius": "{radius.control}",
+        "font-family": "{font.family.sans}",
+        "font-size": "{font.size.{size}}",
+        "font-weight": "{font.weight.medium}"
+      },
+      "states": {
+        "hover": { "background-color": "{color.action.{variant}.background-hover}" },
+        "focus-visible": { "outline-color": "{color.border.focus}" },
+        "disabled": { "opacity": "{opacity.disabled}" }
+      },
+      "parts": {
+        "label": { "element": "span", "content": { "prop": "label" } }
+      }
+    }
+  },
+  "a11y": { "focusVisible": true, "minHitArea": 44, "contrast": "AA" },
+  "usage": {
+    "when": ["user must trigger an action", "submitting a form", "confirming or cancelling"],
+    "whenNot": ["navigating to another page (use ds.link)", "more than one primary action in a view"],
+    "intents": ["submit", "confirm", "cancel", "create", "delete", "retry"]
+  },
+  "relationships": {
+    "pairsWith": [],
+    "excludes": [],
+    "contains": [],
+    "within": ["ds.card"]
+  },
+  "channels": {
+    "web": { "support": "native" },
+    "widget": { "support": "native" },
+    "slack": { "support": "native", "as": "actions.button", "note": "danger maps to style=danger, primary to style=primary, others plain" },
+    "markdown": { "support": "degraded", "as": "link or numbered option", "note": "no interaction; render label as an option the agent can act on" }
+  },
+  "examples": [
+    { "name": "Primary", "tree": { "component": "ds.button", "props": { "label": "Save changes" } } },
+    { "name": "Danger small", "tree": { "component": "ds.button", "props": { "label": "Delete", "variant": "danger", "size": "sm" } } }
+  ]
+}
