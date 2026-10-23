@@ -1,0 +1,33 @@
+{
+  "id": "ds.option",
+  "name": "Option",
+  "version": "0.1.0",
+  "status": "draft",
+  "category": "form",
+  "description": "One choice inside a Select.",
+  "semantics": { "element": "option" },
+  "props": [
+    { "name": "value", "description": "Submitted value.", "type": "text", "required": true, "attribute": "value" },
+    { "name": "label", "description": "Visible text.", "type": "text", "required": true }
+  ],
+  "states": [],
+  "anatomy": {
+    "root": { "description": "Native option.", "element": "option", "content": { "prop": "label" } }
+  },
+  "a11y": { "focusVisible": false, "contrast": "AA", "keyboard": [], "aria": [] },
+  "usage": {
+    "when": ["inside ds.select only"],
+    "whenNot": ["anywhere else"],
+    "intents": ["option", "choice"],
+    "alternatives": []
+  },
+  "guidelines": { "do": ["keep labels short and parallel"], "dont": ["encode meaning only in value"] },
+  "relationships": { "pairsWith": [], "excludes": [], "contains": [], "within": ["ds.select"] },
+  "channels": {
+    "web": { "support": "native" },
+    "widget": { "support": "native" },
+    "slack": { "support": "native", "as": "option" },
+    "markdown": { "support": "native", "as": "list item" }
+  },
+  "examples": []
+}

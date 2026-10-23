@@ -1,0 +1,33 @@
+{
+  "id": "ds.tab-panel",
+  "name": "Tab panel",
+  "version": "0.1.0",
+  "status": "draft",
+  "category": "navigation",
+  "description": "Content shown when its tab is selected.",
+  "semantics": { "element": "div", "role": "tabpanel" },
+  "behavior": "tabs.panel",
+  "props": [
+    { "name": "value", "description": "Matches a ds.tab value.", "type": "text", "required": true }
+  ],
+  "states": [],
+  "anatomy": {
+    "root": {
+      "description": "Hidden unless selected; any content.",
+      "element": "div",
+      "slot": { "acceptsMode": "open" },
+      "tokens": { "padding-block": "{space.inset.sm}" }
+    }
+  },
+  "a11y": { "focusVisible": false, "contrast": "AA", "keyboard": [], "aria": ["role tabpanel and aria-labelledby from the behavior"] },
+  "usage": { "when": ["inside the panels slot of ds.tabs only"], "whenNot": ["anywhere else"], "intents": ["tab content"], "alternatives": [] },
+  "guidelines": { "do": ["keep panels similar in height"], "dont": ["put a form submit inside one panel only"] },
+  "relationships": { "pairsWith": ["ds.tab"], "excludes": [], "contains": [], "within": ["ds.tabs"] },
+  "channels": {
+    "web": { "support": "native" },
+    "widget": { "support": "native" },
+    "slack": { "support": "degraded", "as": "section" },
+    "markdown": { "support": "degraded", "as": "section body" }
+  },
+  "examples": []
+}

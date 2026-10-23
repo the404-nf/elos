@@ -38,13 +38,14 @@ test("tools expose the menu, contracts, tokens and validation over MCP", async (
   const bad = await call("validate_composition", { tree: { component: "ds.card", slots: { actions: [{ component: "ds.card" }] } } });
   assert.equal(bad.isError, true);
   assert.match(bad.data.errors[0], /accepts only ds.button/);
-  const good = await call("validate_composition", { tree: catalog.contracts[1]!.examples[0]!.tree });
+  const good = await call("validate_composition", { tree: catalog.contracts.find((c) => c.id === "ds.card")!.examples[0]!.tree });
   assert.deepEqual(good.data, { valid: true, errors: [] });
 });
 
 test("find_component ranks by intent and flags when-not rules", () => {
   const r = findComponents(catalog, "summarize the weekly report with a delete action");
-  assert.deepEqual(r.map((x) => x.id), ["ds.card", "ds.button"]);
+  assert.equal(r[0]!.id, "ds.card");
+  assert.deepEqual(r.find((x) => x.id === "ds.button")!.matched, ["delete", "action"]);
   const nav = findComponents(catalog, "navigating to another page");
   assert.deepEqual(nav[0]!.caution, ["navigating to another page"]);
   assert.deepEqual(findComponents(catalog, "zebra"), []);

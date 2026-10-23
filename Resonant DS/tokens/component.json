@@ -1,0 +1,18 @@
+{
+  "switch": {
+    "$type": "dimension",
+    "track": {
+      "width": { "$value": { "value": 36, "unit": "px" } },
+      "height": { "$value": { "value": 20, "unit": "px" } }
+    },
+    "thumb": {
+      "size": { "$value": { "value": 16, "unit": "px" } },
+      "offset": { "$value": { "value": 2, "unit": "px" } },
+      "travel": { "$value": { "value": 16, "unit": "px" }, "$description": "track.width - thumb.size - 2 * thumb.offset" }
+    }
+  },
+  "dialog": {
+    "$type": "dimension",
+    "width": { "$value": { "value": 480, "unit": "px" } }
+  }
+}

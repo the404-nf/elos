@@ -1,0 +1,74 @@
+{
+  "id": "ds.stack",
+  "name": "Stack",
+  "version": "0.1.0",
+  "status": "draft",
+  "category": "layout",
+  "description": "Arranges children in a row or column with consistent spacing.",
+  "semantics": { "element": "div" },
+  "props": [
+    { "name": "direction", "description": "Main axis.", "type": { "enum": ["row", "column"] }, "default": "column" },
+    { "name": "gap", "description": "Space between children.", "type": { "enum": ["sm", "md", "lg"] }, "default": "md" },
+    { "name": "align", "description": "Cross-axis alignment.", "type": { "enum": ["start", "center", "end", "stretch"] }, "default": "stretch" }
+  ],
+  "states": [],
+  "anatomy": {
+    "root": {
+      "description": "Flex container. Children keep their own spacing rules.",
+      "element": "div",
+      "layout": { "display": "flex", "gap": "{space.stack.{gap}}" },
+      "stylesByProp": {
+        "direction": { "row": { "flex-direction": "row" }, "column": { "flex-direction": "column" } },
+        "align": { "start": { "align-items": "flex-start" }, "center": { "align-items": "center" }, "end": { "align-items": "flex-end" }, "stretch": { "align-items": "stretch" } }
+      },
+      "slot": { "acceptsMode": "open" }
+    }
+  },
+  "a11y": { "focusVisible": false, "contrast": "AA", "keyboard": [], "aria": ["purely visual; adds no semantics"] },
+  "usage": {
+    "when": ["placing several components in sequence", "a form, a toolbar, a list of cards"],
+    "whenNot": ["a single child", "a two-dimensional grid"],
+    "intents": ["layout", "arrange", "group", "list", "toolbar", "form"],
+    "alternatives": []
+  },
+  "guidelines": {
+    "do": ["nest stacks for row-in-column layouts", "let the gap token carry the rhythm"],
+    "dont": ["add margins to children; use gap", "use a stack for one child"]
+  },
+  "relationships": { "pairsWith": [], "excludes": [], "contains": [], "within": [] },
+  "channels": {
+    "web": { "support": "native" },
+    "widget": { "support": "native" },
+    "slack": { "support": "degraded", "as": "blocks in order", "note": "row direction becomes a sequence; Slack has no horizontal layout except actions" },
+    "markdown": { "support": "degraded", "as": "paragraphs in order" }
+  },
+  "examples": [
+    {
+      "name": "Column of text",
+      "tree": {
+        "component": "ds.stack",
+        "props": { "gap": "sm" },
+        "slots": {
+          "root": [
+            { "component": "ds.text", "props": { "as": "h2", "variant": "heading", "text": "Tokens" } },
+            { "component": "ds.text", "props": { "tone": "secondary", "text": "61 resolved, 2 themes." } }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Row toolbar",
+      "tree": {
+        "component": "ds.stack",
+        "props": { "direction": "row", "gap": "sm", "align": "center" },
+        "slots": {
+          "root": [
+            { "component": "ds.button", "props": { "label": "Publish" } },
+            { "component": "ds.button", "props": { "label": "Discard", "variant": "ghost" } },
+            { "component": "ds.badge", "props": { "label": "draft" } }
+          ]
+        }
+      }
+    }
+  ]
+}

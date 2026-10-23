@@ -11,7 +11,9 @@ Elos stores design systems and makes them usable by humans and AI agents alike. 
 |---|---|
 | `packages/contracts` | Zod schemas for contracts, tokens, compositions, manifests and the built catalog |
 | `packages/core` | Loads a design system directory, validates it, resolves tokens, emits `catalog.json`, `tokens.css`, `components.css` and JSON Schemas |
-| `packages/react` | Data-driven React renderer: draws any composition tree from the catalog using contract anatomy; behavior seam for Zag.js machines |
+| `packages/react` | Data-driven React renderer: draws any composition tree from the catalog using contract anatomy; `behaviors` maps Zag.js machines (dialog, tabs, switch) onto anatomy parts |
+| `packages/mcp` | Read-only MCP server over a catalog: list, get, find by intent, tokens, validate composition |
+| `apps/playground` | Vite app rendering every contract example in every theme with real behavior |
 | `Resonant DS/` | The Resonant design system: `system.json`, `tokens/`, `themes/`, `contracts/` |
 
 ## Commands
@@ -19,7 +21,8 @@ Elos stores design systems and makes them usable by humans and AI agents alike. 
 ```bash
 pnpm install
 pnpm run build:resonant   # emits Resonant DS/dist
-pnpm run preview:resonant # emits Resonant DS/dist/preview.html, every example in every theme
+pnpm run preview:resonant # emits Resonant DS/dist/preview.html, static, every example in every theme
+pnpm run playground       # builds the catalog and serves the interactive playground on :5173
 pnpm test
 pnpm run typecheck
 ```

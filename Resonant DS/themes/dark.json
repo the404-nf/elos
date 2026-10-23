@@ -13,6 +13,13 @@
     "border": {
       "subtle": { "$value": "{color.gray.800}" }
     },
+    "status": {
+      "neutral": { "background": { "$value": "{color.gray.800}" }, "foreground": { "$value": "{color.gray.50}" } },
+      "info": { "background": { "$value": "{color.blue.700}" }, "foreground": { "$value": "{color.white}" } },
+      "success": { "background": { "$value": "{color.green.700}" }, "foreground": { "$value": "{color.white}" } },
+      "warning": { "background": { "$value": "{color.amber.700}" }, "foreground": { "$value": "{color.white}" } },
+      "danger": { "background": { "$value": "{color.red.700}" }, "foreground": { "$value": "{color.white}" } }
+    },
     "action": {
       "secondary": {
         "background": { "$value": "{color.gray.800}" },

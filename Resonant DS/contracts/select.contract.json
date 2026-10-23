@@ -1,0 +1,80 @@
+{
+  "id": "ds.select",
+  "name": "Select",
+  "version": "0.1.0",
+  "status": "draft",
+  "category": "form",
+  "description": "Pick one value from a fixed list.",
+  "semantics": { "element": "select" },
+  "props": [
+    { "name": "name", "description": "Form field name.", "type": "text", "attribute": "name" },
+    { "name": "size", "description": "Control size.", "type": { "enum": ["sm", "md"] }, "default": "md" },
+    { "name": "disabled", "description": "Prevents changes.", "type": "boolean", "default": false, "attribute": "disabled" },
+    { "name": "invalid", "description": "Marks the value as failing validation.", "type": "boolean", "default": false, "attribute": "aria-invalid" }
+  ],
+  "states": ["focus-visible", "disabled", "invalid"],
+  "anatomy": {
+    "root": {
+      "description": "Native select; options are ds.option children.",
+      "element": "select",
+      "slot": { "accepts": ["ds.option"], "acceptsMode": "restrict", "min": 1 },
+      "tokens": {
+        "background-color": "{color.surface.raised}",
+        "color": "{color.text.primary}",
+        "border-color": "{color.border.subtle}",
+        "border-width": "{border.width}",
+        "border-radius": "{radius.control}",
+        "padding-inline": "{space.inset.{size}}",
+        "padding-block": "{space.inset.sm}",
+        "font-size": "{font.size.{size}}",
+        "font-family": "{font.family.sans}"
+      },
+      "states": {
+        "focus-visible": { "border-color": "{color.border.focus}", "outline-color": "{color.border.focus}" },
+        "invalid": { "border-color": "{color.border.danger}" },
+        "disabled": { "opacity": "{opacity.disabled}" }
+      },
+      "styles": { "width": "100%", "box-sizing": "border-box" }
+    }
+  },
+  "a11y": {
+    "focusVisible": true,
+    "minHitArea": 44,
+    "contrast": "AA",
+    "keyboard": [{ "key": "ArrowUp/ArrowDown", "action": "change value" }, { "key": "Space/Enter", "action": "open list" }],
+    "aria": ["always paired with a visible label or aria-label"]
+  },
+  "usage": {
+    "when": ["one choice among roughly four to twenty known options"],
+    "whenNot": ["two or three options (use buttons or a switch)", "free text", "many options that need search"],
+    "intents": ["choose", "pick", "select option", "filter by category"],
+    "alternatives": [{ "component": "ds.input", "when": "the value is free text" }, { "component": "ds.tabs", "when": "the choice switches visible content" }]
+  },
+  "guidelines": {
+    "do": ["order options predictably", "give a sensible default"],
+    "dont": ["use a select for yes/no", "hide the primary action inside a select"]
+  },
+  "relationships": { "pairsWith": ["ds.text"], "excludes": [], "contains": ["ds.option"], "within": ["ds.stack", "ds.card", "ds.dialog"] },
+  "channels": {
+    "web": { "support": "native" },
+    "widget": { "support": "native" },
+    "slack": { "support": "native", "as": "static_select" },
+    "markdown": { "support": "degraded", "as": "numbered options to choose from" }
+  },
+  "examples": [
+    {
+      "name": "Status",
+      "tree": {
+        "component": "ds.select",
+        "props": { "name": "status" },
+        "slots": {
+          "root": [
+            { "component": "ds.option", "props": { "value": "draft", "label": "Draft" } },
+            { "component": "ds.option", "props": { "value": "stable", "label": "Stable" } },
+            { "component": "ds.option", "props": { "value": "deprecated", "label": "Deprecated" } }
+          ]
+        }
+      }
+    }
+  ]
+}

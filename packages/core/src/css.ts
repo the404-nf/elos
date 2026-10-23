@@ -1,5 +1,5 @@
 // Turns a contract's anatomy into CSS rules bound to token variables.
-// Framework-agnostic: the React renderer, the HTML widget and the portal preview all use this output.
+// Framework-agnostic and browser-safe: the React renderer, the HTML widget and the portal preview all use this output.
 import type { Contract, Part, State } from "@elos/contracts";
 
 export const cssVar = (path: string) => `--${path.replace(/\./g, "-")}`;
@@ -10,8 +10,9 @@ const STATE_SELECTORS: Record<State, string[]> = {
   active: [":active"],
   disabled: [":disabled", "[data-disabled]"],
   selected: ["[data-selected]"],
+  checked: [":checked", '[data-state="checked"]'],
   open: ['[data-state="open"]'],
-  invalid: ['[aria-invalid="true"]'],
+  invalid: ['[aria-invalid="true"]', "[data-invalid]"],
 };
 
 const LAYOUT_PROPS: Record<string, string> = { display: "display", direction: "flex-direction", align: "align-items", justify: "justify-content" };
@@ -48,10 +49,14 @@ function baseDecls(part: Part): Decls {
     const v = part.layout?.[k as keyof NonNullable<Part["layout"]>];
     if (v) d[cssProp] = v;
   }
-  if (part.layout?.gap) d.gap = `var(${cssVar(part.layout.gap.slice(1, -1))})`;
   if (part.element === "button") Object.assign(d, { border: "0", cursor: "pointer", font: "inherit" });
-  if (part.tokens && "border-width" in part.tokens) d["border-style"] = "solid"; // tokens cannot express a style keyword
+  if (part.element === "input" || part.element === "select") Object.assign(d, { font: "inherit" });
+  for (const key of Object.keys(part.tokens ?? {})) {
+    const m = key.match(/^(border(?:-\w+)?)-width$/); // tokens cannot express a style keyword
+    if (m) d[`${m[1]}-style`] = "solid";
+  }
   if (part.states && "focus-visible" in part.states) Object.assign(d, { outline: "2px solid transparent", "outline-offset": "2px" });
+  Object.assign(d, part.styles ?? {});
   return d;
 }
 
@@ -72,12 +77,16 @@ export function emitComponentCss(contract: Contract): string {
   };
 
   const visit = (name: string, part: Part) => {
-    const rules = expandBindings(part.tokens ?? {}, enums);
+    const bindings = { ...part.tokens, ...(part.layout?.gap ? { gap: part.layout.gap } : {}) };
+    const rules = expandBindings(bindings, enums);
     const baseIdx = rules.findIndex((r) => Object.keys(r.attrs).length === 0);
     const base = baseIdx >= 0 ? rules.splice(baseIdx, 1)[0]! : { attrs: {}, decls: {} };
     base.decls = { ...baseDecls(part), ...base.decls };
     rules.unshift(base);
+    for (const [prop, byValue] of Object.entries(part.stylesByProp ?? {}))
+      for (const [value, styles] of Object.entries(byValue)) rules.push({ attrs: { [prop]: value }, decls: { ...styles } });
     for (const [state, bindings] of Object.entries(part.states ?? {})) rules.push(...expandBindings(bindings, enums, state as State));
+    for (const [state, styles] of Object.entries(part.stylesByState ?? {})) rules.push({ attrs: {}, state: state as State, decls: { ...styles } });
     for (const [prop, byValue] of Object.entries(part.tokensByProp ?? {}))
       for (const [value, bindings] of Object.entries(byValue))
         rules.push(...expandBindings(bindings, enums).map((r) => ({ ...r, attrs: { ...r.attrs, [prop]: value } })));

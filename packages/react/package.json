@@ -3,9 +3,21 @@
   "version": "0.0.1",
   "private": true,
   "type": "module",
-  "exports": { ".": "./src/index.ts" },
-  "dependencies": { "@elos/contracts": "workspace:*", "@elos/core": "workspace:*" },
-  "peerDependencies": { "react": ">=19" },
+  "exports": {
+    ".": "./src/index.ts",
+    "./behaviors": "./src/behaviors.ts"
+  },
+  "dependencies": {
+    "@elos/contracts": "workspace:*",
+    "@elos/core": "workspace:*",
+    "@zag-js/dialog": "^1.46.0",
+    "@zag-js/react": "^1.46.0",
+    "@zag-js/switch": "^1.46.0",
+    "@zag-js/tabs": "^1.46.0"
+  },
+  "peerDependencies": {
+    "react": ">=19"
+  },
   "devDependencies": {
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",

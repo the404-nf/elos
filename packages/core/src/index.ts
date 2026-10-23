@@ -134,7 +134,8 @@ export function emitCss(catalog: Catalog): string {
   return [block(":root", catalog.tokens.base), ...themes].join("\n");
 }
 
-export const emitComponentsCss = (catalog: Catalog) => catalog.contracts.map(emitComponentCss).join("\n");
+// Behaviors toggle `hidden`; it must win over any emitted display value.
+export const emitComponentsCss = (catalog: Catalog) => ["[hidden] {\n  display: none !important;\n}\n", ...catalog.contracts.map(emitComponentCss)].join("\n");
 
 export function build(dir: string, outDir = join(dir, "dist")): Catalog {
   const catalog = loadSystem(dir);

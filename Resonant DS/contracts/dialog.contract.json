@@ -1,0 +1,114 @@
+{
+  "id": "ds.dialog",
+  "name": "Dialog",
+  "version": "0.1.0",
+  "status": "draft",
+  "category": "overlay",
+  "description": "Modal that interrupts for a decision or a focused task. Opened by its trigger, closed by Escape, the backdrop or Close.",
+  "semantics": { "element": "div" },
+  "behavior": "dialog",
+  "props": [
+    { "name": "title", "description": "Names the decision or task.", "type": "text", "required": true },
+    { "name": "description", "description": "One sentence of consequence or context.", "type": "text" },
+    { "name": "open", "description": "Open at first render.", "type": "boolean", "default": false }
+  ],
+  "states": ["open"],
+  "anatomy": {
+    "root": {
+      "description": "Holds the trigger in flow and the overlay out of flow.",
+      "element": "div",
+      "layout": { "display": "inline-flex" },
+      "parts": {
+        "trigger": {
+          "description": "Exactly one button; the behavior's trigger props are merged onto it.",
+          "element": "div",
+          "layout": { "display": "inline-flex" },
+          "slot": { "accepts": ["ds.button"], "acceptsMode": "restrict", "min": 1, "max": 1, "decorate": "trigger" }
+        },
+        "backdrop": {
+          "description": "Dims the page; click closes.",
+          "element": "div",
+          "styles": { "position": "fixed", "inset": "0", "z-index": "40" },
+          "tokens": { "background-color": "{color.overlay.backdrop}" }
+        },
+        "positioner": {
+          "description": "Centers the content.",
+          "element": "div",
+          "styles": { "position": "fixed", "inset": "0", "z-index": "50" },
+          "layout": { "display": "flex", "align": "center", "justify": "center" },
+          "parts": {
+            "content": {
+              "description": "The dialog surface; role dialog, aria-modal, focus trapped.",
+              "element": "div",
+              "layout": { "display": "flex", "direction": "column", "gap": "{space.stack.md}" },
+              "tokens": {
+                "background-color": "{color.surface.raised}",
+                "color": "{color.text.primary}",
+                "border-radius": "{radius.container}",
+                "padding": "{space.inset.lg}",
+                "max-width": "{dialog.width}",
+                "font-family": "{font.family.sans}"
+              },
+              "styles": { "width": "100%", "box-sizing": "border-box" },
+              "parts": {
+                "title": { "description": "Labels the dialog.", "element": "h2", "content": { "prop": "title" }, "tokens": { "font-size": "{type.title.size}", "font-weight": "{type.title.weight}" }, "styles": { "margin": "0" } },
+                "description": { "description": "Optional supporting sentence.", "element": "p", "optional": true, "content": { "prop": "description" }, "tokens": { "color": "{color.text.secondary}" }, "styles": { "margin": "0" } },
+                "body": { "description": "Any content, e.g. a form.", "element": "div", "optional": true, "slot": { "acceptsMode": "open" } },
+                "footer": {
+                  "description": "Close on the left, actions on the right.",
+                  "element": "footer",
+                  "layout": { "display": "flex", "direction": "row", "align": "center", "justify": "space-between" },
+                  "parts": {
+                    "close": { "description": "Always present so the dialog can be dismissed.", "component": { "id": "ds.button", "props": { "label": "Close", "variant": "ghost" } } },
+                    "actions": {
+                      "description": "Up to two buttons; the primary or danger action last.",
+                      "element": "div",
+                      "layout": { "display": "flex", "direction": "row", "gap": "{space.inset.sm}" },
+                      "slot": { "accepts": ["ds.button"], "acceptsMode": "restrict", "max": 2 }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "a11y": {
+    "focusVisible": true,
+    "contrast": "AA",
+    "keyboard": [{ "key": "Escape", "action": "close" }, { "key": "Tab", "action": "cycle focus inside the dialog" }],
+    "aria": ["role dialog, aria-modal, aria-labelledby title and aria-describedby description from the behavior", "focus returns to the trigger on close"]
+  },
+  "usage": {
+    "when": ["confirming a destructive or irreversible action", "a short focused task that must finish before continuing"],
+    "whenNot": ["information that does not block (use ds.card)", "long forms or multi-step flows", "anything that opens on page load without user intent"],
+    "intents": ["confirm", "modal", "destructive action", "focused task", "ask before"],
+    "alternatives": [{ "component": "ds.card", "when": "the content does not need to block the page" }]
+  },
+  "guidelines": {
+    "do": ["name the action in the title and the primary button", "state the consequence in the description"],
+    "dont": ["stack dialogs", "use OK as a button label", "put the danger action on the left"]
+  },
+  "relationships": { "pairsWith": [], "excludes": ["ds.dialog"], "contains": ["ds.button"], "within": [] },
+  "channels": {
+    "web": { "support": "native" },
+    "widget": { "support": "native" },
+    "slack": { "support": "degraded", "as": "modal view opened by the trigger button", "note": "views.open with the title and body blocks" },
+    "markdown": { "support": "degraded", "as": "a confirmation question with the options" }
+  },
+  "examples": [
+    {
+      "name": "Confirm delete",
+      "tree": {
+        "component": "ds.dialog",
+        "props": { "title": "Delete project?", "description": "This removes every version. It cannot be undone." },
+        "slots": {
+          "trigger": [{ "component": "ds.button", "props": { "label": "Delete project", "variant": "danger" } }],
+          "actions": [{ "component": "ds.button", "props": { "label": "Delete", "variant": "danger" } }]
+        }
+      }
+    }
+  ]
+}

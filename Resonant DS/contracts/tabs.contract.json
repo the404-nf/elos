@@ -1,0 +1,79 @@
+{
+  "id": "ds.tabs",
+  "name": "Tabs",
+  "version": "0.1.0",
+  "status": "draft",
+  "category": "navigation",
+  "description": "Switches between views of related content in the same place.",
+  "semantics": { "element": "div" },
+  "behavior": "tabs",
+  "props": [
+    { "name": "defaultValue", "description": "Value of the tab selected at first.", "type": "text", "required": true }
+  ],
+  "states": [],
+  "anatomy": {
+    "root": {
+      "description": "Owns the selection state shared by its tabs and panels.",
+      "element": "div",
+      "layout": { "display": "flex", "direction": "column", "gap": "{space.stack.md}" },
+      "parts": {
+        "list": {
+          "description": "The tablist. Only ds.tab children.",
+          "element": "div",
+          "slot": { "accepts": ["ds.tab"], "acceptsMode": "restrict", "min": 1 },
+          "layout": { "display": "flex", "direction": "row", "gap": "{space.inset.sm}" },
+          "tokens": { "border-bottom-color": "{color.border.subtle}", "border-bottom-width": "{border.width}" }
+        },
+        "panels": {
+          "description": "One ds.tab-panel per tab, matched by value.",
+          "element": "div",
+          "slot": { "accepts": ["ds.tab-panel"], "acceptsMode": "restrict", "min": 1 }
+        }
+      }
+    }
+  },
+  "a11y": {
+    "focusVisible": true,
+    "contrast": "AA",
+    "keyboard": [{ "key": "ArrowLeft/ArrowRight", "action": "move between tabs" }, { "key": "Home/End", "action": "first/last tab" }],
+    "aria": ["tablist, tab and tabpanel roles with aria-selected and aria-controls, provided by the behavior"]
+  },
+  "usage": {
+    "when": ["two to six peer views of one subject", "settings sections", "code vs preview"],
+    "whenNot": ["sequential steps (use a stepper)", "navigation between pages", "comparing views side by side"],
+    "intents": ["switch view", "sections", "organize", "settings"],
+    "alternatives": [{ "component": "ds.select", "when": "there are more than six views" }]
+  },
+  "guidelines": {
+    "do": ["give every tab a panel with the same value", "keep labels to one or two words"],
+    "dont": ["nest tabs", "use tabs for a wizard"]
+  },
+  "relationships": { "pairsWith": [], "excludes": ["ds.tabs"], "contains": ["ds.tab", "ds.tab-panel"], "within": ["ds.card", "ds.stack"] },
+  "channels": {
+    "web": { "support": "native" },
+    "widget": { "support": "native" },
+    "slack": { "support": "degraded", "as": "actions buttons that re-render the message", "note": "only the selected panel is shown" },
+    "markdown": { "support": "degraded", "as": "sections with headings" }
+  },
+  "examples": [
+    {
+      "name": "Component page",
+      "tree": {
+        "component": "ds.tabs",
+        "props": { "defaultValue": "preview" },
+        "slots": {
+          "list": [
+            { "component": "ds.tab", "props": { "value": "preview", "label": "Preview" } },
+            { "component": "ds.tab", "props": { "value": "contract", "label": "Contract" } },
+            { "component": "ds.tab", "props": { "value": "usage", "label": "Usage" } }
+          ],
+          "panels": [
+            { "component": "ds.tab-panel", "props": { "value": "preview" }, "slots": { "root": [{ "component": "ds.text", "props": { "text": "Rendered examples go here." } }] } },
+            { "component": "ds.tab-panel", "props": { "value": "contract" }, "slots": { "root": [{ "component": "ds.text", "props": { "text": "The JSON contract." } }] } },
+            { "component": "ds.tab-panel", "props": { "value": "usage" }, "slots": { "root": [{ "component": "ds.text", "props": { "text": "When to use, when not." } }] } }
+          ]
+        }
+      }
+    }
+  ]
+}

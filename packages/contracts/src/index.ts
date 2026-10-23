@@ -49,21 +49,35 @@ export const Prop = z.object({
   type: PropType,
   default: Scalar.optional(),
   required: z.boolean().default(false),
+  // Rendered as this HTML attribute on the root element (e.g. "placeholder", "disabled", "aria-invalid").
+  attribute: z.string().optional(),
 });
 
-export const State = z.enum(["hover", "focus-visible", "active", "disabled", "selected", "open", "invalid"]);
+export const State = z.enum(["hover", "focus-visible", "active", "disabled", "selected", "checked", "open", "invalid"]);
 export type State = z.infer<typeof State>;
 
 const TokenBindings = z.record(z.string(), TokenRef); // css-property -> token ref
 
+// Literal CSS a part may carry. Whitelisted: anything a token can express must be a token binding instead.
+export const StyleKey = z.enum([
+  "position", "inset", "top", "right", "bottom", "left", "z-index", "width", "min-width", "max-width", "height", "min-height", "max-height",
+  "overflow", "overflow-y", "flex", "flex-wrap", "flex-direction", "align-items", "justify-content", "align-self", "text-align", "white-space",
+  "cursor", "transform", "transition", "appearance", "box-sizing", "margin", "line-height", "text-transform", "letter-spacing", "resize", "display",
+]);
+const Styles = z.partialRecord(StyleKey, z.string());
+export type Styles = z.infer<typeof Styles>;
+
 export type Part = {
   description?: string;
-  element?: string;
+  element?: string; // HTML element, or "{prop}" to take it from an enum prop (e.g. Text's "as")
   tokens?: Record<string, string>;
   states?: Partial<Record<State, Record<string, string>>>;
   tokensByProp?: Record<string, Record<string, Record<string, string>>>;
+  styles?: Styles;
+  stylesByProp?: Record<string, Record<string, Styles>>;
+  stylesByState?: Partial<Record<State, Styles>>;
   layout?: { display?: "flex" | "grid" | "block" | "inline-flex"; direction?: "row" | "column"; align?: string; justify?: string; gap?: string };
-  slot?: { accepts?: string[]; acceptsMode?: "prefer" | "restrict" | "open"; min?: number; max?: number };
+  slot?: { accepts?: string[]; acceptsMode?: "prefer" | "restrict" | "open"; min?: number; max?: number; decorate?: string };
   component?: { id: string; props?: Record<string, string | number | boolean> };
   content?: { prop: string };
   optional?: boolean;
@@ -76,6 +90,9 @@ export const Part: z.ZodType<Part> = z.lazy(() =>
     tokens: TokenBindings.optional(),
     states: z.partialRecord(State, TokenBindings).optional(),
     tokensByProp: z.record(z.string(), z.record(z.string(), TokenBindings)).optional(),
+    styles: Styles.optional(),
+    stylesByProp: z.record(z.string(), z.record(z.string(), Styles)).optional(),
+    stylesByState: z.partialRecord(State, Styles).optional(),
     layout: z
       .object({
         display: z.enum(["flex", "grid", "block", "inline-flex"]).optional(),
@@ -91,6 +108,8 @@ export const Part: z.ZodType<Part> = z.lazy(() =>
         acceptsMode: z.enum(["prefer", "restrict", "open"]).optional(),
         min: z.number().int().min(0).optional(),
         max: z.number().int().min(1).optional(),
+        // Behavior part whose DOM props are merged onto each slotted child's root (e.g. a dialog's "trigger").
+        decorate: z.string().optional(),
       })
       .optional(),
     component: z.object({ id: ContractId, props: z.record(z.string(), Scalar).optional() }).optional(),

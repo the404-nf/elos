@@ -1,0 +1,55 @@
+{
+  "id": "ds.badge",
+  "name": "Badge",
+  "version": "0.1.0",
+  "status": "draft",
+  "category": "feedback",
+  "description": "Short status or category label.",
+  "semantics": { "element": "span", "role": "status" },
+  "props": [
+    { "name": "tone", "description": "Meaning of the status.", "type": { "enum": ["neutral", "info", "success", "warning", "danger"] }, "default": "neutral" },
+    { "name": "label", "description": "One or two words.", "type": "text", "required": true }
+  ],
+  "states": [],
+  "anatomy": {
+    "root": {
+      "description": "Pill with tinted background; color alone never carries the meaning, the label does.",
+      "element": "span",
+      "content": { "prop": "label" },
+      "layout": { "display": "inline-flex", "align": "center" },
+      "tokens": {
+        "background-color": "{color.status.{tone}.background}",
+        "color": "{color.status.{tone}.foreground}",
+        "padding-inline": "{space.inset.sm}",
+        "border-radius": "{radius.pill}",
+        "font-size": "{font.size.sm}",
+        "font-weight": "{font.weight.medium}",
+        "font-family": "{font.family.sans}"
+      },
+      "styles": { "line-height": "1.6", "white-space": "nowrap" }
+    }
+  },
+  "a11y": { "focusVisible": false, "contrast": "AA", "keyboard": [], "aria": ["the label must make sense without its color"] },
+  "usage": {
+    "when": ["showing a status (draft, stable, failed)", "tagging an item with a category", "a small count"],
+    "whenNot": ["interactive filters (use ds.button)", "long text"],
+    "intents": ["status", "tag", "label", "count", "category"],
+    "alternatives": [{ "component": "ds.button", "when": "the user can click it to filter or act" }]
+  },
+  "guidelines": {
+    "do": ["keep labels to one or two words", "use tone for meaning, not decoration"],
+    "dont": ["rely on color alone", "stack more than three badges on one item"]
+  },
+  "relationships": { "pairsWith": ["ds.text"], "excludes": [], "contains": [], "within": ["ds.card", "ds.stack"] },
+  "channels": {
+    "web": { "support": "native" },
+    "widget": { "support": "native" },
+    "slack": { "support": "degraded", "as": "inline text", "note": "tone becomes an emoji prefix" },
+    "markdown": { "support": "degraded", "as": "inline code or bold text" }
+  },
+  "examples": [
+    { "name": "Neutral", "tree": { "component": "ds.badge", "props": { "label": "draft" } } },
+    { "name": "Success", "tree": { "component": "ds.badge", "props": { "label": "stable", "tone": "success" } } },
+    { "name": "Danger", "tree": { "component": "ds.badge", "props": { "label": "deprecated", "tone": "danger" } } }
+  ]
+}

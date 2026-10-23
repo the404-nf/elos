@@ -6,7 +6,8 @@ import { Category, CompositionNode, type Catalog, type Contract } from "@elos/co
 import { findContract, validateComposition } from "@elos/core";
 
 const text = (data: unknown) => ({ content: [{ type: "text" as const, text: JSON.stringify(data, null, 2) }] });
-const words = (s: string) => s.toLowerCase().match(/[a-z0-9]+/g) ?? [];
+const STOP = new Set(["the", "and", "with", "for", "that", "this", "from", "into", "use", "when"]);
+const words = (s: string) => (s.toLowerCase().match(/[a-z0-9]+/g) ?? []).filter((w) => w.length > 2 && !STOP.has(w));
 
 /** Deterministic keyword ranking over the contract's enumerable guidance. */
 export function findComponents(catalog: Catalog, intent: string, limit = 5) {

@@ -3,7 +3,11 @@
   "version": "0.0.1",
   "private": true,
   "type": "module",
-  "exports": { ".": "./src/index.ts" },
+  "exports": {
+    ".": "./src/index.ts",
+    "./css": "./src/css.ts",
+    "./composition": "./src/composition.ts"
+  },
   "bin": { "elos-build": "./src/cli.ts" },
   "dependencies": { "@elos/contracts": "workspace:*", "zod": "^4.1.0" }
 }

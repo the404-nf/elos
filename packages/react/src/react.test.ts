@@ -5,9 +5,11 @@ import { createElement as h } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { loadSystem } from "@elos/core";
 import { ElosProvider, Render, createComponent, type Node } from "./index.ts";
+import { zagBehaviors } from "./behaviors.ts";
 
 const catalog = loadSystem(join(import.meta.dirname, "../../../Resonant DS"));
-const render = (tree: Node) => renderToStaticMarkup(h(ElosProvider, { catalog }, h(Render, { tree })));
+const render = (tree: Node) => renderToStaticMarkup(h(ElosProvider, { catalog, behaviors: zagBehaviors }, h(Render, { tree })));
+const example = (id: string, name: string) => catalog.contracts.find((c) => c.id === id)!.examples.find((e) => e.name === name)!.tree;
 
 test("card example renders anatomy, data attributes and nested buttons from the contract", () => {
   const html = render(catalog.contracts.find((c) => c.id === "ds.card")!.examples[0]!.tree);
@@ -27,6 +29,31 @@ test("refuses what the contract forbids instead of guessing", () => {
   assert.throws(() => render({ component: "ds.button", props: { label: "x", variant: "loud" } }), /must be one of/);
   assert.throws(() => render({ component: "ds.card", slots: { actions: [{ component: "ds.card" }] } }), /accepts only ds.button/);
   assert.throws(() => render({ component: "ds.toast", props: {} }), /Unknown component ds.toast/);
+});
+
+test("behaviors: Zag props land on the right parts, including a decorated slotted trigger", () => {
+  const dialog = render(example("ds.dialog", "Confirm delete"));
+  assert.match(dialog, /<button class="ds-button__root" data-variant="danger" data-size="md"[^>]*aria-haspopup="dialog"/); // slotted trigger decorated
+  assert.match(dialog, /<div class="ds-dialog__trigger"><button/); // the wrapper itself carries no trigger props
+  assert.match(dialog, /<div class="ds-dialog__content" [^>]*role="dialog"[^>]*aria-modal="true"/);
+  assert.match(dialog, /<div class="ds-dialog__positioner" [^>]*hidden=""/); // closed by default
+  assert.match(dialog, /<button class="ds-button__root" data-variant="ghost"[^>]*>(<span[^>]*>)?Close/); // close part is a referenced Button
+
+  const tabs = render(example("ds.tabs", "Component page"));
+  assert.match(tabs, /<div class="ds-tabs__list" [^>]*role="tablist"/);
+  assert.match(tabs, /<button class="ds-tab__root" [^>]*role="tab"[^>]*aria-selected="true"[^>]*data-selected=""[^>]*>Preview/);
+  assert.match(tabs, /<div class="ds-tab-panel__root" [^>]*role="tabpanel"[^>]*hidden=""[^>]*>.*The JSON contract/);
+
+  const sw = render(example("ds.switch", "On"));
+  assert.match(sw, /<input class="ds-switch__input" [^>]*type="checkbox"[^>]*role="switch"/);
+  assert.match(sw, /<span class="ds-switch__thumb" [^>]*data-state="checked"/);
+
+  assert.throws(() => render({ component: "ds.tab", props: { value: "x", label: "Orphan" } }), /must be placed inside ds.tabs/);
+});
+
+test("element from a prop, attributes from props", () => {
+  assert.match(render(example("ds.text", "Title")), /^<h1 class="ds-text__root" data-as="h1" data-variant="title" data-tone="primary">Design systems/);
+  assert.match(render(example("ds.input", "Invalid email")), /<input class="ds-input__root" [^>]*type="email"[^>]*placeholder="you@example.com"[^>]*aria-invalid="true"/);
 });
 
 test("createComponent maps children and named slots", () => {

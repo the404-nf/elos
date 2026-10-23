@@ -12,7 +12,18 @@
     },
     "border": {
       "subtle": { "$value": "{color.gray.200}" },
-      "focus": { "$value": "{color.blue.500}" }
+      "focus": { "$value": "{color.blue.500}" },
+      "danger": { "$value": "{color.red.500}" }
+    },
+    "overlay": {
+      "backdrop": { "$value": "{color.alpha.black-60}" }
+    },
+    "status": {
+      "neutral": { "background": { "$value": "{color.gray.100}" }, "foreground": { "$value": "{color.gray.800}" } },
+      "info": { "background": { "$value": "{color.blue.100}" }, "foreground": { "$value": "{color.blue.700}" } },
+      "success": { "background": { "$value": "{color.green.100}" }, "foreground": { "$value": "{color.green.700}" } },
+      "warning": { "background": { "$value": "{color.amber.100}" }, "foreground": { "$value": "{color.amber.700}" } },
+      "danger": { "background": { "$value": "{color.red.100}" }, "foreground": { "$value": "{color.red.700}" } }
     },
     "action": {
       "primary": {
@@ -46,12 +57,20 @@
     },
     "stack": {
       "sm": { "$value": "{space.2}" },
-      "md": { "$value": "{space.4}" }
+      "md": { "$value": "{space.4}" },
+      "lg": { "$value": "{space.6}" }
     }
   },
   "radius": {
     "$type": "dimension",
     "control": { "$value": "{radius.md}", "$description": "Buttons, inputs" },
-    "container": { "$value": "{radius.lg}", "$description": "Cards, dialogs" }
+    "container": { "$value": "{radius.lg}", "$description": "Cards, dialogs" },
+    "pill": { "$value": "{radius.full}", "$description": "Badges, switches" }
+  },
+  "type": {
+    "title": { "size": { "$type": "dimension", "$value": "{font.size.xl}" }, "weight": { "$type": "fontWeight", "$value": "{font.weight.semibold}" } },
+    "heading": { "size": { "$type": "dimension", "$value": "{font.size.lg}" }, "weight": { "$type": "fontWeight", "$value": "{font.weight.semibold}" } },
+    "body": { "size": { "$type": "dimension", "$value": "{font.size.md}" }, "weight": { "$type": "fontWeight", "$value": "{font.weight.regular}" } },
+    "caption": { "size": { "$type": "dimension", "$value": "{font.size.sm}" }, "weight": { "$type": "fontWeight", "$value": "{font.weight.regular}" } }
   }
 }

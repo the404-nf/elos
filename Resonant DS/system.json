@@ -2,7 +2,7 @@
   "id": "resonant",
   "name": "Resonant DS",
   "version": "0.1.0",
-  "tokens": ["tokens/primitive.json", "tokens/semantic.json"],
+  "tokens": ["tokens/primitive.json", "tokens/semantic.json", "tokens/component.json"],
   "themes": [
     { "name": "dark", "kind": "mode", "selector": "[data-theme=\"dark\"]", "overlay": "themes/dark.json" }
   ],

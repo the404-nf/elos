@@ -6,6 +6,7 @@ import { createElement as h } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { build, emitCss, emitComponentsCss } from "@elos/core";
 import { ElosProvider, Render } from "./index.ts";
+import { zagBehaviors } from "./behaviors.ts";
 
 const dir = process.argv[2];
 if (!dir) throw new Error("usage: preview <system-dir>");
@@ -18,7 +19,7 @@ const section = (theme: string, selectorAttr: string) => `
     .map(
       (c) => `<h3 style="margin:24px 0 8px; font-weight: 500">${c.name} <code style="opacity:.6">${c.id}</code></h3>
       <div style="display:flex; gap:16px; flex-wrap:wrap; align-items:flex-start">
-        ${c.examples.map((e) => renderToStaticMarkup(h(ElosProvider, { catalog }, h(Render, { tree: e.tree })))).join("\n")}
+        ${c.examples.map((e) => renderToStaticMarkup(h(ElosProvider, { catalog, behaviors: zagBehaviors }, h(Render, { tree: e.tree })))).join("\n")}
       </div>`,
     )
     .join("\n")}

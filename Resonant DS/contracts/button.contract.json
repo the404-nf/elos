@@ -9,7 +9,7 @@
   "props": [
     { "name": "variant", "description": "Visual prominence of the action.", "type": { "enum": ["primary", "secondary", "ghost", "danger"] }, "default": "primary" },
     { "name": "size", "description": "Control size.", "type": { "enum": ["sm", "md", "lg"] }, "default": "md" },
-    { "name": "disabled", "description": "Prevents interaction.", "type": "boolean", "default": false },
+    { "name": "disabled", "description": "Prevents interaction.", "type": "boolean", "default": false, "attribute": "disabled" },
     { "name": "label", "description": "Visible text.", "type": "text", "required": true }
   ],
   "states": ["hover", "focus-visible", "disabled"],
