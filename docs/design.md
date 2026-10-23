@@ -57,7 +57,9 @@ Each contract declares, per channel, whether support is native, degraded or unsu
 
 ## Portal
 
-Next.js with the App Router, Postgres through Drizzle, Better Auth, and the official TypeScript MCP SDK over stateless Streamable HTTP, all in one deploy. The portal is the Storybook: it renders tokens and components from the draft catalog at runtime, so edits preview without a rebuild. Editing works on contracts through forms, not on component source code. Two editing modes are planned: a visual canvas where the user adjusts a component directly, and an advanced mode with inputs and sliders for padding, radius, color, stroke and similar values. Both write token bindings and contract fields, never raw values, so relationships and themes stay intact. Resonant itself will be tuned this way in the portal.
+Next.js with the App Router, Postgres through Drizzle, Better Auth, and the official TypeScript MCP SDK over stateless Streamable HTTP, all in one deploy. The portal is the Storybook: it renders tokens and components from the draft catalog at runtime, so edits preview without a rebuild. Tokens and components are separate top-level areas in the navigation and on the page, with their own listing, detail and editing views. Editing a token shows it applied live inside real compositions, not a swatch: the components and examples that bind to it are rendered from the draft catalog, so the user sees the effect of a change in context before saving. The catalog already knows which components bind to each token, which is what drives that preview.
+
+Editing works on contracts through forms, not on component source code. Two editing modes are planned: a visual canvas where the user adjusts a component directly, and an advanced mode with inputs and sliders for padding, radius, color, stroke and similar values. Both write token bindings and contract fields, never raw values, so relationships and themes stay intact. Resonant itself will be tuned this way in the portal.
 
 Self-hosting is a requirement, so the portal depends on Postgres only. No vendor-specific storage, queues or functions.
 
