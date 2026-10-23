@@ -12,6 +12,8 @@ import {
   type ResolvedToken,
   type Theme,
 } from "@elos/contracts";
+import { cssVar, emitComponentCss } from "./css.ts";
+export { cssVar, emitComponentCss, partClass } from "./css.ts";
 
 type Raw = { type?: string; raw: unknown };
 type Flat = Map<string, Raw>;
@@ -121,8 +123,6 @@ export function loadSystem(dir: string): Catalog {
   return Catalog.parse({ system, builtAt: new Date().toISOString(), tokens, contracts });
 }
 
-export const cssVar = (path: string) => `--${path.replace(/\./g, "-")}`;
-
 export function emitCss(catalog: Catalog): string {
   const block = (selector: string, tokens: ResolvedToken[]) =>
     `${selector} {\n${tokens.map((t) => `  ${cssVar(t.path)}: ${t.value};`).join("\n")}\n}\n`;
@@ -133,11 +133,14 @@ export function emitCss(catalog: Catalog): string {
   return [block(":root", catalog.tokens.base), ...themes].join("\n");
 }
 
+export const emitComponentsCss = (catalog: Catalog) => catalog.contracts.map(emitComponentCss).join("\n");
+
 export function build(dir: string, outDir = join(dir, "dist")): Catalog {
   const catalog = loadSystem(dir);
   mkdirSync(join(outDir, "schema"), { recursive: true });
   writeFileSync(join(outDir, "catalog.json"), JSON.stringify(catalog, null, 2));
   writeFileSync(join(outDir, "tokens.css"), emitCss(catalog));
+  writeFileSync(join(outDir, "components.css"), emitComponentsCss(catalog));
   for (const [name, schema] of Object.entries(jsonSchemas()))
     writeFileSync(join(outDir, "schema", `${name}.schema.json`), JSON.stringify(schema, null, 2));
   return catalog;

@@ -6,6 +6,7 @@
   "engines": { "node": ">=24" },
   "scripts": {
     "build:resonant": "node packages/core/src/cli.ts \"Resonant DS\"",
+    "preview:resonant": "node packages/react/src/preview.ts \"Resonant DS\"",
     "test": "node --test packages/*/src/*.test.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },

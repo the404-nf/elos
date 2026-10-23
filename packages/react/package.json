@@ -1,0 +1,15 @@
+{
+  "name": "@elos/react",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "dependencies": { "@elos/contracts": "workspace:*", "@elos/core": "workspace:*" },
+  "peerDependencies": { "react": ">=19" },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}
