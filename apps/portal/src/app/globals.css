@@ -175,10 +175,12 @@ h1, h2, h3 { margin: 0; }
 .cv { position: relative; min-height: calc(100vh - 230px); overflow: clip; background: var(--color-surface-overlay); border-radius: var(--radius-container); cursor: grab; touch-action: none; }
 .cv:active { cursor: grabbing; }
 .cv--overlay { min-height: calc(100vh - 230px); }
-.stage { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; }
+.stage { position: absolute; left: 0; top: 0; transform-origin: 0 0; } /* no will-change: a promoted layer is rasterized once and scaled, which blurs text */
 .hud { position: absolute; z-index: 4; display: flex; align-items: center; gap: var(--space-2); }
 .hud-tl { left: var(--space-3); top: var(--space-3); flex-wrap: wrap; max-width: 60%; }
-.hud-tr { right: var(--space-3); top: var(--space-3); }
+.hud-tr { right: var(--space-3); top: var(--space-3); gap: var(--space-3); }
+.zoom { display: inline-flex; align-items: center; gap: var(--space-1); padding: 2px; border-radius: var(--radius-pill); background: var(--color-surface-sunken); }
+.zoom .ds-select__root { width: 92px; }
 .hud-br { right: var(--space-3); bottom: var(--space-3); }
 .hud-bc { left: 50%; bottom: var(--space-3); transform: translateX(-50%); white-space: nowrap; }
 .measure { position: absolute; left: 50%; bottom: var(--space-4); transform: translateX(-50%); display: flex; gap: var(--space-2); flex-wrap: wrap; justify-content: center; }

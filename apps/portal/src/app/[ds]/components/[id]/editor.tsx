@@ -154,6 +154,7 @@ function Sections({ bindings, tokens, onChange, layout }: { bindings: Bindings; 
 
 type Axis = "x" | "y" | "d";
 const STEP = 18; // pixels of drag per stop
+const ZOOMS = [25, 50, 75, 100, 150, 200, 300, 400];
 
 /** Handles on the selected part: edges move padding and height, the corner moves radius, the dot between two children moves gap.
  *  Each one walks the token scale, so a drag lands on a token, never a pixel. The same operation the inspector produces. */
@@ -304,9 +305,19 @@ export function ComponentEditor({ ds, contract, catalog, markdown }: { ds: strin
     if (!editing) return;
     const onKey = (e: globalThis.KeyboardEvent) => {
       const t = e.target as HTMLElement;
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z" && !/^(input|textarea|select)$/i.test(t.tagName)) {
+      const typing = /^(input|textarea|select)$/i.test(t.tagName);
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z" && !typing) {
         e.preventDefault();
         undo();
+      }
+      if ((e.ctrlKey || e.metaKey) && ["=", "+", "-", "0"].includes(e.key) && !typing) {
+        e.preventDefault();
+        if (e.key === "0") zoomTo(1);
+        else zoomTo(view.z * (e.key === "-" ? 1 / 1.25 : 1.25));
+      }
+      if (e.shiftKey && e.key === "!" && !typing) {
+        e.preventDefault();
+        fit();
       }
     };
     document.addEventListener("keydown", onKey);
@@ -588,11 +599,17 @@ export function ComponentEditor({ ds, contract, catalog, markdown }: { ds: strin
           <Badge label={`${variants.length * sizes.length} ${variants.length * sizes.length === 1 ? "instance" : "instances"}${state !== "default" ? ` · ${state}` : ""}`} />
           {measures.map((m) => <Badge key={m.k} label={`${m.k} ${m.v}`} />)}
         </div>
-        <div className="hud hud-tr">{chipNav("Canvas theme", (["light", "dark"] as const).map((t) => ({ key: t, label: cap(t), on: canvasTheme === t, go: () => setCanvasTheme(t) })))}</div>
-        <div className="hud hud-br">
-          <Button label="Zoom out" shape="circle" variant="secondary" size="sm" aria-label="Zoom out" icon={<Icon name="zoom-out" size="sm" />} onClick={() => zoomTo(view.z / 1.25)} />
-          <Button label={`${Math.round(view.z * 100)}%`} variant="secondary" size="sm" title="Fit (double-click the canvas does the same)" onClick={fit} />
-          <Button label="Zoom in" shape="circle" variant="secondary" size="sm" aria-label="Zoom in" icon={<Icon name="zoom-in" size="sm" />} onClick={() => zoomTo(view.z * 1.25)} />
+        <div className="hud hud-tr">
+          {chipNav("Canvas theme", (["light", "dark"] as const).map((t) => ({ key: t, label: cap(t), on: canvasTheme === t, go: () => setCanvasTheme(t) })))}
+          <div className="zoom" role="group" aria-label="Zoom">
+            <Button label="Zoom out" shape="circle" variant="ghost" size="sm" aria-label="Zoom out (Ctrl and minus)" icon={<Icon name="zoom-out" size="sm" />} onClick={() => zoomTo(view.z / 1.25)} />
+            <Select size="sm" value={ZOOMS.includes(Math.round(view.z * 100)) ? String(Math.round(view.z * 100)) : "custom"} aria-label="Zoom level" onChange={(e) => (e.target.value === "fit" ? fit() : e.target.value !== "custom" && zoomTo(Number(e.target.value) / 100))}>
+              {!ZOOMS.includes(Math.round(view.z * 100)) && <Option value="custom" label={`${Math.round(view.z * 100)}%`} />}
+              {ZOOMS.map((z) => <Option key={z} value={String(z)} label={`${z}%`} />)}
+              <Option value="fit" label="Fit" />
+            </Select>
+            <Button label="Zoom in" shape="circle" variant="ghost" size="sm" aria-label="Zoom in (Ctrl and plus)" icon={<Icon name="zoom-in" size="sm" />} onClick={() => zoomTo(view.z * 1.25)} />
+          </div>
         </div>
         <div className="hud hud-bc savebar">
           <Text as="span" variant="label" text={String(history.length)} />
