@@ -3,8 +3,7 @@ import { notFound } from "next/navigation";
 import { emitCss } from "@elos/core/css";
 import { emitComponentsCss } from "@elos/core/catalog";
 import { getDraft } from "@/lib/store.ts";
-import { Badge, Elos, Link, Stack, Text, ThemeToggle } from "@/components/elos-client.tsx";
-import { SideNav } from "./nav.tsx";
+import { Elos } from "@/components/elos-client.tsx";
 
 export const dynamic = "force-dynamic";
 
@@ -23,23 +22,7 @@ export default async function SystemLayout({ params, children }: { params: Promi
   return (
     <Elos catalog={catalog}>
       <style dangerouslySetInnerHTML={{ __html: css }} />
-      <div className="shell">
-        <aside className="side">
-          <Stack gap="xs" align="start">
-            <Link href="/" label="Elos" tone="inherit" style={{ textDecoration: "none", fontSize: "var(--font-size-sm)", color: "var(--color-text-secondary)" }} />
-            <Text as="h2" variant="heading" text={catalog.system.name} />
-            <Stack direction="row" gap="sm" align="center">
-              <Badge label="draft" />
-              <Text as="span" variant="caption" tone="secondary" text={`v${catalog.system.version}`} />
-            </Stack>
-          </Stack>
-          <SideNav ds={ds} />
-          <div className="side-foot">
-            <ThemeToggle themes={["light", ...catalog.system.themes.map((t) => t.name)]} />
-          </div>
-        </aside>
-        <main className="main">{children}</main>
-      </div>
+      <div className="page">{children}</div>
     </Elos>
   );
 }

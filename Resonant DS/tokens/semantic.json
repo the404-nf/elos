@@ -334,7 +334,31 @@
         "$description": "Accent gradient, end. Only ever inside a gradient that starts pink."
       }
     },
-    "$type": "color"
+    "$type": "color",
+    "card": {
+      "raised": {
+        "background": {
+          "$value": "{color.surface.raised}"
+        },
+        "border": {
+          "$value": "{color.border.card}"
+        },
+        "foreground": {
+          "$value": "{color.text.primary}"
+        }
+      },
+      "glass": {
+        "background": {
+          "$value": "{color.surface.glass}"
+        },
+        "border": {
+          "$value": "{color.surface.glass-quiet}"
+        },
+        "foreground": {
+          "$value": "{color.text.on-bloom}"
+        }
+      }
+    }
   },
   "space": {
     "inset": {

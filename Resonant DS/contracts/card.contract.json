@@ -42,6 +42,17 @@
       "description": "The whole card is one target (a link or a button): the beam runs around its border on hover and focus. No buttons inside.",
       "type": "boolean",
       "default": false
+    },
+    {
+      "name": "tone",
+      "description": "raised: a fill step above the page. glass: translucent, for tiles on the Bloom header.",
+      "type": {
+        "enum": [
+          "raised",
+          "glass"
+        ]
+      },
+      "default": "raised"
     }
   ],
   "states": [
@@ -58,9 +69,9 @@
         "gap": "{space.stack.md}"
       },
       "tokens": {
-        "background-color": "{color.surface.raised}",
-        "color": "{color.text.primary}",
-        "border-color": "{color.border.card}",
+        "background-color": "{color.card.{tone}.background}",
+        "color": "{color.card.{tone}.foreground}",
+        "border-color": "{color.card.{tone}.border}",
         "border-width": "{border.width}",
         "border-radius": "{radius.container}",
         "padding": "{space.inset.{padding}}",
@@ -178,6 +189,11 @@
         "interactive": {
           "true": {
             "cursor": "pointer"
+          }
+        },
+        "tone": {
+          "glass": {
+            "backdrop-filter": "blur(8px)"
           }
         }
       },

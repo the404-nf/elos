@@ -1,23 +1,26 @@
 /* Portal chrome. Every value binds to the viewed system's tokens; the :root block is only the fallback for pages outside a system.
    Components come from Resonant contracts; these classes are the structure between them. */
 :root {
-  --color-surface-canvas: #f7f7f8;
-  --color-surface-raised: #ffffff;
-  --color-surface-sunken: #ececef;
-  --color-text-primary: #1a1a21;
-  --color-text-secondary: #5c5c69;
-  --color-border-subtle: #d9d9df;
-  --color-border-focus: #3161ff;
-  --color-action-primary-background: #3161ff;
-  --color-action-primary-foreground: #ffffff;
-  --font-family-sans: Inter, system-ui, sans-serif;
-  --font-family-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --color-surface-canvas: #0f0e12;
+  --color-surface-raised: #17161b;
+  --color-surface-sunken: #222128;
+  --color-text-primary: #f5f4f7;
+  --color-text-secondary: #a9a8b3;
+  --color-border-subtle: #26252c;
+  --color-border-focus: #ffffff;
+  --color-action-primary-background: #f5f4f7;
+  --color-action-primary-foreground: #0b0b0f;
+  --font-family-display: "Inter Tight", system-ui, sans-serif;
+  --font-family-sans: "Albert Sans", system-ui, sans-serif;
+  --font-family-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
   --font-size-sm: 13px;
   --font-size-md: 15px;
   --font-size-lg: 17px;
-  --font-size-xl: 20px;
+  --font-size-xl: 22px;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
+  --font-weight-extrabold: 800;
+  --space-4: 16px;
   --space-inset-sm: 8px;
   --space-inset-md: 12px;
   --space-inset-lg: 16px;
@@ -25,9 +28,10 @@
   --space-stack-sm: 8px;
   --space-stack-md: 16px;
   --space-stack-lg: 24px;
-  --radius-sm: 4px;
-  --radius-control: 8px;
-  --radius-container: 12px;
+  --radius-sm: 6px;
+  --radius-control: 999px;
+  --radius-inset: 12px;
+  --radius-container: 16px;
   --border-width: 1px;
 }
 * { box-sizing: border-box; }
@@ -47,18 +51,12 @@ table { font-variant-numeric: tabular-nums; }
 /* ponytail: contracts cannot bind pseudo-elements yet; the placeholder follows secondary text in both themes. */
 .ds-input__root::placeholder, .ds-textarea__root::placeholder { color: var(--color-text-secondary); }
 
-/* Shell: a raised sidebar beside the canvas. */
-.shell { display: grid; grid-template-columns: 232px minmax(0, 1fr); min-height: 100vh; }
-.side {
-  position: sticky; top: 0; height: 100vh; overflow-y: auto;
-  background: var(--color-surface-raised); border-right: var(--border-width) solid var(--color-border-subtle);
-  padding: var(--space-stack-lg) var(--space-inset-lg); display: flex; flex-direction: column; gap: var(--space-stack-lg);
-}
-.side-foot { margin-top: auto; }
-.main { padding: var(--space-stack-lg) var(--space-stack-lg) calc(var(--space-stack-lg) * 2); min-width: 0; max-width: 1280px; }
+/* The frame: the page pads space-4 on every side, the Bloom header sits inside it, content follows at the stack gutter. */
+.page { padding: var(--space-4); display: flex; flex-direction: column; gap: var(--space-stack-md); min-height: 100vh; max-width: 1600px; margin: 0 auto; }
+.page > .ds-page-head__root { padding-top: var(--space-6); }
+.page > .ds-page-head__root .ds-page-head__nav { margin-bottom: var(--space-12); }
+.main { padding: var(--space-stack-lg); min-width: 0; max-width: 1280px; }
 .main > * + * { margin-top: var(--space-stack-lg); }
-.page-head { display: flex; flex-direction: column; gap: var(--space-stack-sm); }
-.page-head-row { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-stack-md); flex-wrap: wrap; }
 .row { display: flex; gap: var(--space-inset-md); align-items: center; flex-wrap: wrap; }
 .grid { display: grid; gap: var(--space-stack-md); grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
 .stack { display: flex; flex-direction: column; gap: var(--space-stack-md); }
@@ -76,8 +74,8 @@ input[type="range"] { width: 100%; margin: 0; }
 /* Preview canvas: the same ground a component ships on. transform makes it the containing block for fixed-position parts
    (dialog backdrop and positioner), so overlays stay inside the preview. */
 .canvas {
-  position: relative; background: var(--color-surface-canvas); border: var(--border-width) dashed var(--color-border-subtle);
-  border-radius: var(--radius-container); padding: var(--space-stack-lg); min-height: 160px; transform: translateZ(0); overflow: hidden;
+  position: relative; background: var(--color-surface-overlay, var(--color-surface-canvas)); border: 0;
+  border-radius: var(--radius-inset); padding: var(--space-stack-lg); min-height: 160px; transform: translateZ(0); overflow: hidden;
 }
 .canvas--overlay { min-height: 360px; }
 .canvas--thumb { min-height: 96px; max-height: 96px; padding: var(--space-inset-md); display: flex; align-items: center; pointer-events: none; }
@@ -118,11 +116,12 @@ h1, h2, h3 { margin: 0; }
   .editor > aside { position: static; }
 }
 @media (max-width: 760px) {
-  .shell { grid-template-columns: 1fr; }
-  /* The sidebar becomes a band: name, areas and theme flow in rows. */
-  .side { position: static; height: auto; flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; border-right: 0; border-bottom: var(--border-width) solid var(--color-border-subtle); gap: var(--space-stack-sm) var(--space-stack-lg); padding: var(--space-inset-md) var(--space-inset-lg); }
-  .side .ds-nav__root { flex-basis: 100%; }
-  .side .ds-nav__root .ds-nav__list { flex-direction: row; flex-wrap: wrap; gap: var(--space-stack-xs); }
-  .side-foot { margin-top: 0; }
-  .main { padding: var(--space-inset-lg); }
+  .page { padding: var(--space-inset-sm); }
+  .page > .ds-page-head__root .ds-page-head__nav { margin-bottom: var(--space-6); }
 }
+
+/* Home grids from the layout guide: three cards at 1.2fr 1fr 1fr, then two at 1.6fr 1fr. */
+.grid--home { grid-template-columns: 1.2fr 1fr 1fr; }
+.grid--wide { grid-template-columns: 1.6fr 1fr; }
+@media (max-width: 1180px) { .grid--home, .grid--wide { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 760px) { .grid--home, .grid--wide { grid-template-columns: 1fr; } }

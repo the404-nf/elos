@@ -1,30 +1,33 @@
-// The header every screen starts with: where you are, what it is, and the screen's actions.
+// The Bloom header every screen starts with: the app nav on top, then where you are, what the page is, and its actions.
+// A thin composition over the ds.page-head contract; the nav row is the portal's and comes from the current path.
 import type { ReactNode } from "react";
-import { Breadcrumb, BreadcrumbItem, Stack, Text } from "./elos-client.tsx";
+import { Breadcrumb, BreadcrumbItem, PageHeadBase } from "./elos-client.tsx";
+import { TopNav } from "@/app/[ds]/nav.tsx";
 
-export function PageHead({ title, code, description, crumbs, actions, children }: {
+export function PageHead({ title, code, description, eyebrow, variant, crumbs, actions, extras, tabs, children }: {
   title: string;
-  code?: boolean; // the title is an identifier (a token path), set in the mono face
-  description?: string;
+  code?: boolean; // the title is an identifier (a token path): the eyebrow names its group
+  description?: string; // the lead: one sentence
+  eyebrow?: string;
+  variant?: "page-title" | "display";
   crumbs?: { href: string; label: string }[];
   actions?: ReactNode;
-  children?: ReactNode; // beside the title: badges, ids
+  extras?: ReactNode;
+  tabs?: ReactNode;
+  children?: ReactNode; // beside the title: badges, ids (rendered as extras)
 }) {
+  const eye = eyebrow ?? (code ? title.split(".").slice(0, -1).join(" · ") : undefined);
   return (
-    <header className="page-head">
-      {crumbs && crumbs.length > 0 && (
-        <Breadcrumb label="You are here" list={crumbs.map((c, i) => <BreadcrumbItem key={c.href} href={c.href} label={c.label} current={i === crumbs.length - 1} separator={i === crumbs.length - 1 ? "" : undefined} />)} />
-      )}
-      <div className="page-head-row">
-        <Stack gap="xs">
-          <Stack direction="row" gap="sm" align="center">
-            <Text as="h1" variant="title" text={title} style={code ? { fontFamily: "var(--font-family-mono)" } : undefined} />
-            {children}
-          </Stack>
-          {description && <Text tone="secondary" text={description} />}
-        </Stack>
-        {actions && <Stack direction="row" gap="sm" align="center">{actions}</Stack>}
-      </div>
-    </header>
+    <PageHeadBase
+      title={title}
+      eyebrow={eye}
+      lead={description}
+      variant={variant}
+      nav={<TopNav />}
+      breadcrumb={crumbs && crumbs.length > 0 ? <Breadcrumb label="You are here" list={crumbs.map((c, i) => <BreadcrumbItem key={c.href} href={c.href} label={c.label} current={i === crumbs.length - 1} separator={i === crumbs.length - 1 ? "" : undefined} />)} /> : undefined}
+      actions={actions}
+      extras={extras ?? children}
+      tabs={tabs}
+    />
   );
 }

@@ -5,52 +5,170 @@
   "status": "draft",
   "category": "navigation",
   "description": "The primary navigation between the areas of a product: a labelled list of destinations with one marked current.",
-  "semantics": { "element": "nav" },
+  "semantics": {
+    "element": "nav"
+  },
   "props": [
-    { "name": "label", "description": "What the navigation covers, for assistive technology.", "type": "text", "required": true, "attribute": "aria-label" }
+    {
+      "name": "label",
+      "description": "What the navigation covers, for assistive technology.",
+      "type": "text",
+      "required": true,
+      "attribute": "aria-label"
+    },
+    {
+      "name": "orientation",
+      "description": "Stacked in a sidebar, or a row of pills on the page head.",
+      "type": {
+        "enum": [
+          "vertical",
+          "horizontal"
+        ]
+      },
+      "default": "vertical"
+    }
   ],
   "states": [],
   "anatomy": {
     "root": {
       "description": "The nav landmark.",
       "element": "nav",
-      "tokens": { "font-family": "{font.family.sans}" },
+      "tokens": {
+        "font-family": "{font.family.sans}"
+      },
       "parts": {
         "list": {
           "description": "ds.nav-item children, stacked.",
           "element": "div",
-          "slot": { "accepts": ["ds.nav-item"], "acceptsMode": "restrict", "min": 1 },
-          "layout": { "display": "flex", "direction": "column", "gap": "{space.stack.xs}" }
+          "slot": {
+            "accepts": [
+              "ds.nav-item"
+            ],
+            "acceptsMode": "restrict",
+            "min": 1
+          },
+          "layout": {
+            "display": "flex",
+            "direction": "column",
+            "gap": "{space.1}"
+          },
+          "stylesByProp": {
+            "orientation": {
+              "horizontal": {
+                "flex-direction": "row",
+                "flex-wrap": "wrap"
+              }
+            }
+          }
         }
       }
     }
   },
-  "a11y": { "focusVisible": false, "contrast": "AA", "keyboard": [{ "key": "Tab", "action": "move between items" }], "aria": ["nav landmark with aria-label", "the current item carries aria-current"] },
-  "usage": {
-    "when": ["switching between the top-level areas of a product", "a sidebar or top band"],
-    "whenNot": ["switching views of one subject (use ds.tabs)", "a path to the current page (use ds.breadcrumb)"],
-    "intents": ["navigation", "sidebar", "areas", "menu of pages"],
-    "alternatives": [{ "component": "ds.tabs", "when": "the destinations are views of the same subject" }]
+  "a11y": {
+    "focusVisible": false,
+    "contrast": "AA",
+    "keyboard": [
+      {
+        "key": "Tab",
+        "action": "move between items"
+      }
+    ],
+    "aria": [
+      "nav landmark with aria-label",
+      "the current item carries aria-current"
+    ]
   },
-  "guidelines": { "do": ["keep to seven items or fewer", "name areas with nouns"], "dont": ["nest navigations", "put actions in it"] },
-  "relationships": { "pairsWith": ["ds.breadcrumb"], "excludes": [], "contains": ["ds.nav-item"], "within": [] },
+  "usage": {
+    "when": [
+      "switching between the top-level areas of a product",
+      "a sidebar or top band"
+    ],
+    "whenNot": [
+      "switching views of one subject (use ds.tabs)",
+      "a path to the current page (use ds.breadcrumb)"
+    ],
+    "intents": [
+      "navigation",
+      "sidebar",
+      "areas",
+      "menu of pages"
+    ],
+    "alternatives": [
+      {
+        "component": "ds.tabs",
+        "when": "the destinations are views of the same subject"
+      }
+    ]
+  },
+  "guidelines": {
+    "do": [
+      "keep to seven items or fewer",
+      "name areas with nouns"
+    ],
+    "dont": [
+      "nest navigations",
+      "put actions in it"
+    ]
+  },
+  "relationships": {
+    "pairsWith": [
+      "ds.breadcrumb"
+    ],
+    "excludes": [],
+    "contains": [
+      "ds.nav-item"
+    ],
+    "within": []
+  },
   "channels": {
-    "web": { "support": "native" },
-    "widget": { "support": "unsupported", "note": "a widget has one view" },
-    "slack": { "support": "degraded", "as": "links in a section" },
-    "markdown": { "support": "native", "as": "list of links" }
+    "web": {
+      "support": "native"
+    },
+    "widget": {
+      "support": "unsupported",
+      "note": "a widget has one view"
+    },
+    "slack": {
+      "support": "degraded",
+      "as": "links in a section"
+    },
+    "markdown": {
+      "support": "native",
+      "as": "list of links"
+    }
   },
   "examples": [
     {
       "name": "Portal areas",
       "tree": {
         "component": "ds.nav",
-        "props": { "label": "Areas" },
+        "props": {
+          "label": "Areas"
+        },
         "slots": {
           "list": [
-            { "component": "ds.nav-item", "props": { "href": "/resonant", "label": "Overview" } },
-            { "component": "ds.nav-item", "props": { "href": "/resonant/tokens", "label": "Tokens", "current": true } },
-            { "component": "ds.nav-item", "props": { "href": "/resonant/components", "label": "Components" } }
+            {
+              "component": "ds.nav-item",
+              "props": {
+                "href": "/resonant",
+                "label": "Overview"
+              }
+            },
+            {
+              "component": "ds.nav-item",
+              "props": {
+                "href": "/resonant/tokens",
+                "label": "Tokens",
+                "current": true
+              }
+            },
+            {
+              "component": "ds.nav-item",
+              "props": {
+                "href": "/resonant/components",
+                "label": "Components"
+              }
+            }
           ]
         }
       }

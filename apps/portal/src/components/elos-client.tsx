@@ -3,6 +3,7 @@
 // composed from, and the theme switch. The portal is built from the system it shows; nothing here is markup.
 import { useEffect, useState, type ChangeEvent, type CSSProperties, type ElementType, type FocusEvent, type ReactNode } from "react";
 import NextLink from "next/link";
+import { useRouter } from "next/navigation";
 import type { Catalog } from "@elos/contracts";
 import { ElosProvider, Render, createComponent, type Node } from "@elos/react";
 import { zagBehaviors } from "@elos/react/behaviors";
@@ -22,15 +23,20 @@ export { Render };
 export type { Node };
 
 type Dom = { id?: string; title?: string; style?: CSSProperties; "aria-label"?: string; "aria-pressed"?: boolean; inert?: boolean };
-type Tone = "neutral" | "info" | "success" | "warning" | "danger";
+type Tone = "neutral" | "accent" | "info" | "success" | "warning" | "danger";
+export type TextVariant = "display" | "page-title" | "stat" | "title" | "heading" | "lead" | "body" | "label" | "caption" | "eyebrow" | "code";
 
-export const Button = createComponent<Dom & { label: string; variant?: "primary" | "secondary" | "ghost" | "danger"; size?: "sm" | "md" | "lg"; type?: "button" | "submit"; disabled?: boolean; onClick?: () => void; icon?: ReactNode }>("ds.button");
-export const Badge = createComponent<Dom & { label: string; tone?: Tone }>("ds.badge");
-export const Text = createComponent<Dom & { text: string; as?: "p" | "span" | "h1" | "h2" | "h3"; variant?: "title" | "heading" | "body" | "caption"; tone?: "primary" | "secondary" }>("ds.text");
+export const Button = createComponent<Dom & { label: string; variant?: "primary" | "secondary" | "ghost" | "danger" | "glass"; size?: "sm" | "md" | "lg"; type?: "button" | "submit"; disabled?: boolean; onClick?: () => void; icon?: ReactNode }>("ds.button");
+export const Badge = createComponent<Dom & { label: string; tone?: Tone; dot?: boolean }>("ds.badge");
+export const Text = createComponent<Dom & { text: string; as?: "p" | "span" | "div" | "code" | "h1" | "h2" | "h3" | "h4"; variant?: TextVariant; tone?: "primary" | "secondary" | "tertiary" }>("ds.text");
 export const Stack = createComponent<Dom & { direction?: "row" | "column"; gap?: "xs" | "sm" | "md" | "lg"; align?: "start" | "center" | "end" | "stretch" }>("ds.stack");
-export const Card = createComponent<Dom & { title?: string; heading?: "h2" | "h3"; padding?: "md" | "lg"; actions?: ReactNode; body?: ReactNode }>("ds.card");
+export const Card = createComponent<Dom & { title?: string; heading?: "h2" | "h3"; padding?: "md" | "lg" | "xl"; tone?: "raised" | "glass"; interactive?: boolean; actions?: ReactNode; body?: ReactNode }>("ds.card");
+export const Icon = createComponent<Dom & { name: string; size?: "xs" | "sm" | "md" | "lg" | "xl"; accent?: boolean }>("ds.icon");
+export const Illustration = createComponent<Dom & { name: string; size?: "md" | "lg"; accent?: boolean; motion?: boolean }>("ds.illustration");
+/** The Bloom header. Slots are named: nav, breadcrumb, actions, extras, tabs. */
+export const PageHeadBase = createComponent<Dom & { title: string; eyebrow?: string; lead?: string; variant?: "page-title" | "display"; nav?: ReactNode; breadcrumb?: ReactNode; actions?: ReactNode; extras?: ReactNode; tabs?: ReactNode }>("ds.page-head");
 export const Link = createComponent<Dom & { href: string; label: string; tone?: "link" | "inherit" }>("ds.link");
-export const Nav = createComponent<Dom & { label: string; list: ReactNode }>("ds.nav");
+export const Nav = createComponent<Dom & { label: string; orientation?: "vertical" | "horizontal"; list: ReactNode }>("ds.nav");
 export const NavItem = createComponent<Dom & { href: string; label: string; current?: boolean }>("ds.nav-item");
 export const Breadcrumb = createComponent<Dom & { label?: string; list: ReactNode }>("ds.breadcrumb");
 export const BreadcrumbItem = createComponent<Dom & { href: string; label: string; current?: boolean; separator?: string }>("ds.breadcrumb-item");
@@ -64,10 +70,11 @@ export const Dialog = createComponent<Dom & { title: string; description?: strin
 export const options = (values: readonly string[], labels?: Record<string, string>) =>
   values.map((v) => <Option key={v} value={v} label={labels?.[v] ?? v.charAt(0).toUpperCase() + v.slice(1)} />);
 
-export function ThemeToggle({ themes }: { themes: string[] }) {
-  const [theme, setTheme] = useState("light");
+/** Dark is the default; the toggle flips to light and back, and remembers the choice. */
+export function ThemeToggle() {
+  const [theme, setTheme] = useState("dark");
   useEffect(() => {
-    setTheme(document.documentElement.getAttribute("data-theme") || "light");
+    setTheme(document.documentElement.getAttribute("data-theme") || "dark");
   }, []);
   const apply = (t: string) => {
     setTheme(t);
@@ -76,9 +83,12 @@ export function ThemeToggle({ themes }: { themes: string[] }) {
       localStorage.setItem("elos-theme", t);
     } catch {}
   };
-  return (
-    <Field label="Theme">
-      <Select size="sm" value={theme} onChange={(e) => apply(e.target.value)}>{options(themes)}</Select>
-    </Field>
-  );
+  const next = theme === "dark" ? "light" : "dark";
+  return <Button variant="glass" size="sm" label={next === "light" ? "Light" : "Dark"} aria-label={`Switch to the ${next} theme`} icon={<Icon name={next === "light" ? "sun" : "moon"} size="sm" />} onClick={() => apply(next)} />;
+}
+
+/** A button that navigates: the approved screens put "Publish" and "Review changes" in the header as buttons. */
+export function GoButton({ href, ...p }: { href: string; label: string; variant?: "primary" | "secondary" | "ghost" | "danger" | "glass"; size?: "sm" | "md" | "lg"; icon?: ReactNode }) {
+  const router = useRouter();
+  return <Button {...p} onClick={() => router.push(href)} />;
 }
