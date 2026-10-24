@@ -10,6 +10,23 @@
   },
   "props": [
     {
+      "name": "as",
+      "description": "article, or a when the whole card is one link (set href; no buttons or links inside).",
+      "type": {
+        "enum": [
+          "article",
+          "a"
+        ]
+      },
+      "default": "article"
+    },
+    {
+      "name": "href",
+      "description": "Where a link card goes.",
+      "type": "text",
+      "attribute": "href"
+    },
+    {
       "name": "title",
       "description": "Heading shown in the header.",
       "type": "text"
@@ -53,6 +70,12 @@
         ]
       },
       "default": "raised"
+    },
+    {
+      "name": "featured",
+      "description": "The one featured card of a view: gradient edge and a soft glow from below.",
+      "type": "boolean",
+      "default": false
     }
   ],
   "states": [
@@ -62,7 +85,7 @@
   "anatomy": {
     "root": {
       "description": "Raised surface with border and padding; stacks header, body and actions.",
-      "element": "article",
+      "element": "{as}",
       "layout": {
         "display": "flex",
         "direction": "column",
@@ -195,6 +218,20 @@
           "glass": {
             "backdrop-filter": "blur(8px)"
           }
+        },
+        "as": {
+          "a": {
+            "text-decoration": "none",
+            "display": "flex"
+          }
+        },
+        "featured": {
+          "true": {
+            "border": "1.5px solid transparent",
+            "background-image": "var(--gradient-glow), linear-gradient(var(--color-card-raised-background), var(--color-card-raised-background)), var(--gradient-edge)",
+            "background-origin": "padding-box, padding-box, border-box",
+            "background-clip": "padding-box, padding-box, border-box"
+          }
         }
       },
       "states": {
@@ -251,7 +288,8 @@
       "put more than three actions in a card",
       "make the whole card clickable when it also contains buttons",
       "put buttons or links inside an interactive card",
-      "lift or shadow a card on hover: the beam is the hover"
+      "lift or shadow a card on hover: the beam is the hover",
+      "feature more than one card per view"
     ]
   },
   "resources": [

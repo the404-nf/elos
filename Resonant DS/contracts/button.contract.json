@@ -60,6 +60,17 @@
       "description": "Visible text.",
       "type": "text",
       "required": true
+    },
+    {
+      "name": "shape",
+      "description": "pill, or a circle for an icon-only button (give it an aria-label).",
+      "type": {
+        "enum": [
+          "pill",
+          "circle"
+        ]
+      },
+      "default": "pill"
     }
   ],
   "states": [
@@ -139,6 +150,18 @@
           "element": "span",
           "content": {
             "prop": "label"
+          },
+          "stylesByProp": {
+            "shape": {
+              "circle": {
+                "position": "absolute",
+                "width": "1px",
+                "height": "1px",
+                "overflow": "hidden",
+                "clip-path": "inset(50%)",
+                "white-space": "nowrap"
+              }
+            }
           }
         }
       },
@@ -152,11 +175,24 @@
           "glass": {
             "backdrop-filter": "blur(8px)"
           }
+        },
+        "shape": {
+          "circle": {
+            "position": "relative"
+          }
         }
       },
       "styles": {
         "box-sizing": "border-box",
         "white-space": "nowrap"
+      },
+      "tokensByProp": {
+        "shape": {
+          "circle": {
+            "width": "{control.height.{size}}",
+            "padding-inline": "{space.1}"
+          }
+        }
       }
     }
   },

@@ -28,6 +28,17 @@
       "type": "boolean",
       "default": false,
       "attribute": "aria-current"
+    },
+    {
+      "name": "tone",
+      "description": "default on a page surface; bloom on the page head, where text is white or ink.",
+      "type": {
+        "enum": [
+          "default",
+          "bloom"
+        ]
+      },
+      "default": "default"
     }
   ],
   "states": [
@@ -51,7 +62,7 @@
         "gap": "{space.inset.sm}"
       },
       "tokens": {
-        "color": "{color.text.secondary}",
+        "color": "{color.nav.{tone}.foreground}",
         "background-color": "{color.transparent}",
         "padding-inline": "{space.inset.md}",
         "padding-block": "{space.inset.sm}",
@@ -72,8 +83,8 @@
       },
       "states": {
         "hover": {
-          "color": "{color.text.primary}",
-          "background-color": "{color.surface.sunken}"
+          "color": "{color.nav.{tone}.hover-foreground}",
+          "background-color": "{color.nav.{tone}.hover-background}"
         },
         "selected": {
           "color": "{color.action.primary.foreground}",

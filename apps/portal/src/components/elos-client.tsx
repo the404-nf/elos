@@ -1,7 +1,7 @@
 "use client";
 // Client side of the portal: the Resonant provider with behaviors, the typed components the chrome is
 // composed from, and the theme switch. The portal is built from the system it shows; nothing here is markup.
-import { useEffect, useState, type ChangeEvent, type CSSProperties, type ElementType, type FocusEvent, type ReactNode } from "react";
+import { useEffect, useState, type ChangeEvent, type CSSProperties, type ElementType, type FocusEvent, type MouseEvent, type ReactNode } from "react";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import type { Catalog } from "@elos/contracts";
@@ -26,18 +26,18 @@ type Dom = { id?: string; title?: string; style?: CSSProperties; "aria-label"?: 
 type Tone = "neutral" | "accent" | "info" | "success" | "warning" | "danger";
 export type TextVariant = "display" | "page-title" | "stat" | "title" | "heading" | "lead" | "body" | "label" | "caption" | "eyebrow" | "code";
 
-export const Button = createComponent<Dom & { label: string; variant?: "primary" | "secondary" | "ghost" | "danger" | "glass"; size?: "sm" | "md" | "lg"; type?: "button" | "submit"; disabled?: boolean; onClick?: () => void; icon?: ReactNode }>("ds.button");
+export const Button = createComponent<Dom & { label: string; variant?: "primary" | "secondary" | "ghost" | "danger" | "glass"; size?: "sm" | "md" | "lg"; shape?: "pill" | "circle"; type?: "button" | "submit"; disabled?: boolean; onClick?: () => void; icon?: ReactNode }>("ds.button");
 export const Badge = createComponent<Dom & { label: string; tone?: Tone; dot?: boolean }>("ds.badge");
 export const Text = createComponent<Dom & { text: string; as?: "p" | "span" | "div" | "code" | "h1" | "h2" | "h3" | "h4"; variant?: TextVariant; tone?: "primary" | "secondary" | "tertiary" }>("ds.text");
 export const Stack = createComponent<Dom & { direction?: "row" | "column"; gap?: "xs" | "sm" | "md" | "lg"; align?: "start" | "center" | "end" | "stretch" }>("ds.stack");
-export const Card = createComponent<Dom & { title?: string; heading?: "h2" | "h3"; padding?: "md" | "lg" | "xl"; tone?: "raised" | "glass"; interactive?: boolean; actions?: ReactNode; body?: ReactNode }>("ds.card");
+export const Card = createComponent<Dom & { title?: string; heading?: "h2" | "h3"; padding?: "md" | "lg" | "xl"; tone?: "raised" | "glass"; as?: "article" | "a"; href?: string; interactive?: boolean; featured?: boolean; actions?: ReactNode; body?: ReactNode }>("ds.card");
 export const Icon = createComponent<Dom & { name: string; size?: "xs" | "sm" | "md" | "lg" | "xl"; accent?: boolean }>("ds.icon");
 export const Illustration = createComponent<Dom & { name: string; size?: "md" | "lg"; accent?: boolean; motion?: boolean }>("ds.illustration");
 /** The Bloom header. Slots are named: nav, breadcrumb, actions, extras, tabs. */
 export const PageHeadBase = createComponent<Dom & { title: string; eyebrow?: string; lead?: string; variant?: "page-title" | "display"; nav?: ReactNode; breadcrumb?: ReactNode; actions?: ReactNode; extras?: ReactNode; tabs?: ReactNode }>("ds.page-head");
 export const Link = createComponent<Dom & { href: string; label: string; tone?: "link" | "inherit" }>("ds.link");
 export const Nav = createComponent<Dom & { label: string; orientation?: "vertical" | "horizontal"; list: ReactNode }>("ds.nav");
-export const NavItem = createComponent<Dom & { href: string; label: string; current?: boolean }>("ds.nav-item");
+export const NavItem = createComponent<Dom & { href: string; label: string; current?: boolean; tone?: "default" | "bloom"; onClick?: (e: MouseEvent<HTMLAnchorElement>) => void }>("ds.nav-item");
 export const Breadcrumb = createComponent<Dom & { label?: string; list: ReactNode }>("ds.breadcrumb");
 export const BreadcrumbItem = createComponent<Dom & { href: string; label: string; current?: boolean; separator?: string }>("ds.breadcrumb-item");
 export const Separator = createComponent<Dom & { orientation?: "horizontal" | "vertical" }>("ds.separator");
@@ -84,7 +84,7 @@ export function ThemeToggle() {
     } catch {}
   };
   const next = theme === "dark" ? "light" : "dark";
-  return <Button variant="glass" size="sm" label={next === "light" ? "Light" : "Dark"} aria-label={`Switch to the ${next} theme`} icon={<Icon name={next === "light" ? "sun" : "moon"} size="sm" />} onClick={() => apply(next)} />;
+  return <Button variant="glass" shape="circle" label={`Switch to the ${next} theme`} aria-label={`Switch to the ${next} theme`} icon={<Icon name={next === "light" ? "sun" : "moon"} />} onClick={() => apply(next)} />;
 }
 
 /** A button that navigates: the approved screens put "Publish" and "Review changes" in the header as buttons. */

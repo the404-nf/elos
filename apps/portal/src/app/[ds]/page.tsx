@@ -1,6 +1,6 @@
 import { allVersions, diffFiles, getDraft } from "@/lib/store.ts";
 import { Markdown } from "@/components/markdown.tsx";
-import { Badge, Card, GoButton, Link, Stack, Text } from "@/components/elos-client.tsx";
+import { Badge, Card, GoButton, Link, Render, Stack, Table, TableCell, TableRow, Text } from "@/components/elos-client.tsx";
 import { PageHead } from "@/components/page-head.tsx";
 
 const n = (count: number, word: string) => `${count} ${word}${count === 1 ? "" : "s"}`;
@@ -11,6 +11,7 @@ export default async function Overview({ params }: { params: Promise<{ ds: strin
   const readme = typeof files["README.md"] === "string" ? (files["README.md"] as string) : "";
   const latest = versions[0];
   const changed = latest ? diffFiles(latest.files, files).filter((p) => p !== "system.json") : Object.keys(files);
+  const kind = (p: string) => (latest && !(p in latest.files) ? "added" : !(p in files) ? "removed" : "edited");
   const themes = 1 + catalog.system.themes.length;
   const tiles: [number, string, string][] = [
     [catalog.tokens.base.length, "Tokens", `/${ds}/tokens`],
@@ -20,9 +21,9 @@ export default async function Overview({ params }: { params: Promise<{ ds: strin
   ];
   const lead = latest
     ? changed.length
-      ? `${n(changed.length, "change")} since v${latest.version}, waiting to be published.`
-      : `Published as v${latest.version}. The draft has no changes.`
-    : `Not published yet. The first version will snapshot all ${n(changed.length, "file")} of the draft.`;
+      ? `Calm, precise components. ${n(changed.length, "change")} since v${latest.version}, waiting to be published.`
+      : `Calm, precise components. Published as v${latest.version}; the draft has no changes.`
+    : `Calm, precise components. Not published yet: the first version will snapshot all ${n(changed.length, "file")} of the draft.`;
   return (
     <>
       <PageHead
@@ -37,10 +38,10 @@ export default async function Overview({ params }: { params: Promise<{ ds: strin
           </>
         }
         extras={tiles.map(([count, label, href]) => (
-          <Card key={label} tone="glass" padding="lg" style={{ minWidth: 150 }}>
+          <Card key={label} tone="glass" padding="lg" as="a" href={href}>
             <Stack gap="xs">
               <Text as="span" variant="stat" text={String(count)} />
-              <Link href={href} label={label} tone="inherit" style={{ textDecoration: "none", opacity: 0.85 }} />
+              <Text as="span" variant="label" text={label} style={{ opacity: 0.85 }} />
             </Stack>
           </Card>
         ))}
@@ -49,29 +50,45 @@ export default async function Overview({ params }: { params: Promise<{ ds: strin
         <Card title="What changed" heading="h2">
           <Stack gap="sm">
             {changed.length === 0 && <Text tone="secondary" text="Nothing since the last version." />}
-            {changed.slice(0, 6).map((p) => (
-              <Stack key={p} direction="row" gap="sm" align="center">
-                <Badge label="edited" tone="accent" dot />
-                <Text as="code" variant="code" text={p} />
-              </Stack>
-            ))}
-            {changed.length > 6 && <Text variant="caption" tone="secondary" text={`and ${changed.length - 6} more`} />}
-            <Link href={`/${ds}/versions`} label="View all" />
+            {changed.length > 0 && (
+              <Table
+                caption="Files changed since the last version"
+                body={changed.slice(0, 6).map((p) => (
+                  <TableRow key={p}>
+                    <TableCell>
+                      <Stack direction="row" gap="sm" align="center">
+                        <Badge label={kind(p)} tone="accent" dot />
+                        <Text as="code" variant="code" text={p.replace(/\.(contract|page)\.json$/, "")} />
+                      </Stack>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              />
+            )}
+            {changed.length > 6 && <Text variant="caption" tone="secondary" text={`and ${n(changed.length - 6, "more file")}`} />}
+            <Link href={`/${ds}/versions`} label="View diff" />
           </Stack>
         </Card>
-        <Card title="Agent ready" heading="h2">
-          <Stack gap="sm">
-            <Text variant="heading" text="Claude, Cursor and Codex read the same catalog you edit." />
+        <Card title="Agent ready" heading="h2" featured>
+          <Stack gap="md">
+            <Text variant="title" text="Claude, Cursor and Codex read the same catalog you edit." />
             <Text as="code" variant="code" text={`claude mcp add ${ds} --transport http http://localhost:3000/api/${ds}/mcp`} style={{ display: "block", padding: "var(--space-inset-md)", borderRadius: "var(--radius-inset)", background: "var(--color-surface-overlay)", overflowX: "auto" }} />
-            <Stack direction="row" gap="sm">
+            <Stack direction="row" gap="md">
               <Link href={`/api/${ds}/catalog`} label="Catalog JSON" />
               <Link href={`/api/${ds}/css`} label="CSS" />
             </Stack>
           </Stack>
         </Card>
         <Card title="Components" heading="h2">
-          <Stack gap="sm">
+          <Stack gap="md">
             <Text as="span" variant="stat" text={String(catalog.contracts.length)} />
+            <div className="well" inert aria-hidden="true">
+              <Render tree={{ component: "ds.stack", props: { direction: "row", gap: "md", align: "center" }, slots: { root: [
+                { component: "ds.button", props: { label: "Save", size: "sm" } },
+                { component: "ds.switch", props: { label: "", checked: true } },
+                { component: "ds.badge", props: { label: "Published", tone: "accent", dot: true } },
+              ] } }} />
+            </div>
             <Stack direction="row" gap="xs">
               {(["draft", "stable", "deprecated"] as const).map((s) => {
                 const count = catalog.contracts.filter((c) => c.status === s).length;
@@ -88,12 +105,12 @@ export default async function Overview({ params }: { params: Promise<{ ds: strin
           <Stack gap="sm">
             <Stack direction="row" gap="sm" align="center">
               <Badge label="Draft" tone="accent" dot />
-              <Text variant="caption" tone="secondary" text={`last changed ${updatedAt.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}`} />
+              <Text variant="caption" tone="secondary" text={`${n(changed.length, "change")} · last edited ${updatedAt.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}`} />
             </Stack>
             {versions.slice(0, 4).map((v) => (
               <Stack key={v.id} direction="row" gap="sm" align="center">
                 <Text as="code" variant="code" text={`v${v.version}`} />
-                <Text variant="caption" tone="secondary" text={v.note || "published"} />
+                <Text variant="caption" tone="secondary" text={`${v.note || "published"} · ${v.createdAt.toLocaleDateString(undefined, { dateStyle: "medium" })}`} />
               </Stack>
             ))}
             <Link href={`/${ds}/versions`} label="All versions" />

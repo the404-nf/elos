@@ -125,3 +125,15 @@ h1, h2, h3 { margin: 0; }
 .grid--wide { grid-template-columns: 1.6fr 1fr; }
 @media (max-width: 1180px) { .grid--home, .grid--wide { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 760px) { .grid--home, .grid--wide { grid-template-columns: 1fr; } }
+
+/* Library grid from the layout guide: four columns, two below 1180px, one below 760px. Link cards stack their well on top. */
+.grid--library { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.well { background: var(--color-surface-overlay); border-radius: var(--radius-inset); min-height: 140px; display: flex; align-items: center; justify-content: center; padding: var(--space-inset-md); overflow: hidden; pointer-events: none; }
+.well > * { max-width: 100%; }
+/* List with sidebar: a sticky 230px column of groups beside a table card. */
+.with-side { display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: var(--space-stack-md); align-items: start; }
+.with-side > aside { position: sticky; top: var(--space-4); }
+.chips { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; }
+.chips .ds-nav__list { flex-direction: row; flex-wrap: wrap; }
+@media (max-width: 1180px) { .grid--library { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 760px) { .grid--library { grid-template-columns: 1fr; } .with-side { grid-template-columns: 1fr; } .with-side > aside { position: static; } }

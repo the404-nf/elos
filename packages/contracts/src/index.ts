@@ -80,7 +80,8 @@ export const StyleKey = z.enum([
   // Decorative parts (lights, grain, beams) and glass: effects a token cannot carry.
   "opacity", "mix-blend-mode", "background-image", "backdrop-filter", "filter", "mask", "-webkit-mask", "mask-composite", "-webkit-mask-composite", "clip-path", "isolation", "will-change",
   // Inline SVG parts (icons, illustrations).
-  "fill", "stroke", "stroke-width", "stroke-linecap", "stroke-linejoin", "background-size", "background-position", "margin-left", "margin-right", "margin-top", "margin-bottom",
+  "fill", "stroke", "stroke-width", "stroke-linecap", "stroke-linejoin", "background-size", "background-position", "background-origin", "background-clip", "margin-left", "margin-right", "margin-top", "margin-bottom",
+  "grid-template-columns", "grid-template-areas", "grid-area", "grid-column", "grid-row", "justify-self", "align-content", "place-items",
 ]);
 const Styles = z.record(z.string().refine((k) => StyleKey.options.includes(k as never) || k.startsWith("--"), "not a whitelisted style key"), z.string());
 export type Styles = z.infer<typeof Styles>;

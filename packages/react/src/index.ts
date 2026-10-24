@@ -30,6 +30,11 @@ function useElos(): Ctx {
   return ctx;
 }
 
+/** The catalog the nearest ElosProvider serves. */
+export function useCatalog(): Catalog {
+  return useElos().catalog;
+}
+
 export function useContract(id: string): Contract {
   const { catalog } = useElos();
   const c = catalog.contracts.find((c) => c.id === id);

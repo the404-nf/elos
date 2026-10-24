@@ -358,6 +358,32 @@
           "$value": "{color.text.on-bloom}"
         }
       }
+    },
+    "nav": {
+      "default": {
+        "foreground": {
+          "$value": "{color.text.secondary}",
+          "$description": "Nav items on a page surface."
+        },
+        "hover-background": {
+          "$value": "{color.surface.sunken}"
+        },
+        "hover-foreground": {
+          "$value": "{color.text.primary}"
+        }
+      },
+      "bloom": {
+        "foreground": {
+          "$value": "{color.text.on-bloom}",
+          "$description": "Nav items on the Bloom header."
+        },
+        "hover-background": {
+          "$value": "{color.surface.glass}"
+        },
+        "hover-foreground": {
+          "$value": "{color.text.on-bloom}"
+        }
+      }
     }
   },
   "space": {

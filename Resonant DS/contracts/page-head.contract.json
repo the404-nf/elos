@@ -77,6 +77,16 @@
                 "variant": "glass"
               }
             }
+          ],
+          "extras": [
+            {
+              "component": "ds.badge",
+              "props": {
+                "label": "Draft",
+                "tone": "accent",
+                "dot": true
+              }
+            }
           ]
         }
       }
@@ -206,7 +216,7 @@
             "gap": "{space.3}"
           },
           "tokens": {
-            "margin-bottom": "{space.12}"
+            "margin-bottom": "{space.8}"
           }
         },
         "breadcrumb": {
@@ -244,13 +254,13 @@
           "description": "Title and lead on the left, actions bottom right.",
           "element": "div",
           "layout": {
-            "display": "flex",
-            "direction": "row",
-            "align": "end",
+            "display": "grid",
             "gap": "{space.5}"
           },
           "styles": {
-            "flex-wrap": "wrap"
+            "grid-template-columns": "minmax(0, 1fr) auto",
+            "grid-template-areas": "\"text actions\" \"extras actions\"",
+            "align-items": "end"
           },
           "parts": {
             "text": {
@@ -262,7 +272,7 @@
                 "gap": "{space.3}"
               },
               "styles": {
-                "flex": "1 1 320px",
+                "grid-area": "text",
                 "min-width": "0"
               },
               "parts": {
@@ -303,7 +313,7 @@
               }
             },
             "actions": {
-              "description": "At most two: one primary and one glass.",
+              "description": "At most two: one primary and one glass. Bottom right; under the lead on the home.",
               "element": "div",
               "optional": true,
               "slot": {
@@ -319,35 +329,67 @@
                 "gap": "{space.2}"
               },
               "styles": {
-                "margin-left": "auto"
+                "grid-area": "actions",
+                "justify-self": "end",
+                "align-self": "end"
+              },
+              "stylesByProp": {
+                "variant": {
+                  "display": {
+                    "justify-self": "start"
+                  }
+                }
+              }
+            },
+            "extras": {
+              "description": "Badges and tabs under the lead; on the home, a 2 by 2 grid of glass stat tiles on the right.",
+              "element": "div",
+              "optional": true,
+              "slot": {
+                "acceptsMode": "open"
+              },
+              "layout": {
+                "display": "flex",
+                "direction": "row",
+                "align": "center",
+                "gap": "{space.3}"
+              },
+              "styles": {
+                "grid-area": "extras",
+                "flex-wrap": "wrap",
+                "min-width": "0"
+              },
+              "stylesByProp": {
+                "variant": {
+                  "display": {
+                    "display": "grid",
+                    "grid-template-columns": "repeat(2, minmax(140px, 1fr))",
+                    "justify-self": "end",
+                    "align-self": "end",
+                    "width": "100%",
+                    "max-width": "440px"
+                  }
+                }
+              }
+            }
+          },
+          "stylesByProp": {
+            "variant": {
+              "display": {
+                "grid-template-columns": "minmax(0, 1.3fr) minmax(0, 1fr)",
+                "grid-template-areas": "\"text extras\" \"actions extras\""
               }
             }
           }
         },
-        "extras": {
-          "description": "Glass stat tiles, a segmented control or a note under the lead.",
-          "element": "div",
-          "optional": true,
-          "slot": {
-            "acceptsMode": "open"
-          },
-          "layout": {
-            "display": "flex",
-            "direction": "row",
-            "align": "center",
-            "gap": "{space.3}"
-          },
-          "styles": {
-            "flex-wrap": "wrap"
-          }
-        },
         "tabs": {
-          "description": "Section tabs on detail pages.",
+          "description": "Section tabs on detail pages: a Tabs, or a Nav of links when the sections are routes.",
           "element": "div",
           "optional": true,
           "slot": {
             "accepts": [
-              "ds.tabs"
+              "ds.tabs",
+              "ds.nav"
             ],
             "acceptsMode": "restrict",
             "max": 1

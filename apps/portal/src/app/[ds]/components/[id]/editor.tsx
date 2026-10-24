@@ -3,17 +3,20 @@
 // styles, or switch the panel to JSON. Contract tab: the contract as a form, or as code. Every edit
 // re-renders from the modified contract; Save validates the whole system on the server before the draft changes.
 import { useMemo, useState, useTransition, type MouseEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { StyleKey, type Catalog, type Contract, type Part } from "@elos/contracts";
 import { emitComponentCss, partClass } from "@elos/core/css";
 import { ElosProvider, Render } from "@elos/react";
 import { zagBehaviors } from "@elos/react/behaviors";
-import { Badge, Button, Card, Checkbox, Field, Input, Option, Select, Stack, Text, Textarea, elements, options } from "@/components/elos-client.tsx";
+import { Badge, Button, Card, Checkbox, Field, Input, Nav, NavItem, Option, Select, Stack, Table, TableCell, TableRow, Text, Textarea, elements, options } from "@/components/elos-client.tsx";
 import { PageHead } from "@/components/page-head.tsx";
 import { saveContract } from "../actions.ts";
 import { ContractForm } from "./contract-form.tsx";
 
 type Bindings = Record<string, string>;
+type Stop = { path: string; value: number; label: string };
+const TABS = ["preview", "contract", "usage"] as const;
+type Tab = (typeof TABS)[number];
 const STATES = ["hover", "focus-visible", "active", "disabled", "selected", "checked", "open", "invalid"] as const;
 const SUPPORT_TONE = { native: "success", degraded: "warning", unsupported: "danger" } as const;
 const mono = { fontFamily: "var(--font-family-mono)" } as const;
@@ -30,8 +33,42 @@ function findPart(anatomy: Record<string, Part>, name: string): Part | undefined
 }
 const partNames = (anatomy: Record<string, Part>): string[] => Object.entries(anatomy).flatMap(([n, p]) => [n, ...(p.parts ? partNames(p.parts) : [])]);
 
+/** The dimension tokens a binding can snap to: the siblings of the bound token, one stop per value, sorted. */
+function stopsFor(ref: string, tokens: Catalog["tokens"]["base"]): { current: number; stops: Stop[] } | null {
+  const m = ref.match(/^\{([a-z0-9.-]+)\}$/);
+  if (!m) return null;
+  const path = m[1]!;
+  const parent = path.split(".").slice(0, -1).join(".");
+  const px = (v: string) => (/^-?[\d.]+px$/.test(v) ? parseFloat(v) : NaN);
+  const siblings = tokens.filter((t) => t.type === "dimension" && t.path.startsWith(parent + ".") && t.path.split(".").length === path.split(".").length && !Number.isNaN(px(t.value)));
+  const byValue = new Map<number, Stop>();
+  for (const t of siblings.sort((a, b) => (a.path === path ? -1 : b.path === path ? 1 : 0))) {
+    const v = px(t.value);
+    const stop = byValue.get(v);
+    if (stop) stop.label += ` ${t.path.split(".").pop()}`; // ponytail: tokens that share a value share a stop; the bound one, else the first, names it
+    else byValue.set(v, { path: t.path, value: v, label: t.path.split(".").pop()! });
+  }
+  const stops = [...byValue.values()].sort((a, b) => a.value - b.value);
+  const current = stops.findIndex((st) => st.value === px(tokens.find((t) => t.path === path)?.value ?? ""));
+  return stops.length > 1 && current >= 0 ? { current, stops } : null;
+}
+
+/** A range that snaps a dimension binding to the stops of its scale, the way the approved inspector does. */
+function ScaleSlider({ label, tokenRef, tokens, onPick }: { label: string; tokenRef: string; tokens: Catalog["tokens"]["base"]; onPick: (ref: string) => void }) {
+  const scale = stopsFor(tokenRef, tokens);
+  if (!scale) return null;
+  const { current, stops } = scale;
+  return (
+    <div className="scale">
+      <input type="range" min={0} max={stops.length - 1} step={1} value={current} aria-label={`${label} on the ${tokenRef.slice(1, -1).split(".").slice(0, -1).join(".")} scale`}
+        aria-valuetext={`${stops[current]!.label}, ${stops[current]!.value}px`} onChange={(e) => onPick(`{${stops[Number(e.target.value)]!.path}}`)} />
+      <div className="scale-labels">{stops.map((st) => <Text key={st.path} as="span" variant="eyebrow" tone={st.path === stops[current]!.path ? "primary" : "tertiary"} text={String(st.value)} title={st.label} />)}</div>
+    </div>
+  );
+}
+
 /** Key/value rows for token bindings or literal styles. Defined at module level so React keeps the inputs mounted between keystrokes. */
-function Rows({ label, bindings, onChange, keyList }: { label: string; bindings: Bindings; onChange: (b: Bindings) => void; keyList?: string }) {
+function Rows({ label, bindings, onChange, keyList, tokens }: { label: string; bindings: Bindings; onChange: (b: Bindings) => void; keyList?: string; tokens?: Catalog["tokens"]["base"] }) {
   const entries = Object.entries(bindings);
   const rename = (i: number, key: string) => onChange(Object.fromEntries(entries.map(([k, v], j) => (j === i ? [key, v] : [k, v]))));
   return (
@@ -41,12 +78,15 @@ function Rows({ label, bindings, onChange, keyList }: { label: string; bindings:
         <Button label="Add" variant="ghost" size="sm" onClick={() => onChange({ ...bindings, "": "" })} />
       </Stack>
       {entries.map(([k, v], i) => (
-        <Stack key={i} direction="row" gap="xs" align="center">
+        <Stack key={i} gap="xs">
+          <Stack direction="row" gap="xs" align="center">
           <div style={{ width: 130, flex: "none" }}>
             <Input size="sm" list={keyList} value={k} placeholder="css property" aria-label={`${label} property`} onChange={(e) => rename(i, e.target.value)} />
           </div>
           <Input size="sm" list={keyList ? undefined : "token-refs"} value={v} placeholder={keyList ? "value" : "{token.path}"} aria-label={`${label} value`} onChange={(e) => onChange({ ...bindings, [k]: e.target.value })} />
           <Button label="×" variant="ghost" size="sm" aria-label={`Remove ${k || "row"}`} onClick={() => onChange(Object.fromEntries(entries.filter((_, j) => j !== i)))} />
+          </Stack>
+          {tokens && <ScaleSlider label={k} tokenRef={v} tokens={tokens} onPick={(ref) => onChange({ ...bindings, [k]: ref })} />}
         </Stack>
       ))}
       {entries.length === 0 && <Text as="span" variant="caption" tone="secondary" text="None." />}
@@ -63,9 +103,9 @@ function rulesFor(c: Contract, tree: { props?: Record<string, unknown> } | undef
   return specific.length ? specific.slice(0, 5) : [...c.guidelines.do.slice(0, 1).map((text) => ({ text, kind: "do" })), ...c.guidelines.dont.slice(0, 1).map((text) => ({ text, kind: "dont" }))];
 }
 
-function CopyButton({ label, text }: { label: string; text: string }) {
+function CopyButton({ label, text, variant = "ghost", size = "sm" }: { label: string; text: string; variant?: "ghost" | "glass"; size?: "sm" | "md" }) {
   const [done, setDone] = useState(false);
-  return <Button label={done ? "Copied" : label} variant="ghost" size="sm" onClick={() => navigator.clipboard.writeText(text).then(() => { setDone(true); setTimeout(() => setDone(false), 1500); })} />;
+  return <Button label={done ? "Copied" : label} variant={variant} size={size} onClick={() => navigator.clipboard.writeText(text).then(() => { setDone(true); setTimeout(() => setDone(false), 1500); })} />;
 }
 
 export function ComponentEditor({ ds, contract, catalog, markdown, usageHtml }: { ds: string; contract: Contract; catalog: Catalog; markdown: string; usageHtml: string }) {
@@ -73,6 +113,8 @@ export function ComponentEditor({ ds, contract, catalog, markdown, usageHtml }: 
   const [showTree, setShowTree] = useState(false);
   const [baseline, setBaseline] = useState<Contract>(contract); // what the draft holds, updated on save
   const router = useRouter();
+  const params = useSearchParams();
+  const [tab, setTab] = useState<Tab>((TABS as readonly string[]).includes(params.get("tab") ?? "") ? (params.get("tab") as Tab) : "preview");
   const [selected, setSelected] = useState<string | null>(null);
   const [example, setExample] = useState(0);
   const [selectMode, setSelectMode] = useState(true);
@@ -124,6 +166,7 @@ export function ComponentEditor({ ds, contract, catalog, markdown, usageHtml }: 
 
   const previewPanel = (
     <div className="editor">
+      <Card title="Variants" heading="h2">
       <Stack gap="sm">
         <Stack direction="row" gap="md" align="end" style={{ justifyContent: "space-between" }}>
           <Field label="Example">
@@ -159,23 +202,23 @@ export function ComponentEditor({ ds, contract, catalog, markdown, usageHtml }: 
           ))}
         </Stack>
       </Stack>
+      </Card>
 
       <aside>
-        <Card>
+        <Card title={part && selected ? selected : "Anatomy and bindings"} heading="h2">
           <Stack gap="md">
             {part && selected ? (
               <>
                 <Stack direction="row" gap="sm" align="center" style={{ justifyContent: "space-between" }}>
-                  <Text as="h2" variant="heading" text={selected} />
+                  <Text variant="caption" tone="secondary" text={`${part.element ?? "div"}${part.description ? ` · ${part.description}` : ""}`} />
                   <Checkbox label="JSON" checked={partAsJson} onChange={(e) => setPartAsJson(e.target.checked)} />
                 </Stack>
-                <Text variant="caption" tone="secondary" text={`${part.element ?? "div"}${part.description ? ` · ${part.description}` : ""}`} />
                 {partAsJson ? (
                   <Textarea key={selected} rows={18} style={mono} aria-label={`${selected} as JSON`} defaultValue={JSON.stringify(part, null, 2)}
                     onBlur={(e) => { try { const p = JSON.parse(e.target.value); setError(null); update(() => p); } catch (err) { setError(`Invalid JSON: ${(err as Error).message}`); } }} />
                 ) : (
                   <>
-                    <Rows label="Token bindings" bindings={part.tokens ?? {}} onChange={(tokens) => update((p) => ({ ...p, tokens }))} />
+                    <Rows label="Token bindings" bindings={part.tokens ?? {}} tokens={catalog.tokens.base} onChange={(tokens) => update((p) => ({ ...p, tokens }))} />
                     {Object.entries(part.states ?? {}).map(([state, b]) => (
                       <Rows key={state} label={`State: ${state}`} bindings={b} onChange={(nb) => update((p) => ({ ...p, states: { ...p.states, [state]: nb } }))} />
                     ))}
@@ -190,12 +233,28 @@ export function ComponentEditor({ ds, contract, catalog, markdown, usageHtml }: 
                 )}
               </>
             ) : (
-              <>
-                <Text as="h2" variant="heading" text="Anatomy" />
-                <Text variant="caption" tone="secondary" text="Click a part in the preview, or pick one from the list under it, to edit its token bindings, states and styles. Props, usage and guidelines are on the Contract tab." />
-              </>
+              <Text variant="caption" tone="secondary" text="Click a part in the preview, or pick one from the list under it, to edit its token bindings, states and styles. Dimension bindings get a slider that snaps to the scale. Props, usage and guidelines are on the Contract tab." />
             )}
             {error && <div className="error">{error}</div>}
+          </Stack>
+        </Card>
+        <Card title="Channels" heading="h2">
+          <Table caption="Channel support" body={Object.entries(draft.channels).map(([ch, s]) => (
+            <TableRow key={ch}>
+              <TableCell><Stack gap="xs"><Text as="span" variant="label" text={ch} /><Text as="span" variant="caption" tone="secondary" text={`${s.as ? `as ${s.as}` : s.support}${s.note ? ` · ${s.note}` : ""}`} /></Stack></TableCell>
+              <TableCell align="end"><Badge label={s.support} tone={SUPPORT_TONE[s.support]} /></TableCell>
+            </TableRow>
+          ))} />
+        </Card>
+        <Card title="Keyboard and focus" heading="h2">
+          <Stack gap="xs">
+            {draft.a11y.keyboard.map((k) => <Stack key={k.key} direction="row" gap="sm" align="center"><Text as="code" variant="code" text={k.key} /><Text as="span" variant="caption" tone="secondary" text={k.action} /></Stack>)}
+            <ul className="rules">
+              <li data-kind={draft.a11y.focusVisible ? "do" : "dont"}>{draft.a11y.focusVisible ? "Visible focus ring on color.border.focus" : "No focus ring"}</li>
+              {draft.a11y.minHitArea && <li data-kind="do">Hit area at least {draft.a11y.minHitArea}px</li>}
+              <li data-kind="do">{draft.a11y.contrast} contrast in dark and light</li>
+              {draft.a11y.aria.map((a) => <li key={a}>{a}</li>)}
+            </ul>
           </Stack>
         </Card>
       </aside>
@@ -227,44 +286,33 @@ export function ComponentEditor({ ds, contract, catalog, markdown, usageHtml }: 
 
       <PageHead
         title={draft.name}
+        description={draft.description}
         crumbs={[{ href: `/${ds}/components`, label: "Components" }, { href: `/${ds}/components/${draft.id}`, label: draft.name }]}
         actions={
           <>
-            {error && <span className="error">{error.split("\n")[0]}</span>}
-            {saved && !dirty && <Text as="span" variant="caption" tone="secondary" text="Saved." />}
-            {dirty && <Button label="Discard" variant="ghost" onClick={() => change(baseline)} />}
-            <Button label={pending ? "Saving…" : "Save to draft"} disabled={!dirty || pending} onClick={save} />
+            {dirty && <Button label="Discard" variant="glass" onClick={() => change(baseline)} />}
+            {!dirty && <CopyButton label="Copy for agent" text={JSON.stringify(draft, null, 2)} variant="glass" size="md" />}
+            <Button label={pending ? "Saving…" : !dirty && saved ? "Saved" : "Save to draft"} disabled={!dirty || pending} onClick={save} />
           </>
         }
-      >
-        <Badge label={draft.status} tone={draft.status === "stable" ? "success" : draft.status === "deprecated" ? "danger" : "neutral"} />
-        <Text as="span" variant="caption" tone="secondary" text={draft.id} style={mono} />
-      </PageHead>
-      <Stack direction="row" gap="xs" align="center">
-        <Text as="span" variant="caption" tone="secondary" text="Channels" />
-        {Object.entries(draft.channels).map(([ch, s]) => (
-          <Badge key={ch} label={`${ch} ${s.support}`} tone={SUPPORT_TONE[s.support]} title={`${s.as ? `as ${s.as}` : s.support}${s.note ? ` · ${s.note}` : ""}`} />
-        ))}
-      </Stack>
-
-      <Render
-        tree={{
-          component: "ds.tabs",
-          props: { defaultValue: "preview" },
-          slots: {
-            list: [
-              { component: "ds.tab", props: { value: "preview", label: "Preview" } },
-              { component: "ds.tab", props: { value: "contract", label: "Contract" } },
-              { component: "ds.tab", props: { value: "usage", label: "Usage" } },
-            ],
-            panels: [
-              { component: "ds.tab-panel", props: { value: "preview" }, slots: { root: [<div key="p">{previewPanel}</div>] } },
-              { component: "ds.tab-panel", props: { value: "contract" }, slots: { root: [<div key="c">{contractPanel}</div>] } },
-              { component: "ds.tab-panel", props: { value: "usage" }, slots: { root: [<Card key="u" padding="lg"><div className="prose" dangerouslySetInnerHTML={{ __html: usageHtml }} /></Card>] } },
-            ],
-          },
-        }}
+        extras={
+          <>
+            <Badge label={draft.status} tone={draft.status === "stable" ? "success" : draft.status === "deprecated" ? "danger" : "accent"} dot />
+            <Text as="code" variant="code" text={`v${draft.version}`} />
+            <Text as="code" variant="code" text={draft.id} />
+            <Text as="span" variant="caption" text={`${draft.behavior ? "Zag " + draft.behavior : "native " + draft.semantics.element} · ${draft.props.filter((p) => typeof p.type === "object").length} enum props · ${draft.states.length} states`} style={{ opacity: 0.85 }} />
+            {error && <span className="error">{error.split("\n")[0]}</span>}
+          </>
+        }
+        tabs={
+          <Nav label="Sections" orientation="horizontal" list={TABS.map((t) => (
+            <NavItem key={t} href={`?tab=${t}`} label={t.charAt(0).toUpperCase() + t.slice(1)} tone="bloom" current={tab === t} onClick={(e) => { e.preventDefault(); setTab(t); }} />
+          ))} />
+        }
       />
+      {tab === "preview" && previewPanel}
+      {tab === "contract" && contractPanel}
+      {tab === "usage" && <Card padding="xl"><div className="prose" dangerouslySetInnerHTML={{ __html: usageHtml }} /></Card>}
     </ElosProvider>
   );
 }
