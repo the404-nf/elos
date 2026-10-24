@@ -41,7 +41,24 @@ export function checkOp(contract: Contract, catalog: Catalog, op: Op): string | 
   return null;
 }
 
-const themeValue = (catalog: Catalog, theme: string, ref: string) => {
+/** The token one stop up (+1) or down (-1) the scale of a dimension binding: the siblings of the bound token, by value. Null when there is none. */
+export function stepToken(catalog: Catalog, ref: string, dir: 1 | -1): string | null {
+  const m = ref.match(/^\{([a-z0-9.-]+)\}$/);
+  if (!m) return null;
+  const path = m[1]!;
+  const parent = path.split(".").slice(0, -1).join(".");
+  const px = (v: string) => (/^-?[\d.]+px$/.test(v) ? parseFloat(v) : NaN);
+  const stops = catalog.tokens.base
+    .filter((t) => t.type === "dimension" && t.path.startsWith(parent + ".") && t.path.split(".").length === path.split(".").length && !Number.isNaN(px(t.value)))
+    .sort((a, b) => px(a.value) - px(b.value));
+  const current = stops.find((t) => t.path === path);
+  if (!current) return null;
+  const candidates = stops.filter((t) => (dir > 0 ? px(t.value) > px(current.value) : px(t.value) < px(current.value)));
+  const pick = dir > 0 ? candidates[0] : candidates.at(-1);
+  return pick ? `{${pick.path}}` : null;
+}
+
+const themeValue =(catalog: Catalog, theme: string, ref: string) => {
   const m = ref.match(/^\{([a-z0-9.-]+)\}$/);
   if (!m) return /\{\w+\}/.test(ref) ? "(per prop)" : ref;
   return (catalog.tokens[theme] ?? catalog.tokens.base).find((t) => t.path === m[1])?.value ?? "?";

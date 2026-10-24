@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Catalog } from "@elos/contracts";
-import { applyOp, checkOp, render, vocabulary } from "./operate.ts";
+import { applyOp, checkOp, render, stepToken, vocabulary } from "./operate.ts";
 
 const catalog = JSON.parse(readFileSync(join(import.meta.dirname, "../../../../Resonant DS/dist/catalog.json"), "utf8")) as Catalog;
 const button = catalog.contracts.find((c) => c.id === "ds.button")!;
@@ -23,4 +23,7 @@ test("the one operation: check, apply, render per theme", () => {
   assert.match(out, /^Themes: base \| dark/);
   assert.match(out, /gap \{space.inset.md\} = 12px \| 12px/);
   assert.ok(vocabulary(catalog).startsWith("{color."), "semantic tokens come first");
+  assert.equal(stepToken(catalog, "{space.4}", 1), "{space.5}");
+  assert.equal(stepToken(catalog, "{space.1}", -1), null, "nothing below the smallest stop");
+  assert.equal(stepToken(catalog, "{space.inset.{size}}", 1), null, "a prop placeholder has no scale");
 });
