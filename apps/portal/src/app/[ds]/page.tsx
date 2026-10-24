@@ -15,6 +15,7 @@ export default async function Overview({ params }: { params: Promise<{ ds: strin
     [catalog.tokens.base.length, "Tokens", `/${ds}/tokens`],
     [catalog.contracts.length, "Components", `/${ds}/components`],
     [catalog.pages.length, "Pages", `/${ds}/pages`],
+    [catalog.screens.length, "Screens", `/${ds}/screens`],
     [1 + catalog.system.themes.length, "Themes", `/${ds}/tokens`],
   ];
   const lead = latest

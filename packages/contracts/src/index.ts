@@ -225,6 +225,15 @@ export const PageExample = z.object({
 });
 export type PageExample = z.infer<typeof PageExample>;
 
+// ---------- screens (ADR 0017): product compositions kept on the spine and edited on the canvas ----------
+export const Screen = z.object({
+  id: z.string().regex(/^screen\.[a-z][a-z0-9-]*$/),
+  name: z.string(),
+  description: z.string().default(""),
+  tree: CompositionNode,
+});
+export type Screen = z.infer<typeof Screen>;
+
 // ---------- system manifest ----------
 export const Theme = z.object({
   name: z.string(),
@@ -243,6 +252,7 @@ export const SystemManifest = z.object({
   fonts: z.array(z.object({ family: z.string(), url: z.string().url() })).default([]), // faces the font tokens name; the CSS imports them
   contracts: z.string().default("contracts"), // folder of *.contract.json
   pages: z.string().default("pages"), // folder of *.page.json
+  screens: z.string().default("screens"), // folder of *.screen.json
   assets: z.string().default("assets"), // folder of <kind>/<name>.svg
 });
 export type SystemManifest = z.infer<typeof SystemManifest>;
@@ -263,6 +273,7 @@ export const Catalog = z.object({
   tokens: z.record(z.string(), z.array(ResolvedToken)), // "base" and each theme name -> flat resolved tokens
   contracts: z.array(Contract),
   pages: z.array(PageExample).default([]),
+  screens: z.array(Screen).default([]),
   assets: z.record(z.string(), z.record(z.string(), z.string())).default({}), // kind -> name -> svg source
 });
 export type Catalog = z.infer<typeof Catalog>;

@@ -42,31 +42,33 @@ export function useContract(id: string): Contract {
   return c;
 }
 
-export function Render({ tree }: { tree: Node }) {
+/** Renders a composition tree. With `path` (the root's, usually ""), every node's root element carries `data-node`
+ *  with its path in the tree (`/<slot>/<index>` per level), so an editor can map a click back to a node. */
+export function Render({ tree, path }: { tree: Node; path?: string }) {
   const contract = useContract(tree.component);
   const { props, errors } = resolveProps(contract, tree.props);
   errors.push(...checkSlots(contract, tree));
   if (errors.length) throw new Error(errors.join("\n"));
-  return contract.behavior ? h(WithBehavior, { tree, contract, props }) : h(Body, { tree, contract, props, parts: {} });
+  return contract.behavior ? h(WithBehavior, { tree, contract, props, path }) : h(Body, { tree, contract, props, parts: {}, path });
 }
 
-type BodyProps = { tree: Node; contract: Contract; props: Record<string, Scalar>; parts: Record<string, DomProps> };
+type BodyProps = { tree: Node; contract: Contract; props: Record<string, Scalar>; parts: Record<string, DomProps>; path?: string };
 
-function WithBehavior({ tree, contract, props }: Omit<BodyProps, "parts">) {
+function WithBehavior({ tree, contract, props, path }: Omit<BodyProps, "parts">) {
   const { behaviors } = useElos();
   const parent = useContext(ParentBehavior);
   const behavior = behaviors[contract.behavior!];
   if (!behavior) throw new Error(`${contract.id}: behavior "${contract.behavior}" has no adapter registered`);
   const { parts, expose } = behavior({ props, parent });
-  return h(ParentBehavior.Provider, { value: expose }, h(Body, { tree, contract, props, parts }));
+  return h(ParentBehavior.Provider, { value: expose }, h(Body, { tree, contract, props, parts, path }));
 }
 
-function Body({ tree, contract, props, parts }: BodyProps) {
+function Body({ tree, contract, props, parts, path }: BodyProps) {
   const decoration = useContext(Decoration);
   const { elements, catalog } = useElos();
   const [rootName, root] = Object.entries(contract.anatomy)[0]!;
   // Reset decoration for everything below: it was meant for this component's root only.
-  return h(Decoration.Provider, { value: undefined }, renderPart({ contract, props, tree, parts, decoration, elements, catalog }, rootName, root, true));
+  return h(Decoration.Provider, { value: undefined }, renderPart({ contract, props, tree, parts, decoration, elements, catalog, path }, rootName, root, true));
 }
 
 type PartCtx = BodyProps & { decoration?: DomProps; elements: Record<string, ElementType>; catalog: Catalog };
@@ -90,7 +92,7 @@ function renderPart(ctx: PartCtx, name: string, part: Part, isRoot: boolean): Re
     if (items.length === 0 && part.optional) return null;
     const decorate = part.slot.decorate ? parts[part.slot.decorate] : undefined;
     items.forEach((item, i) => {
-      const el = isNode(item) ? h(Render, { key: i, tree: item }) : (item as ReactNode);
+      const el = isNode(item) ? h(Render, { key: i, tree: item, path: ctx.path === undefined ? undefined : `${ctx.path}/${name}/${i}` }) : (item as ReactNode);
       children.push(decorate ? h(Decoration.Provider, { key: i, value: decorate }, el) : el);
     });
   }
@@ -128,6 +130,7 @@ function renderPart(ctx: PartCtx, name: string, part: Part, isRoot: boolean): Re
       if (p.cssVar) attrs.style = { ...(attrs.style as object | undefined), [p.cssVar]: v };
     }
     if (contract.semantics.role && contract.semantics.role !== part.element) attrs.role = contract.semantics.role;
+    if (ctx.path !== undefined) attrs["data-node"] = ctx.path;
   }
   // A part that decorates its slot hands the behavior props to the slotted child, never to itself.
   Object.assign(attrs, part.slot?.decorate ? undefined : parts[name], isRoot ? ctx.decoration : undefined);

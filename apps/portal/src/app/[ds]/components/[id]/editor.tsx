@@ -103,13 +103,13 @@ function Palette({ choices, current, onPick }: { choices: Token[]; current: stri
       {[...groups].filter(([g]) => g !== "primitives").map(([g, ts]) => (
         <div key={g} className="palette-group">
           <Text as="span" variant="eyebrow" tone="tertiary" text={g.replace(/^color\./, "")} />
-          <div className="swatches">{ts.map((t) => <Swatch key={t.path} token={t} on={`{${t.path}}` === current} onPick={onPick} />)}</div>
+          <div className="palette-swatches">{ts.map((t) => <Swatch key={t.path} token={t} on={`{${t.path}}` === current} onPick={onPick} />)}</div>
         </div>
       ))}
       {groups.has("primitives") && (
         <div className="palette-group">
           <Button label={primitives ? "Hide primitives" : `Primitives (${groups.get("primitives")!.length})`} variant="ghost" size="sm" aria-expanded={primitives} onClick={() => setPrimitives(!primitives)} />
-          {primitives && <div className="swatches">{groups.get("primitives")!.map((t) => <Swatch key={t.path} token={t} on={`{${t.path}}` === current} onPick={onPick} />)}</div>}
+          {primitives && <div className="palette-swatches">{groups.get("primitives")!.map((t) => <Swatch key={t.path} token={t} on={`{${t.path}}` === current} onPick={onPick} />)}</div>}
         </div>
       )}
     </div>
@@ -117,7 +117,7 @@ function Palette({ choices, current, onPick }: { choices: Token[]; current: stri
 }
 // ponytail: a native button like the handles; a contract when a second screen needs a swatch picker (ADR 0014 left the color picker for later)
 const Swatch = ({ token: t, on, onPick }: { token: Token; on: boolean; onPick: (ref: string) => void }) => (
-  <button type="button" className="swatch" aria-pressed={on} aria-label={`${t.path} ${t.value}`} title={`${t.path}\n${t.value}${t.description ? "\n" + t.description : ""}`} style={{ background: t.value }} onClick={() => onPick(`{${t.path}}`)} />
+  <button type="button" className="palette-swatch" aria-pressed={on} aria-label={`${t.path} ${t.value}`} title={`${t.path}\n${t.value}${t.description ? "\n" + t.description : ""}`} style={{ background: t.value }} onClick={() => onPick(`{${t.path}}`)} />
 );
 
 /** One property of the inspector: a token picker of the property's category, a swatch palette for colors, a slider for dimensions. */
@@ -135,7 +135,7 @@ function PropRow({ prop, value, tokens, onChange, onRemove }: { prop: string; va
           <Input size="sm" list="token-refs" value={value} aria-label={`${prop} binding`} onChange={(e) => onChange(e.target.value)} style={mono} title={substituted ? "Follows a prop: the placeholder picks the token per value." : undefined} />
         ) : swatchable ? (
           <button type="button" className="swatch-trigger" aria-expanded={open} aria-label={`${prop} token: ${bound?.path ?? (value || "none")}. Opens the palette.`} onClick={() => setOpen(!open)} onKeyDown={(e) => { if (e.key === "Escape") setOpen(false); }} style={mono}>
-            <span className="swatch" style={{ background: bound?.value ?? "transparent" }} />
+            <span className="palette-swatch" style={{ background: bound?.value ?? "transparent" }} />
             <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{bound?.path ?? (value || "choose a token")}</span>
           </button>
         ) : (

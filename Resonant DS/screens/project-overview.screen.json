@@ -1,0 +1,67 @@
+{
+  "id": "screen.project-overview",
+  "name": "Project overview",
+  "description": "The first screen composed on the canvas: a header, three summary cards and the latest changes. Edit it at Screens in the portal.",
+  "tree": {
+    "component": "ds.stack",
+    "props": { "gap": "lg" },
+    "slots": {
+      "root": [
+        {
+          "component": "ds.stack",
+          "props": { "direction": "row", "gap": "md", "align": "center" },
+          "slots": {
+            "root": [
+              { "component": "ds.text", "props": { "as": "h2", "variant": "title", "text": "Acme Web" } },
+              { "component": "ds.badge", "props": { "label": "live", "tone": "success", "dot": true } }
+            ]
+          }
+        },
+        {
+          "component": "ds.stack",
+          "props": { "direction": "row", "gap": "md", "align": "stretch" },
+          "slots": {
+            "root": [
+              {
+                "component": "ds.card",
+                "props": { "title": "Screens" },
+                "slots": { "body": [{ "component": "ds.text", "props": { "as": "span", "variant": "stat", "text": "12" } }] }
+              },
+              {
+                "component": "ds.card",
+                "props": { "title": "Journeys" },
+                "slots": { "body": [{ "component": "ds.text", "props": { "as": "span", "variant": "stat", "text": "3" } }] }
+              },
+              {
+                "component": "ds.card",
+                "props": { "title": "Open reviews" },
+                "slots": { "body": [{ "component": "ds.text", "props": { "as": "span", "variant": "stat", "text": "2" } }, { "component": "ds.badge", "props": { "label": "needs a decision", "tone": "warning" } }] }
+              }
+            ]
+          }
+        },
+        {
+          "component": "ds.card",
+          "props": { "title": "Latest changes" },
+          "slots": {
+            "body": [
+              {
+                "component": "ds.stack",
+                "props": { "gap": "sm" },
+                "slots": {
+                  "root": [
+                    { "component": "ds.text", "props": { "text": "Checkout: the summary card gained a discount row." } },
+                    { "component": "ds.text", "props": { "tone": "secondary", "variant": "caption", "text": "Today by Lê" } },
+                    { "component": "ds.text", "props": { "text": "Onboarding: step three now asks for the team name first." } },
+                    { "component": "ds.text", "props": { "tone": "secondary", "variant": "caption", "text": "Yesterday by an agent" } }
+                  ]
+                }
+              }
+            ],
+            "actions": [{ "component": "ds.button", "props": { "label": "Publish", "variant": "primary", "size": "sm" } }]
+          }
+        }
+      ]
+    }
+  }
+}
