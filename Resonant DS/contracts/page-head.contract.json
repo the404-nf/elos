@@ -155,7 +155,7 @@
       "styles": {
         "position": "relative",
         "isolation": "isolate",
-        "overflow": "hidden",
+        "overflow": "clip",
         "box-sizing": "border-box"
       },
       "parts": {

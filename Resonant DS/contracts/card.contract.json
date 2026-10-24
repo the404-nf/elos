@@ -111,7 +111,7 @@
             "display": "none",
             "position": "absolute",
             "inset": "0",
-            "overflow": "hidden",
+            "overflow": "clip",
             "padding": "1.5px",
             "pointer-events": "none",
             "opacity": "var(--card-beam, 0)",
