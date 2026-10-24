@@ -158,20 +158,57 @@
           }
         },
         "header": {
-          "description": "Title of the group. Omit when the surrounding context already names it.",
-          "element": "{heading}",
+          "description": "Title row: the heading on the left, the meta slot (a link, a count, a toggle) on the right. Omitted when both are empty.",
+          "element": "div",
           "optional": true,
-          "content": {
-            "prop": "title"
+          "layout": {
+            "display": "flex",
+            "direction": "row",
+            "align": "center",
+            "gap": "{space.3}"
           },
-          "tokens": {
-            "font-family": "{type.heading.family}",
-            "font-size": "{font.size.md}",
-            "font-weight": "{type.heading.weight}",
-            "letter-spacing": "{type.heading.tracking}"
-          },
-          "styles": {
-            "margin": "0"
+          "parts": {
+            "title": {
+              "description": "Title of the group. Omit when the surrounding context already names it.",
+              "element": "{heading}",
+              "optional": true,
+              "content": {
+                "prop": "title"
+              },
+              "tokens": {
+                "font-family": "{type.heading.family}",
+                "font-size": "{font.size.md}",
+                "font-weight": "{type.heading.weight}",
+                "letter-spacing": "{type.heading.tracking}"
+              },
+              "styles": {
+                "margin": "0",
+                "flex": "1 1 auto",
+                "min-width": "0"
+              }
+            },
+            "meta": {
+              "description": "Trailing detail: a quiet link, a count or a segmented control.",
+              "element": "div",
+              "optional": true,
+              "slot": {
+                "acceptsMode": "open"
+              },
+              "layout": {
+                "display": "flex",
+                "direction": "row",
+                "align": "center",
+                "gap": "{space.2}"
+              },
+              "tokens": {
+                "color": "{color.text.secondary}",
+                "font-size": "{font.size.base}"
+              },
+              "styles": {
+                "margin-left": "auto",
+                "flex": "none"
+              }
+            }
           }
         },
         "body": {

@@ -18,14 +18,16 @@ const groupOf = (t: ResolvedToken): string => {
   return GROUP_OF[head!] ?? (COMPONENT_GROUPS.has(head!) ? "Component sizes" : head!);
 };
 const ORDER = ["Color · palette", "Color · text", "Color · surface", "Color · border", "Color · accent", "Color · status", "Color · action", "Color · nav", "Color · card", "Color · bloom", "Color · overlay", "Color · icon", "Color · illustration", "Color · gradient", "Space", "Radius", "Typography", "Motion", "Elevation", "Gradients", "Icons", "Other", "Component sizes"];
-const short = (v: string) => (v.length > 48 ? `${v.slice(0, 48)}…` : v);
+const short = (v: string) => (v.length > 40 ? `${v.slice(0, 40)}…` : v);
 const mono = { fontFamily: "var(--font-family-mono)", fontSize: "var(--font-size-sm)", textDecoration: "none" } as const;
 
-export default async function Tokens({ params, searchParams }: { params: Promise<{ ds: string }>; searchParams: Promise<{ group?: string; tier?: string; q?: string }> }) {
+export default async function Tokens({ params, searchParams }: { params: Promise<{ ds: string }>; searchParams: Promise<{ group?: string; tier?: string; q?: string; theme?: string }> }) {
   const [{ ds }, query] = await Promise.all([params, searchParams]);
   const { catalog } = await getDraft(ds);
+  const theme = query.theme === "dark" ? "dark" : "light";
   const dark = new Map((catalog.tokens.dark ?? []).map((t) => [t.path, t]));
   const all = catalog.tokens.base;
+  const shownValue = (t: ResolvedToken) => (theme === "dark" ? (dark.get(t.path) ?? t) : t);
 
   const groups = new Map<string, ResolvedToken[]>();
   for (const t of all) groups.set(groupOf(t), [...(groups.get(groupOf(t)) ?? []), t]);
@@ -34,29 +36,18 @@ export default async function Tokens({ params, searchParams }: { params: Promise
   const tier = (TIERS as string[]).includes(query.tier ?? "") ? (query.tier as Tier) : null;
   const q = (query.q ?? "").trim().toLowerCase();
   const matches = (t: ResolvedToken) => (!tier || tierOf(t) === tier) && (!q || t.path.includes(q) || t.value.toLowerCase().includes(q) || (t.alias ?? "").includes(q));
-  const href = (g: string | null, tr: string | null) => `/${ds}/tokens?${new URLSearchParams({ ...(g ? { group: g } : {}), ...(tr ? { tier: tr } : {}), ...(q ? { q } : {}) })}`;
+  const href = (g: string | null, tr: string | null, th = theme) => `/${ds}/tokens?${new URLSearchParams({ ...(g ? { group: g } : {}), ...(tr ? { tier: tr } : {}), ...(q ? { q } : {}), ...(th === "dark" ? { theme: "dark" } : {}) })}`;
+  const visible = all.filter(matches);
   const shown = (group ? [group] : ordered).map((g) => [g, groups.get(g)!.filter(matches)] as const).filter(([, list]) => list.length);
 
-  /** One swatch, or two when the dark theme changes the value. */
-  const Swatch = ({ t }: { t: ResolvedToken }) => {
-    const d = dark.get(t.path);
-    const differs = d && (d.alias !== t.alias || d.value !== t.value);
-    return (
-      <span className="swatch-pair">
-        <TokenPreview token={t} size={32} />
-        {differs && d && <span data-theme="dark"><TokenPreview token={d} size={32} /></span>}
-      </span>
-    );
-  };
   const Row = ({ t }: { t: ResolvedToken }) => {
-    const d = dark.get(t.path);
-    const darkValue = d && (d.alias !== t.alias || d.value !== t.value) ? (d.alias ? `→ ${d.alias}` : short(d.value)) : null;
+    const v = shownValue(t);
     return (
       <TableRow>
-        <TableCell><Swatch t={t} /></TableCell>
+        <TableCell><span data-theme={theme}><TokenPreview token={v} size={28} /></span></TableCell>
         <TableCell><Link href={`/${ds}/tokens/${t.path}`} label={t.path} tone="inherit" style={mono} title={t.description} /></TableCell>
-        <TableCell><Text as="code" variant="code" tone="secondary" text={t.alias ? `→ ${t.alias}${darkValue ? `  ·  dark ${darkValue}` : ""}` : darkValue ? `dark ${darkValue}` : ""} /></TableCell>
-        <TableCell align="end"><Text as="code" variant="code" text={short(t.value)} /></TableCell>
+        <TableCell><Text as="code" variant="code" tone="secondary" text={v.alias ? `→ ${v.alias}` : tierOf(t)} /></TableCell>
+        <TableCell align="end"><Text as="code" variant="code" text={short(v.value)} /></TableCell>
       </TableRow>
     );
   };
@@ -72,7 +63,7 @@ export default async function Tokens({ params, searchParams }: { params: Promise
         ))}
       </div>
     ) : (
-      <div className="scroll-x token-table"><Table caption={`${g} tokens`} body={list.map((t) => <Row key={t.path} t={t} />)} /></div>
+      <div className="scroll-x token-table"><Table body={list.map((t) => <Row key={t.path} t={t} />)} /></div>
     );
 
   return (
@@ -81,7 +72,12 @@ export default async function Tokens({ params, searchParams }: { params: Promise
         eyebrow={catalog.system.name}
         title="Tokens"
         description={`${all.length} tokens in three tiers. Components bind to semantic tokens, never to primitives.`}
-        extras={TIERS.map((tr) => <Text key={tr} as="span" variant="caption" text={`${all.filter((t) => tierOf(t) === tr).length} ${tr}`} style={{ opacity: 0.85 }} />)}
+        extras={
+          <Nav label="Theme shown" orientation="horizontal" list={[
+            <NavItem key="light" href={href(group, tier, "light")} label="Light" tone="bloom" current={theme === "light"} />,
+            <NavItem key="dark" href={href(group, tier, "dark")} label="Dark" tone="bloom" current={theme === "dark"} />,
+          ]} />
+        }
       />
       <div className="with-side">
         <aside>
@@ -89,8 +85,8 @@ export default async function Tokens({ params, searchParams }: { params: Promise
             <Stack gap="sm">
               <Text as="span" variant="caption" tone="secondary" text="Groups" />
               <Nav label="Token groups" list={[
-                <NavItem key="all" href={href(null, tier)} label="All" meta={String(all.length)} current={!group} />,
-                ...ordered.map((g) => <NavItem key={g} href={href(g, tier)} label={g} meta={String(groups.get(g)!.length)} current={g === group} />),
+                <NavItem key="all" href={href(null, tier)} label="All" meta={String(visible.length)} current={!group} />,
+                ...ordered.map((g) => <NavItem key={g} href={href(g, tier)} label={g} meta={String(groups.get(g)!.filter(matches).length)} current={g === group} />),
               ]} />
             </Stack>
           </Card>
@@ -104,12 +100,13 @@ export default async function Tokens({ params, searchParams }: { params: Promise
             <form method="get" action={`/${ds}/tokens`}>
               {group && <input type="hidden" name="group" value={group} />}
               {tier && <input type="hidden" name="tier" value={tier} />}
+              {theme === "dark" && <input type="hidden" name="theme" value="dark" />}
               <Input type="search" name="q" defaultValue={q} placeholder="Filter by name, value or alias" aria-label="Filter tokens" />
             </form>
           </div>
-          {shown.length === 0 && <Card><Text tone="secondary" text={`No token matches "${q}".`} /></Card>}
           <Card padding="lg">
             <Stack gap="md">
+              {shown.length === 0 && <Text tone="secondary" text={`No token matches "${q}".`} />}
               {shown.map(([g, list]) => (
                 <Stack key={g} gap="sm">
                   <div className="table-head">

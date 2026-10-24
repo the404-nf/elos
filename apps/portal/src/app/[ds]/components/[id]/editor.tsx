@@ -1,25 +1,30 @@
 "use client";
-// Component editor. Preview tab: click a part in the live preview to select it and edit its bindings and
-// styles, or switch the panel to JSON. Contract tab: the contract as a form, or as code. Every edit
-// re-renders from the modified contract; Save validates the whole system on the server before the draft changes.
+// Component page. Reading: an overview generated from the contract (variants, channels, anatomy and bindings, keyboard, do and don't),
+// the contract as code or form, accessibility, usage. Editing: three panes, parts and variants on the left, the canvas in the middle
+// with its own theme and size, the inspector on the right where every control writes a token binding and sliders snap to the scale.
+// Save validates the whole system on the server before the draft changes.
 import { useMemo, useState, useTransition, type MouseEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { StyleKey, type Catalog, type Contract, type Part } from "@elos/contracts";
 import { emitComponentCss, partClass } from "@elos/core/css";
 import { ElosProvider, Render } from "@elos/react";
 import { zagBehaviors } from "@elos/react/behaviors";
-import { Badge, Button, Card, Checkbox, Field, Icon, Input, Nav, NavItem, Option, Select, Stack, Table, TableCell, TableRow, Text, Textarea, elements, options } from "@/components/elos-client.tsx";
+import { Badge, Button, Card, Checkbox, Field, Icon, Input, Link, Nav, NavItem, Option, Select, Stack, Table, TableCell, TableRow, Text, Textarea, elements, options } from "@/components/elos-client.tsx";
+import { CopyButton } from "@/components/copy-button.tsx";
 import { PageHead } from "@/components/page-head.tsx";
 import { saveContract } from "../actions.ts";
 import { ContractForm } from "./contract-form.tsx";
 
 type Bindings = Record<string, string>;
 type Stop = { path: string; value: number; label: string };
+type Tokens = Catalog["tokens"]["base"];
+type EnumProp = Contract["props"][number] & { type: { enum: string[] } };
 const TABS = ["overview", "contract", "accessibility", "usage"] as const;
 type Tab = (typeof TABS)[number];
 const STATES = ["hover", "focus-visible", "active", "disabled", "selected", "checked", "open", "invalid"] as const;
 const SUPPORT_TONE = { native: "success", degraded: "warning", unsupported: "danger" } as const;
 const mono = { fontFamily: "var(--font-family-mono)" } as const;
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 function mapPart(anatomy: Record<string, Part>, name: string, fn: (p: Part) => Part): Record<string, Part> {
   return Object.fromEntries(Object.entries(anatomy).map(([n, p]) => [n, n === name ? fn(p) : p.parts ? { ...p, parts: mapPart(p.parts, name, fn) } : p]));
@@ -31,10 +36,11 @@ function findPart(anatomy: Record<string, Part>, name: string): Part | undefined
     if (nested) return nested;
   }
 }
-const partNames = (anatomy: Record<string, Part>): string[] => Object.entries(anatomy).flatMap(([n, p]) => [n, ...(p.parts ? partNames(p.parts) : [])]);
+const partList = (anatomy: Record<string, Part>, depth = 0): { name: string; part: Part; depth: number }[] =>
+  Object.entries(anatomy).flatMap(([name, part]) => [{ name, part, depth }, ...(part.parts ? partList(part.parts, depth + 1) : [])]);
 
 /** The dimension tokens a binding can snap to: the siblings of the bound token, one stop per value, sorted. */
-function stopsFor(ref: string, tokens: Catalog["tokens"]["base"]): { current: number; stops: Stop[] } | null {
+function stopsFor(ref: string, tokens: Tokens): { current: number; stops: Stop[] } | null {
   const m = ref.match(/^\{([a-z0-9.-]+)\}$/);
   if (!m) return null;
   const path = m[1]!;
@@ -52,9 +58,10 @@ function stopsFor(ref: string, tokens: Catalog["tokens"]["base"]): { current: nu
   const current = stops.findIndex((st) => st.value === px(tokens.find((t) => t.path === path)?.value ?? ""));
   return stops.length > 1 && current >= 0 ? { current, stops } : null;
 }
+/** Substitutes a prop placeholder with the example's value, so `{space.inset.{size}}` resolves for the shown variant. */
+const concrete = (ref: string, props: Record<string, unknown>) => ref.replace(/\{(\w+)\}(?=[^{]*$|\.)/g, (m, p) => (p in props ? String(props[p]) : m));
 
-/** A range that snaps a dimension binding to the stops of its scale, the way the approved inspector does. */
-function ScaleSlider({ label, tokenRef, tokens, onPick }: { label: string; tokenRef: string; tokens: Catalog["tokens"]["base"]; onPick: (ref: string) => void }) {
+function ScaleSlider({ label, tokenRef, tokens, onPick }: { label: string; tokenRef: string; tokens: Tokens; onPick: (ref: string) => void }) {
   const scale = stopsFor(tokenRef, tokens);
   if (!scale) return null;
   const { current, stops } = scale;
@@ -67,60 +74,65 @@ function ScaleSlider({ label, tokenRef, tokens, onPick }: { label: string; token
   );
 }
 
-/** Key/value rows for token bindings or literal styles. Defined at module level so React keeps the inputs mounted between keystrokes. */
-function Rows({ label, bindings, onChange, keyList, tokens }: { label: string; bindings: Bindings; onChange: (b: Bindings) => void; keyList?: string; tokens?: Catalog["tokens"]["base"] }) {
-  const entries = Object.entries(bindings);
-  const rename = (i: number, key: string) => onChange(Object.fromEntries(entries.map(([k, v], j) => (j === i ? [key, v] : [k, v]))));
+/** One binding row: the token name as an input with completion; a swatch for colors; a slider for dimensions. */
+function BindingRow({ prop, value, tokens, catalog, onChange, onRemove }: { prop: string; value: string; tokens: Tokens; catalog: Catalog; onChange: (ref: string) => void; onRemove: () => void }) {
+  const resolved = catalog.tokens.base.find((t) => `{${t.path}}` === value);
   return (
     <Stack gap="xs">
-      <Stack direction="row" gap="sm" align="center" style={{ justifyContent: "space-between" }}>
-        <Text as="span" variant="caption" text={label} style={{ fontWeight: "var(--font-weight-medium)" }} />
-        <Button label="Add" variant="ghost" size="sm" onClick={() => onChange({ ...bindings, "": "" })} />
+      <Stack direction="row" gap="xs" align="center">
+        <Text as="code" variant="code" tone="secondary" text={prop} style={{ width: 110, flex: "none", overflow: "hidden", textOverflow: "ellipsis" }} />
+        {resolved?.type === "color" && <span style={{ width: 14, height: 14, borderRadius: 4, flex: "none", background: resolved.value, boxShadow: "inset 0 0 0 1px var(--color-border-default)" }} />}
+        <Input size="sm" list="token-refs" value={value} placeholder="{token.path}" aria-label={`${prop} binding`} onChange={(e) => onChange(e.target.value)} style={mono} />
+        <Button label="×" variant="ghost" size="sm" aria-label={`Remove ${prop}`} onClick={onRemove} />
       </Stack>
-      {entries.map(([k, v], i) => (
-        <Stack key={i} gap="xs">
-          <Stack direction="row" gap="xs" align="center">
-          <div style={{ width: 130, flex: "none" }}>
-            <Input size="sm" list={keyList} value={k} placeholder="css property" aria-label={`${label} property`} onChange={(e) => rename(i, e.target.value)} />
-          </div>
-          <Input size="sm" list={keyList ? undefined : "token-refs"} value={v} placeholder={keyList ? "value" : "{token.path}"} aria-label={`${label} value`} onChange={(e) => onChange({ ...bindings, [k]: e.target.value })} />
-          <Button label="×" variant="ghost" size="sm" aria-label={`Remove ${k || "row"}`} onClick={() => onChange(Object.fromEntries(entries.filter((_, j) => j !== i)))} />
-          </Stack>
-          {tokens && <ScaleSlider label={k} tokenRef={v} tokens={tokens} onPick={(ref) => onChange({ ...bindings, [k]: ref })} />}
-        </Stack>
-      ))}
-      {entries.length === 0 && <Text as="span" variant="caption" tone="secondary" text="None." />}
+      <ScaleSlider label={prop} tokenRef={value} tokens={tokens} onPick={onChange} />
     </Stack>
   );
 }
 
-/** Usage lines and guidelines that mention a value used by the example (variant names, prop values, prop names). */
-function rulesFor(c: Contract, tree: { props?: Record<string, unknown> } | undefined) {
-  const words = new Set([...Object.values(tree?.props ?? {}).map((v) => String(v).toLowerCase()), ...Object.keys(tree?.props ?? {}).map((k) => k.toLowerCase())]);
-  const hit = (s: string) => [...words].some((w) => w.length > 2 && new RegExp(`\\b${w}\\b`, "i").test(s));
-  const pick = (lines: string[], kind: string) => lines.filter(hit).map((text) => ({ text, kind }));
-  const specific = [...pick(c.usage.whenNot, "dont"), ...pick(c.guidelines.dont, "dont"), ...pick(c.usage.when, "do"), ...pick(c.guidelines.do, "do")];
-  return specific.length ? specific.slice(0, 5) : [...c.guidelines.do.slice(0, 1).map((text) => ({ text, kind: "do" })), ...c.guidelines.dont.slice(0, 1).map((text) => ({ text, kind: "dont" }))];
+/** Key/value rows for token bindings or literal styles. */
+function Rows({ label, bindings, onChange, keyList, tokens, catalog }: { label: string; bindings: Bindings; onChange: (b: Bindings) => void; keyList?: string; tokens: Tokens; catalog: Catalog }) {
+  const entries = Object.entries(bindings);
+  const rename = (i: number, key: string) => onChange(Object.fromEntries(entries.map(([k, v], j) => (j === i ? [key, v] : [k, v]))));
+  return (
+    <Stack gap="sm">
+      <Stack direction="row" gap="sm" align="center" style={{ justifyContent: "space-between" }}>
+        <Text as="span" variant="label" text={label} />
+        <Button label="Add" variant="ghost" size="sm" onClick={() => onChange({ ...bindings, "": "" })} />
+      </Stack>
+      {entries.map(([k, v], i) =>
+        keyList || k === "" ? (
+          <Stack key={i} direction="row" gap="xs" align="center">
+            <div style={{ width: 110, flex: "none" }}><Input size="sm" list={keyList} value={k} placeholder="property" aria-label={`${label} property`} onChange={(e) => rename(i, e.target.value)} style={mono} /></div>
+            <Input size="sm" list={keyList ? undefined : "token-refs"} value={v} placeholder={keyList ? "value" : "{token.path}"} aria-label={`${label} value`} onChange={(e) => onChange({ ...bindings, [k]: e.target.value })} style={mono} />
+            <Button label="×" variant="ghost" size="sm" aria-label={`Remove ${k || "row"}`} onClick={() => onChange(Object.fromEntries(entries.filter((_, j) => j !== i)))} />
+          </Stack>
+        ) : (
+          <BindingRow key={k} prop={k} value={v} tokens={tokens} catalog={catalog} onChange={(ref) => onChange({ ...bindings, [k]: ref })} onRemove={() => onChange(Object.fromEntries(entries.filter((_, j) => j !== i)))} />
+        ),
+      )}
+      {entries.length === 0 && <Text as="span" variant="caption" tone="tertiary" text="None." />}
+    </Stack>
+  );
 }
 
-function CopyButton({ label, text, variant = "ghost", size = "sm" }: { label: string; text: string; variant?: "ghost" | "glass"; size?: "sm" | "md" }) {
-  const [done, setDone] = useState(false);
-  return <Button label={done ? "Copied" : label} variant={variant} size={size} onClick={() => navigator.clipboard.writeText(text).then(() => { setDone(true); setTimeout(() => setDone(false), 1500); })} />;
-}
+const Rules = ({ items, kind }: { items: string[]; kind: "do" | "dont" }) => <ul className="rules">{items.map((r) => <li key={r} data-kind={kind}>{r}</li>)}</ul>;
 
-export function ComponentEditor({ ds, contract, catalog, markdown, usageHtml }: { ds: string; contract: Contract; catalog: Catalog; markdown: string; usageHtml: string }) {
-  const [draft, setDraft] = useState<Contract>(contract);
-  const [showTree, setShowTree] = useState(false);
-  const [baseline, setBaseline] = useState<Contract>(contract); // what the draft holds, updated on save
-  const router = useRouter();
+export function ComponentEditor({ ds, contract, catalog, markdown }: { ds: string; contract: Contract; catalog: Catalog; markdown: string; usageHtml?: string }) {
   const params = useSearchParams();
+  const router = useRouter();
+  const [draft, setDraft] = useState<Contract>(contract);
+  const [baseline, setBaseline] = useState<Contract>(contract); // what the draft holds, updated on save
   const [tab, setTab] = useState<Tab>((TABS as readonly string[]).includes(params.get("tab") ?? "") ? (params.get("tab") as Tab) : "overview");
   const [editing, setEditing] = useState(params.get("edit") === "1");
-  const [selected, setSelected] = useState<string | null>(null);
+  const [showTree, setShowTree] = useState(false);
+  const [selected, setSelected] = useState<string>(Object.keys(contract.anatomy)[0]!);
   const [example, setExample] = useState(0);
-  const [selectMode, setSelectMode] = useState(true);
+  const [variant, setVariant] = useState<string | null>(null);
+  const [size, setSize] = useState<string | null>(null);
+  const [canvasTheme, setCanvasTheme] = useState<"light" | "dark">("dark");
   const [partAsJson, setPartAsJson] = useState(false);
-  const [contractView, setContractView] = useState<"form" | "code">("form");
+  const [contractView, setContractView] = useState<"code" | "form">("code");
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [pending, start] = useTransition();
@@ -130,31 +142,48 @@ export function ComponentEditor({ ds, contract, catalog, markdown, usageHtml }: 
   const css = useMemo(() => {
     try {
       // Scoped to the canvas: the chrome around it is built from the same contracts and must not light up.
-      return emitComponentCss(draft) + (selected ? `\n.canvas .${partClass(draft.id, selected)} { outline: 2px dashed var(--color-border-focus); outline-offset: 3px; }` : "");
+      return emitComponentCss(draft) + (editing ? `\n.cv .${partClass(draft.id, selected)} { outline: 2px dashed var(--color-border-focus); outline-offset: 3px; }` : "");
     } catch {
       return "";
     }
-  }, [draft, selected]);
-  const tokenPaths = useMemo(() => catalog.tokens.base.map((t) => t.path), [catalog]);
+  }, [draft, selected, editing]);
+  const tokens = catalog.tokens.base;
   const dirty = JSON.stringify(draft) !== JSON.stringify(baseline);
+  const changedCount = useMemo(() => {
+    const flat = (c: Contract) => Object.fromEntries(partList(c.anatomy).flatMap(({ name, part }) => Object.entries({ ...part.tokens, ...part.styles, ...Object.fromEntries(Object.entries(part.states ?? {}).flatMap(([s, b]) => Object.entries(b).map(([k, v]) => [`${s} ${k}`, v]))) }).map(([k, v]) => [`${name} ${k}`, v])));
+    const a = flat(draft), b = flat(baseline);
+    return new Set([...Object.keys(a), ...Object.keys(b)]).size - Object.keys(a).filter((k) => a[k] === b[k]).length;
+  }, [draft, baseline]);
+
+  const firstEnum = (names: string[]) => draft.props.find((p) => names.includes(p.name) && typeof p.type === "object") as EnumProp | undefined;
+  const variantProp = firstEnum(["variant", "tone", "kind"]);
+  const sizeProp = firstEnum(["size"]);
   const tree = draft.examples[example]?.tree;
-  const previewTree = tree && draft.id === "ds.dialog" ? { ...tree, props: { ...tree.props, open: true } } : tree;
-  const part = selected ? findPart(draft.anatomy, selected) : undefined;
+  const shownProps = { ...tree?.props, ...(variantProp && variant ? { [variantProp.name]: variant } : {}), ...(sizeProp && size ? { [sizeProp.name]: size } : {}) };
+  const shownTree = tree && { ...tree, props: { ...shownProps, ...(draft.id === "ds.dialog" ? { open: true } : {}) } };
+  const withProp = (name: string, value: string) => tree && { ...tree, props: { ...tree.props, [name]: value } };
+  const part = findPart(draft.anatomy, selected);
+  const rootPart = Object.values(draft.anatomy)[0]!;
+  const resolve = (ref: string) => tokens.find((t) => `{${t.path}}` === concrete(ref, shownProps))?.value;
+  const measures = Object.entries(rootPart.tokens ?? {})
+    .filter(([k]) => /padding|radius|height|gap|width/.test(k))
+    .map(([k, v]) => ({ k, v: resolve(v) }))
+    .filter((m) => m.v)
+    .slice(0, 3);
 
   const change = (next: Contract) => {
     setSaved(false);
     setDraft(next);
   };
   const pick = (e: MouseEvent<HTMLDivElement>) => {
-    if (!selectMode) return;
     const el = (e.target as HTMLElement).closest(`[class*="${prefix}"]`);
     e.preventDefault();
     e.stopPropagation();
-    if (!el) return setSelected(null);
+    if (!el) return;
     const cls = [...el.classList].find((c) => c.startsWith(prefix));
-    setSelected(cls ? cls.slice(prefix.length) : null);
+    if (cls) setSelected(cls.slice(prefix.length));
   };
-  const update = (fn: (p: Part) => Part) => selected && change({ ...draft, anatomy: mapPart(draft.anatomy, selected, fn) });
+  const update = (fn: (p: Part) => Part) => change({ ...draft, anatomy: mapPart(draft.anatomy, selected, fn) });
   const save = () =>
     start(async () => {
       setError(null);
@@ -164,87 +193,88 @@ export function ComponentEditor({ ds, contract, catalog, markdown, usageHtml }: 
       setSaved(true);
       router.refresh();
     });
+  const statusTone = draft.status === "stable" ? "success" : draft.status === "deprecated" ? "danger" : "accent";
+  const metaLine = [draft.behavior ? `Zag ${draft.behavior}` : `Native ${draft.semantics.element}`, variantProp && `${variantProp.type.enum.length} ${variantProp.name}s`, sizeProp && `${sizeProp.type.enum.length} sizes`].filter(Boolean) as string[];
 
-  const firstEnum = (names: string[]) => draft.props.find((p) => names.includes(p.name) && typeof p.type === "object") as (Contract["props"][number] & { type: { enum: string[] } }) | undefined;
-  const variantProp = firstEnum(["variant", "tone", "kind"]);
-  const sizeProp = firstEnum(["size"]);
-  const withProp = (name: string, value: string) => tree && { ...tree, props: { ...tree.props, [name]: value } };
-  const rootPart = Object.values(draft.anatomy)[0]!;
-  const partList = (anatomy: Record<string, Part>, depth = 0): { name: string; part: Part; depth: number }[] =>
-    Object.entries(anatomy).flatMap(([name, part]) => [{ name, part, depth }, ...(part.parts ? partList(part.parts, depth + 1) : [])]);
-  const Rules = ({ items, kind }: { items: string[]; kind: "do" | "dont" }) => (
-    <ul className="rules">{items.map((r) => <li key={r} data-kind={kind}>{r}</li>)}</ul>
-  );
-  const overviewPanel = (
+  // ---------- reading ----------
+  const overview = (
     <>
       <div className="grid grid--wide">
-        <Card title="Variants" heading="h2">
+        <Card title="Variants" heading="h2" meta={
+          <Nav label="Show" orientation="horizontal" list={[
+            <NavItem key="p" href="#" label="Preview" tone="chip" current={!showTree} onClick={(e) => { e.preventDefault(); setShowTree(false); }} />,
+            <NavItem key="t" href="#" label="Tree" tone="chip" current={showTree} onClick={(e) => { e.preventDefault(); setShowTree(true); }} />,
+          ]} />
+        }>
           <Stack gap="md">
-            <div className="canvas">
-              {previewTree ? (
-                <Stack gap="md" align="center">
-                  {variantProp && <Stack direction="row" gap="sm" align="center" style={{ justifyContent: "center", flexWrap: "wrap" }}>{variantProp.type.enum.map((v) => <Render key={v} tree={withProp(variantProp.name, v)!} />)}</Stack>}
-                  {sizeProp && <Stack direction="row" gap="sm" align="center" style={{ justifyContent: "center", flexWrap: "wrap" }}>{sizeProp.type.enum.map((v) => <Render key={v} tree={withProp(sizeProp.name, v)!} />)}</Stack>}
-                  {!variantProp && !sizeProp && <Render tree={previewTree} />}
-                </Stack>
-              ) : (
-                <Text tone="secondary" text={`This component has no standalone example; it renders inside ${draft.relationships.within.join(", ")}.`} />
-              )}
-            </div>
-            {(variantProp || sizeProp) && (
-              <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))" }}>
-                {[variantProp, sizeProp].filter(Boolean).map((p) => (
-                  <Stack key={p!.name} gap="xs">
-                    <Text as="span" variant="label" text={p!.name} />
-                    <Text variant="caption" tone="secondary" text={`${p!.description} Values: ${p!.type.enum.join(", ")}. Default ${String(p!.default)}.`} />
+            {showTree ? (
+              <pre className="code">{JSON.stringify(tree, null, 2)}</pre>
+            ) : (
+              <div className="canvas">
+                {tree ? (
+                  <Stack gap="lg" align="center">
+                    {variantProp && <Stack direction="row" gap="sm" align="center" style={{ justifyContent: "center", flexWrap: "wrap" }}>{variantProp.type.enum.map((v) => <Render key={v} tree={withProp(variantProp.name, v)!} />)}</Stack>}
+                    {sizeProp && <Stack direction="row" gap="sm" align="center" style={{ justifyContent: "center", flexWrap: "wrap" }}>{sizeProp.type.enum.map((v) => <Render key={v} tree={withProp(sizeProp.name, v)!} />)}</Stack>}
+                    {!variantProp && !sizeProp && <Render tree={shownTree!} />}
+                  </Stack>
+                ) : (
+                  <Text tone="secondary" text={`No standalone example; it renders inside ${draft.relationships.within.map((w) => w.replace("ds.", "")).join(", ")}.`} />
+                )}
+              </div>
+            )}
+            {variantProp && (
+              <div className="vrule">
+                {variantProp.type.enum.map((v) => (
+                  <Stack key={v} gap="xs">
+                    <Text as="span" variant="label" text={cap(v)} />
+                    <Text variant="caption" tone="secondary" text={v === variantProp.default ? "The default." : `${variantProp.name}="${v}"`} />
                   </Stack>
                 ))}
               </div>
             )}
-            {tree && (
-              <Stack direction="row" gap="xs" style={{ justifyContent: "flex-end" }}>
-                <Button label={showTree ? "Hide tree" : "Tree"} variant="ghost" size="sm" onClick={() => setShowTree(!showTree)} />
-                <CopyButton label="Copy tree" text={JSON.stringify(tree, null, 2)} />
-                <CopyButton label="Copy guidelines" text={markdown} />
-              </Stack>
-            )}
-            {showTree && tree && <pre className="code">{JSON.stringify(tree, null, 2)}</pre>}
           </Stack>
         </Card>
         <Card title="Channels" heading="h2">
-          <Table caption="Channel support" body={Object.entries(draft.channels).map(([ch, s]) => (
+          <Table body={Object.entries(draft.channels).map(([ch, s]) => (
             <TableRow key={ch}>
-              <TableCell><Stack gap="xs"><Text as="span" variant="label" text={ch} /><Text as="span" variant="caption" tone="secondary" text={`${s.as ? `as ${s.as}` : s.support}${s.note ? ` · ${s.note}` : ""}`} /></Stack></TableCell>
-              <TableCell align="end"><Badge label={s.support} tone={SUPPORT_TONE[s.support]} /></TableCell>
+              <TableCell><Stack gap="xs"><Text as="span" variant="label" text={cap(ch)} /><Text as="span" variant="caption" tone="secondary" text={`${s.as ? `as ${s.as}` : s.support}${s.note ? ` · ${s.note}` : ""}`} /></Stack></TableCell>
+              <TableCell align="end"><Badge label={cap(s.support)} tone={SUPPORT_TONE[s.support]} /></TableCell>
             </TableRow>
           ))} />
         </Card>
       </div>
       <div className="grid grid--wide">
         <Card title="Anatomy and bindings" heading="h2">
-          <div className="grid" style={{ gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1.2fr)" }}>
-            <Stack gap="sm">
-              {partList(draft.anatomy).map(({ name, part, depth }, i) => (
-                <Stack key={name} direction="row" gap="sm" align="start" style={{ paddingLeft: depth * 16 }}>
-                  <Badge label={String(i + 1)} tone="accent" />
-                  <Stack gap="xs">
-                    <Text as="span" variant="label" text={`${name}${part.optional ? " · optional" : ""}${part.slot ? " · slot" : ""}`} />
-                    {part.description && <Text variant="caption" tone="secondary" text={part.description} />}
+          <Stack gap="md">
+            {tree && <div className="anat" inert aria-hidden="true"><Render tree={shownTree!} /></div>}
+            <div className="grid" style={{ gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1.2fr)" }}>
+              <Stack gap="sm">
+                {partList(draft.anatomy).map(({ name, part: p, depth }, i) => (
+                  <Stack key={name} direction="row" gap="sm" align="start" style={{ paddingLeft: depth * 16 }}>
+                    <Badge label={String(i + 1)} tone="accent" />
+                    <Stack gap="xs">
+                      <Text as="span" variant="label" text={`${name}${p.optional ? " · optional" : ""}${p.slot ? " · slot" : ""}`} />
+                      {p.description && <Text variant="caption" tone="secondary" text={p.description} />}
+                    </Stack>
                   </Stack>
-                </Stack>
-              ))}
-            </Stack>
-            <Table caption="Root token bindings" body={Object.entries(rootPart.tokens ?? {}).map(([prop, ref]) => (
-              <TableRow key={prop}>
-                <TableCell><Text as="code" variant="code" tone="secondary" text={prop} /></TableCell>
-                <TableCell align="end"><Text as="code" variant="code" text={ref} /></TableCell>
-              </TableRow>
-            ))} />
-          </div>
+                ))}
+              </Stack>
+              <div className="bind">
+                {Object.entries(rootPart.tokens ?? {}).map(([prop, ref]) => [
+                  <Text key={`${prop}-k`} as="code" variant="code" tone="secondary" text={prop} />,
+                  <Text key={`${prop}-v`} as="code" variant="code" text={ref.slice(1, -1)} />,
+                ])}
+              </div>
+            </div>
+          </Stack>
         </Card>
         <Card title="Keyboard and focus" heading="h2">
-          <Stack gap="xs">
-            {draft.a11y.keyboard.map((k) => <Stack key={k.key} direction="row" gap="sm" align="center"><Text as="code" variant="code" text={k.key} /><Text as="span" variant="caption" tone="secondary" text={k.action} /></Stack>)}
+          <Stack gap="sm">
+            {draft.a11y.keyboard.length > 0 && (
+              <Stack direction="row" gap="sm" align="center" style={{ flexWrap: "wrap" }}>
+                {draft.a11y.keyboard.map((k) => <Stack key={k.key} direction="row" gap="xs" align="center"><Text as="code" variant="code" text={k.key} style={{ padding: "2px 7px", borderRadius: "var(--radius-sm)", background: "var(--color-surface-overlay)" }} /><Text as="span" variant="caption" tone="secondary" text={k.action} /></Stack>)}
+              </Stack>
+            )}
             <ul className="rules">
               {draft.a11y.minHitArea && <li data-kind="do">Hit area at least {draft.a11y.minHitArea}px</li>}
               <li data-kind={draft.a11y.focusVisible ? "do" : "dont"}>{draft.a11y.focusVisible ? "Visible focus ring on color.border.focus" : "No focus ring"}</li>
@@ -254,184 +284,207 @@ export function ComponentEditor({ ds, contract, catalog, markdown, usageHtml }: 
         </Card>
       </div>
       <div className="grid" style={{ gridTemplateColumns: "1fr 1fr" }}>
-        <Card heading="h2" title="Do"><Rules items={[...draft.guidelines.do, ...draft.usage.when.map((w) => `Use it when ${w}`)]} kind="do" /></Card>
-        <Card heading="h2" title="Don't"><Rules items={[...draft.guidelines.dont, ...draft.usage.whenNot.map((w) => `Not for ${w}`)]} kind="dont" /></Card>
+        <Card><Stack gap="sm"><div><Badge label="Do" tone="success" /></div><Rules items={draft.guidelines.do} kind="do" /></Stack></Card>
+        <Card><Stack gap="sm"><div><Badge label="Don't" tone="danger" /></div><Rules items={draft.guidelines.dont} kind="dont" /></Stack></Card>
       </div>
     </>
   );
-  const accessibilityPanel = (
-    <div className="grid grid--wide">
-      <Card title="Keyboard and ARIA" heading="h2">
-        <Stack gap="sm">
-          {draft.a11y.keyboard.length === 0 && <Text tone="secondary" text="Not interactive: no keyboard map." />}
-          {draft.a11y.keyboard.map((k) => <Stack key={k.key} direction="row" gap="sm" align="center"><Text as="code" variant="code" text={k.key} /><Text as="span" text={k.action} /></Stack>)}
-          <ul className="rules">{draft.a11y.aria.map((a) => <li key={a} data-kind="do">{a}</li>)}</ul>
-        </Stack>
-      </Card>
-      <Card title="Targets" heading="h2">
-        <ul className="rules">
-          <li data-kind="do">{draft.a11y.contrast} contrast in light and dark</li>
-          {draft.a11y.minHitArea && <li data-kind="do">Hit area at least {draft.a11y.minHitArea}px</li>}
-          <li data-kind={draft.a11y.focusVisible ? "do" : "dont"}>{draft.a11y.focusVisible ? "Focus ring: 2px color.border.focus, 2px offset" : "No focus ring"}</li>
-          <li data-kind="do">Every transition and animation stops under prefers-reduced-motion</li>
-        </ul>
-      </Card>
-    </div>
-  );
-
-  const previewPanel = (
-    <div className="editor">
-      <Card title="Canvas" heading="h2">
-      <Stack gap="sm">
-        <Stack direction="row" gap="md" align="end" style={{ justifyContent: "space-between" }}>
-          <Field label="Example">
-            <Select size="sm" value={String(example)} onChange={(e) => setExample(Number(e.target.value))}>
-              {draft.examples.map((ex, i) => <Option key={ex.name} value={String(i)} label={ex.name} />)}
-            </Select>
-          </Field>
-          <Checkbox label="Select parts" checked={selectMode} onChange={(e) => setSelectMode(e.target.checked)} />
-        </Stack>
-        <div className={`canvas${draft.category === "overlay" ? " canvas--overlay" : ""}`} onClickCapture={pick} style={{ cursor: selectMode ? "crosshair" : undefined }}>
-          {previewTree ? <Render tree={previewTree} /> : <Text tone="secondary" text={`This component has no standalone example; it renders inside ${draft.relationships.within.join(", ")}.`} />}
-        </div>
-        {tree && (
-          <>
-            <Stack direction="row" gap="md" align="start" style={{ justifyContent: "space-between" }}>
-              <ul className="rules">
-                {rulesFor(draft, tree).map((r) => <li key={r.text} data-kind={r.kind}>{r.text}</li>)}
-              </ul>
-              <Stack direction="row" gap="xs">
-                <Button label={showTree ? "Hide tree" : "Tree"} variant="ghost" size="sm" onClick={() => setShowTree(!showTree)} />
-                <CopyButton label="Copy tree" text={JSON.stringify(tree, null, 2)} />
-                <CopyButton label="Copy contract" text={JSON.stringify(draft, null, 2)} />
-                <CopyButton label="Copy guidelines" text={markdown} />
-              </Stack>
-            </Stack>
-            {showTree && <pre className="code">{JSON.stringify(tree, null, 2)}</pre>}
-          </>
-        )}
-        <Stack direction="row" gap="xs" align="center">
-          <Text as="span" variant="caption" tone="secondary" text="Parts" />
-          {partNames(draft.anatomy).map((n) => (
-            <Button key={n} label={n} size="sm" variant={n === selected ? "secondary" : "ghost"} aria-pressed={n === selected} onClick={() => setSelected(n)} />
-          ))}
-        </Stack>
-      </Stack>
-      </Card>
-
-      <aside>
-        <Card title={part && selected ? selected : "Anatomy and bindings"} heading="h2">
-          <Stack gap="md">
-            {part && selected ? (
-              <>
-                <Stack direction="row" gap="sm" align="center" style={{ justifyContent: "space-between" }}>
-                  <Text variant="caption" tone="secondary" text={`${part.element ?? "div"}${part.description ? ` · ${part.description}` : ""}`} />
-                  <Checkbox label="JSON" checked={partAsJson} onChange={(e) => setPartAsJson(e.target.checked)} />
-                </Stack>
-                {partAsJson ? (
-                  <Textarea key={selected} rows={18} style={mono} aria-label={`${selected} as JSON`} defaultValue={JSON.stringify(part, null, 2)}
-                    onBlur={(e) => { try { const p = JSON.parse(e.target.value); setError(null); update(() => p); } catch (err) { setError(`Invalid JSON: ${(err as Error).message}`); } }} />
-                ) : (
-                  <>
-                    <Rows label="Token bindings" bindings={part.tokens ?? {}} tokens={catalog.tokens.base} onChange={(tokens) => update((p) => ({ ...p, tokens }))} />
-                    {Object.entries(part.states ?? {}).map(([state, b]) => (
-                      <Rows key={state} label={`State: ${state}`} bindings={b} onChange={(nb) => update((p) => ({ ...p, states: { ...p.states, [state]: nb } }))} />
-                    ))}
-                    <Field label="Add state">
-                      <Select size="sm" value="" onChange={(e) => e.target.value && update((p) => ({ ...p, states: { ...p.states, [e.target.value]: {} } }))}>
-                        <Option value="" label="Choose a state" />
-                        {STATES.filter((s) => !(part.states && s in part.states)).map((s) => <Option key={s} value={s} label={s} />)}
-                      </Select>
-                    </Field>
-                    <Rows label="Literal styles" bindings={(part.styles ?? {}) as Bindings} onChange={(styles) => update((p) => ({ ...p, styles }))} keyList="style-keys" />
-                  </>
-                )}
-              </>
-            ) : (
-              <Text variant="caption" tone="secondary" text="Click a part in the preview, or pick one from the list under it, to edit its token bindings, states and styles. Dimension bindings get a slider that snaps to the scale. Props, usage and guidelines are on the Contract tab." />
-            )}
-            {error && <div className="error">{error}</div>}
-          </Stack>
-        </Card>
-        <Card title="Channels" heading="h2">
-          <Table caption="Channel support" body={Object.entries(draft.channels).map(([ch, s]) => (
-            <TableRow key={ch}>
-              <TableCell><Stack gap="xs"><Text as="span" variant="label" text={ch} /><Text as="span" variant="caption" tone="secondary" text={`${s.as ? `as ${s.as}` : s.support}${s.note ? ` · ${s.note}` : ""}`} /></Stack></TableCell>
-              <TableCell align="end"><Badge label={s.support} tone={SUPPORT_TONE[s.support]} /></TableCell>
-            </TableRow>
-          ))} />
-        </Card>
-        <Card title="Keyboard and focus" heading="h2">
-          <Stack gap="xs">
-            {draft.a11y.keyboard.map((k) => <Stack key={k.key} direction="row" gap="sm" align="center"><Text as="code" variant="code" text={k.key} /><Text as="span" variant="caption" tone="secondary" text={k.action} /></Stack>)}
-            <ul className="rules">
-              <li data-kind={draft.a11y.focusVisible ? "do" : "dont"}>{draft.a11y.focusVisible ? "Visible focus ring on color.border.focus" : "No focus ring"}</li>
-              {draft.a11y.minHitArea && <li data-kind="do">Hit area at least {draft.a11y.minHitArea}px</li>}
-              <li data-kind="do">{draft.a11y.contrast} contrast in dark and light</li>
-              {draft.a11y.aria.map((a) => <li key={a}>{a}</li>)}
-            </ul>
-          </Stack>
-        </Card>
-      </aside>
-    </div>
-  );
-
   const contractPanel = (
-    <Stack gap="md">
-      <Stack direction="row" gap="sm" style={{ justifyContent: "flex-end" }}>
-        <Field label="View">
-          <Select size="sm" value={contractView} onChange={(e) => setContractView(e.target.value as "form" | "code")}>{options(["form", "code"])}</Select>
-        </Field>
-      </Stack>
+    <Card title={`${draft.id.replace("ds.", "")}.contract.json`} heading="h2" meta={
+      <Nav label="View" orientation="horizontal" list={(["code", "form"] as const).map((v) => <NavItem key={v} href="#" label={cap(v)} tone="chip" current={contractView === v} onClick={(e) => { e.preventDefault(); setContractView(v); }} />)} />
+    }>
       {contractView === "form" ? (
         <ContractForm draft={draft} onChange={change} />
       ) : (
         <Textarea rows={40} style={mono} aria-label="Contract as JSON" key={JSON.stringify(baseline)} defaultValue={JSON.stringify(draft, null, 2)}
           onBlur={(e) => { try { change(JSON.parse(e.target.value)); setError(null); } catch (err) { setError(`Invalid JSON: ${(err as Error).message}`); } }} />
       )}
-      {error && <div className="error">{error}</div>}
-    </Stack>
+    </Card>
+  );
+  const accessibility = (
+    <div className="grid grid--wide">
+      <Card title="Accessibility" heading="h2">
+        <Stack gap="sm">
+          {draft.a11y.keyboard.map((k) => <Stack key={k.key} direction="row" gap="sm" align="center"><Text as="code" variant="code" text={k.key} /><Text as="span" text={k.action} /></Stack>)}
+          <ul className="rules">
+            {draft.a11y.aria.map((a) => <li key={a} data-kind="do">{a}</li>)}
+            <li data-kind="do">{draft.a11y.contrast} contrast in light and dark</li>
+            {draft.a11y.minHitArea && <li data-kind="do">Hit area at least {draft.a11y.minHitArea}px</li>}
+            <li data-kind={draft.a11y.focusVisible ? "do" : "dont"}>{draft.a11y.focusVisible ? "Focus ring: 2px color.border.focus, 2px offset" : "No focus ring"}</li>
+            <li data-kind="do">Every transition and animation stops under prefers-reduced-motion</li>
+          </ul>
+        </Stack>
+      </Card>
+      <Card title="Markdown for agents" heading="h2" meta={<CopyButton label="Copy" text={markdown} />}>
+        <Text variant="caption" tone="secondary" text="The same guidelines, rendered as the Markdown channel serves them." />
+      </Card>
+    </div>
+  );
+  const usage = (
+    <>
+      <div className="grid" style={{ gridTemplateColumns: "1fr 1fr" }}>
+        <Card title="Use when" heading="h2"><Rules items={draft.usage.when.map(cap)} kind="do" /></Card>
+        <Card title="Don't use when" heading="h2"><Rules items={draft.usage.whenNot.map(cap)} kind="dont" /></Card>
+      </div>
+      {(draft.usage.alternatives.length > 0 || draft.resources.length > 0) && (
+        <div className="grid" style={{ gridTemplateColumns: "1fr 1fr" }}>
+          <Card title="Alternatives" heading="h2">
+            <Stack gap="xs">
+              {draft.usage.alternatives.map((a) => <Stack key={a.component} direction="row" gap="sm" align="center"><Link href={`/${ds}/components/${a.component}`} label={a.component.replace("ds.", "")} /><Text as="span" variant="caption" tone="secondary" text={a.when} /></Stack>)}
+              {draft.usage.alternatives.length === 0 && <Text tone="secondary" text="None listed." />}
+            </Stack>
+          </Card>
+          <Card title="Resources" heading="h2">
+            <Stack gap="xs">{draft.resources.map((r) => <Link key={r.url} href={r.url} label={r.title} />)}</Stack>
+          </Card>
+        </div>
+      )}
+    </>
+  );
+
+  // ---------- editing ----------
+  const editor = (
+    <div className="ed">
+      <div className="pane"><Card padding="lg">
+        <Stack gap="md">
+          <Stack gap="xs">
+            <Text as="span" variant="caption" tone="secondary" text="Parts" />
+            <Nav label="Parts" list={partList(draft.anatomy).map(({ name, depth }) => (
+              <NavItem key={name} href="#" label={name} current={selected === name} style={{ marginLeft: depth * 14, ...mono }} onClick={(e) => { e.preventDefault(); setSelected(name); }} />
+            ))} />
+          </Stack>
+          {variantProp && (
+            <Stack gap="xs">
+              <Text as="span" variant="caption" tone="secondary" text={cap(variantProp.name)} />
+              <Nav label={variantProp.name} list={variantProp.type.enum.map((v) => (
+                <NavItem key={v} href="#" label={cap(v)} current={(variant ?? String(tree?.props?.[variantProp.name] ?? variantProp.default)) === v} onClick={(e) => { e.preventDefault(); setVariant(v); }} />
+              ))} />
+            </Stack>
+          )}
+          {draft.examples.length > 1 && (
+            <Field label="Example">
+              <Select size="sm" value={String(example)} onChange={(e) => setExample(Number(e.target.value))}>
+                {draft.examples.map((ex, i) => <Option key={ex.name} value={String(i)} label={ex.name} />)}
+              </Select>
+            </Field>
+          )}
+        </Stack>
+      </Card></div>
+
+      <Stack gap="md">
+        <Card padding="lg">
+          <Stack gap="sm">
+            <div className="cv-top">
+              {sizeProp && (
+                <Nav label="Size" orientation="horizontal" list={sizeProp.type.enum.map((v) => (
+                  <NavItem key={v} href="#" label={v} tone="chip" current={(size ?? String(tree?.props?.[sizeProp.name] ?? sizeProp.default)) === v} onClick={(e) => { e.preventDefault(); setSize(v); }} />
+                ))} />
+              )}
+              <span style={{ flex: 1 }} />
+              <Nav label="Canvas theme" orientation="horizontal" list={(["light", "dark"] as const).map((t) => (
+                <NavItem key={t} href="#" label={cap(t)} tone="chip" current={canvasTheme === t} onClick={(e) => { e.preventDefault(); setCanvasTheme(t); }} />
+              ))} />
+            </div>
+            <div className={`canvas cv${draft.category === "overlay" ? " canvas--overlay" : ""}`} data-theme={canvasTheme} onClickCapture={pick} style={{ cursor: "crosshair" }}>
+              {shownTree ? <Render tree={shownTree} /> : <Text tone="secondary" text={`No standalone example; it renders inside ${draft.relationships.within.join(", ")}.`} />}
+              {measures.length > 0 && (
+                <div className="measure">{measures.map((m) => <Badge key={m.k} label={`${m.k} ${m.v}`} tone="neutral" />)}</div>
+              )}
+            </div>
+          </Stack>
+        </Card>
+        <div className="savebar">
+          <Text as="span" variant="label" text={String(changedCount)} />
+          <Text as="span" variant="caption" text={dirty ? "unsaved changes to the draft" : "no unsaved changes"} style={{ opacity: 0.8 }} />
+          <span style={{ flex: 1 }} />
+          {error && <Text as="span" variant="caption" text={error.split("\n")[0]!} style={{ color: "var(--color-status-danger-foreground)" }} />}
+          <Button label="Discard" variant="ghost" size="sm" disabled={!dirty} onClick={() => change(baseline)} />
+          <Button label={pending ? "Saving…" : "Save to draft"} size="sm" disabled={!dirty || pending} onClick={save} />
+        </div>
+      </Stack>
+
+      <div className="pane"><Card padding="lg">
+        <Stack gap="md">
+          <Stack direction="row" gap="sm" align="center" style={{ justifyContent: "space-between" }}>
+            <Text as="span" variant="label" text={`${selected}${variantProp && variant ? ` · ${variant}` : ""}`} style={mono} />
+            <Checkbox label="JSON" checked={partAsJson} onChange={(e) => setPartAsJson(e.target.checked)} />
+          </Stack>
+          {part?.description && <Text variant="caption" tone="secondary" text={`${part.element ?? "div"} · ${part.description}`} />}
+          {part && partAsJson ? (
+            <Textarea key={selected} rows={22} style={mono} aria-label={`${selected} as JSON`} defaultValue={JSON.stringify(part, null, 2)}
+              onBlur={(e) => { try { const p = JSON.parse(e.target.value); setError(null); update(() => p); } catch (err) { setError(`Invalid JSON: ${(err as Error).message}`); } }} />
+          ) : part ? (
+            <>
+              <Rows label="Token bindings" bindings={part.tokens ?? {}} tokens={tokens} catalog={catalog} onChange={(t) => update((p) => ({ ...p, tokens: t }))} />
+              {Object.entries(part.states ?? {}).map(([state, b]) => (
+                <Rows key={state} label={`State: ${state}`} bindings={b} tokens={tokens} catalog={catalog} onChange={(nb) => update((p) => ({ ...p, states: { ...p.states, [state]: nb } }))} />
+              ))}
+              <Field label="Add state">
+                <Select size="sm" value="" onChange={(e) => e.target.value && update((p) => ({ ...p, states: { ...p.states, [e.target.value]: {} } }))}>
+                  <Option value="" label="Choose a state" />
+                  {STATES.filter((s) => !(part.states && s in part.states)).map((s) => <Option key={s} value={s} label={s} />)}
+                </Select>
+              </Field>
+              {part.motion && Object.keys(part.motion).length > 0 && (
+                <Stack gap="sm">
+                  <Text as="span" variant="label" text="Motion" />
+                  {Object.entries(part.motion).map(([prop, m]) => (
+                    <Stack key={prop} gap="xs">
+                      <Text as="code" variant="code" tone="secondary" text={prop} />
+                      <Stack direction="row" gap="xs">
+                        <Select size="sm" value={m.duration} aria-label={`${prop} duration`} onChange={(e) => update((p) => ({ ...p, motion: { ...p.motion, [prop]: { ...m, duration: e.target.value } } }))}>
+                          {tokens.filter((t) => t.path.startsWith("motion.duration.")).map((t) => <Option key={t.path} value={`{${t.path}}`} label={`${t.path.split(".").pop()} ${t.value}`} />)}
+                        </Select>
+                        <Select size="sm" value={m.easing} aria-label={`${prop} easing`} onChange={(e) => update((p) => ({ ...p, motion: { ...p.motion, [prop]: { ...m, easing: e.target.value } } }))}>
+                          {tokens.filter((t) => t.path.startsWith("motion.easing.")).map((t) => <Option key={t.path} value={`{${t.path}}`} label={t.path.split(".").pop()!} />)}
+                        </Select>
+                      </Stack>
+                    </Stack>
+                  ))}
+                </Stack>
+              )}
+              <Rows label="Literal styles" bindings={(part.styles ?? {}) as Bindings} tokens={tokens} catalog={catalog} onChange={(styles) => update((p) => ({ ...p, styles }))} keyList="style-keys" />
+            </>
+          ) : null}
+        </Stack>
+      </Card></div>
+    </div>
   );
 
   return (
     <ElosProvider catalog={modified} behaviors={zagBehaviors} elements={elements}>
       <style>{css}</style>
-      <datalist id="token-refs">{tokenPaths.map((p) => <option key={p} value={`{${p}}`} />)}</datalist>
+      <datalist id="token-refs">{tokens.map((t) => <option key={t.path} value={`{${t.path}}`} />)}</datalist>
       <datalist id="style-keys">{StyleKey.options.map((k) => <option key={k} value={k} />)}</datalist>
 
       <PageHead
         title={editing ? `Editing ${draft.name}` : draft.name}
         description={editing ? "Every control writes a token binding to the contract. Sliders snap to the scale." : draft.description}
-        crumbs={[{ href: `/${ds}/components`, label: "Components" }, { href: `/${ds}/components/${draft.id}`, label: draft.name }, ...(editing ? [{ href: `/${ds}/components/${draft.id}?edit=1`, label: "Edit" }] : [])]}
+        crumbs={[{ href: `/${ds}/components`, label: "Components" }, { href: `/${ds}/components?category=${draft.category}`, label: cap(draft.category.replace("-", " ")) }, ...(editing ? [{ href: `/${ds}/components/${draft.id}`, label: draft.name }, { href: "#", label: "Edit" }] : [{ href: `/${ds}/components/${draft.id}`, label: draft.name }])]}
         actions={
           editing ? (
-            <>
-              <Button label={dirty ? "Discard" : "Close"} variant="glass" onClick={() => { if (dirty) change(baseline); else setEditing(false); }} />
-              <Button label={pending ? "Saving…" : !dirty && saved ? "Saved" : "Save to draft"} disabled={!dirty || pending} onClick={save} />
-            </>
+            <Button label="Close" variant="glass" onClick={() => { if (dirty) change(baseline); setEditing(false); }} />
           ) : (
             <>
-              <CopyButton label="Copy for agent" text={JSON.stringify(draft, null, 2)} variant="glass" size="md" />
+              <CopyButton label="Copy for agent" text={JSON.stringify(draft, null, 2)} variant="glass" size="md" icon />
               <Button label="Edit" icon={<Icon name="edit" size="sm" />} onClick={() => setEditing(true)} />
             </>
           )
         }
-        extras={
+        extras={editing ? undefined : (
           <>
-            <Badge label={draft.status} tone={draft.status === "stable" ? "success" : draft.status === "deprecated" ? "danger" : "accent"} dot />
-            <Text as="code" variant="code" text={`v${draft.version}`} />
-            <Text as="code" variant="code" text={draft.id} />
-            <Text as="span" variant="caption" text={[draft.behavior ? `Zag ${draft.behavior}` : `native ${draft.semantics.element}`, variantProp && `${variantProp.type.enum.length} ${variantProp.name}s`, sizeProp && `${sizeProp.type.enum.length} sizes`].filter(Boolean).join(" · ")} style={{ opacity: 0.85 }} />
-            {error && <span className="error">{error.split("\n")[0]}</span>}
+            <Badge label={cap(draft.status)} tone={statusTone} dot />
+            <Badge label={`v${draft.version}`} />
+            {metaLine.map((m) => <Badge key={m} label={m} />)}
           </>
-        }
+        )}
         tabs={editing ? undefined : (
           <Nav label="Sections" orientation="horizontal" list={TABS.map((t) => (
-            <NavItem key={t} href={`?tab=${t}`} label={t.charAt(0).toUpperCase() + t.slice(1)} tone="bloom" current={tab === t} onClick={(e) => { e.preventDefault(); setTab(t); }} />
+            <NavItem key={t} href={`?tab=${t}`} label={cap(t)} tone="bloom" current={tab === t} onClick={(e) => { e.preventDefault(); setTab(t); }} />
           ))} />
         )}
       />
-      {editing ? previewPanel : tab === "overview" ? overviewPanel : tab === "contract" ? contractPanel : tab === "accessibility" ? accessibilityPanel : <Card padding="xl"><div className="prose" dangerouslySetInnerHTML={{ __html: usageHtml }} /></Card>}
+      {editing ? editor : tab === "overview" ? overview : tab === "contract" ? contractPanel : tab === "accessibility" ? accessibility : usage}
     </ElosProvider>
   );
 }

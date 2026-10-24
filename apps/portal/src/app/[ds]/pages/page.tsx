@@ -1,5 +1,6 @@
 import { getDraft } from "@/lib/store.ts";
-import { Render, Stack, Text } from "@/components/elos-client.tsx";
+import { Card, Render, Text } from "@/components/elos-client.tsx";
+import { CopyButton } from "@/components/copy-button.tsx";
 import { PageHead } from "@/components/page-head.tsx";
 
 export default async function Pages({ params }: { params: Promise<{ ds: string }> }) {
@@ -7,20 +8,16 @@ export default async function Pages({ params }: { params: Promise<{ ds: string }
   const { catalog } = await getDraft(ds);
   return (
     <>
-      <PageHead title="Pages" description="Composed screens built only from this system's components. Tokens are previewed against them, and agents learn from them." />
+      <PageHead eyebrow={catalog.system.name} title="Pages" description="Composed screens built only from this system's components. Tokens are previewed against them, and agents learn from them." />
       {catalog.pages.map((pg) => (
-        <Stack key={pg.id} gap="sm">
-          <Stack direction="row" gap="sm" align="center">
-            <Text as="h2" variant="heading" text={pg.name} />
-            <Text as="span" variant="caption" tone="secondary" text={pg.id} style={{ fontFamily: "var(--font-family-mono)" }} />
-          </Stack>
+        <Card key={pg.id} id={pg.id} title={pg.name} heading="h2" meta={<><Text as="code" variant="code" tone="secondary" text={pg.id} /><CopyButton label="Copy tree" text={JSON.stringify(pg.tree, null, 2)} /></>}>
           <Text variant="caption" tone="secondary" text={pg.description} />
           <div className="canvas canvas--overlay">
             <Render tree={pg.tree} />
           </div>
-        </Stack>
+        </Card>
       ))}
-      {catalog.pages.length === 0 && <Text tone="secondary" text="No page examples yet. Add pages/*.page.json to the system." />}
+      {catalog.pages.length === 0 && <Card><Text tone="secondary" text="No page examples yet. Add pages/*.page.json to the system." /></Card>}
     </>
   );
 }

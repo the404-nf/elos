@@ -20,7 +20,7 @@ export default async function Versions({ params }: { params: Promise<{ ds: strin
 
   return (
     <>
-      <PageHead title="Versions" description="Publishing cuts an immutable snapshot of the draft. Rollback copies an old snapshot, or one file of it, back into the draft; history is never rewritten." />
+      <PageHead eyebrow={catalog.system.name} title="Versions" description="Publishing cuts an immutable snapshot of the draft. Rollback copies an old snapshot, or one file of it, back into the draft; history is never rewritten." />
 
       <Card heading="h2" title={`Draft · v${catalog.system.version}`}>
         <Stack gap="md">

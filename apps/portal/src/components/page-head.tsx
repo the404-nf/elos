@@ -24,7 +24,7 @@ export function PageHead({ title, code, description, eyebrow, variant, crumbs, a
       lead={description}
       variant={variant}
       nav={<TopNav />}
-      breadcrumb={crumbs && crumbs.length > 0 ? <Breadcrumb label="You are here" list={crumbs.map((c, i) => <BreadcrumbItem key={c.href} href={c.href} label={c.label} current={i === crumbs.length - 1} separator={i === crumbs.length - 1 ? "" : undefined} />)} /> : undefined}
+      breadcrumb={crumbs && crumbs.length > 0 ? <Breadcrumb label="You are here" list={crumbs.map((c, i) => <BreadcrumbItem key={c.href} href={c.href} label={c.label} tone="bloom" current={i === crumbs.length - 1} separator={i === crumbs.length - 1 ? "" : undefined} />)} /> : undefined}
       actions={actions}
       extras={extras ?? children}
       tabs={tabs}

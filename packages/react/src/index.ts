@@ -94,8 +94,14 @@ function renderPart(ctx: PartCtx, name: string, part: Part, isRoot: boolean): Re
       children.push(decorate ? h(Decoration.Provider, { key: i, value: decorate }, el) : el);
     });
   }
-  for (const [childName, child] of Object.entries(part.parts ?? {}))
-    children.push(h(Fragment, { key: childName }, renderPart(ctx, childName, child, false)));
+  let rendered = 0;
+  for (const [childName, child] of Object.entries(part.parts ?? {})) {
+    const node = renderPart(ctx, childName, child, false);
+    if (node !== null) rendered++;
+    children.push(h(Fragment, { key: childName }, node));
+  }
+  // An optional container with nothing in it (no content, no slot, every child part gone) renders nothing.
+  if (part.optional && !part.content && !part.slot && !part.asset && part.parts && rendered === 0) return null;
 
   const { class: extraClass, ...constants } = part.attributes ?? {};
   const attrs: DomProps = { className: extraClass ? `${partClass(contract.id, name)} ${extraClass}` : partClass(contract.id, name), ...constants };
@@ -160,11 +166,10 @@ const toArray = (v: unknown): SlotItem[] => (Array.isArray(v) ? v : [v]) as Slot
 
 const slotNames = (parts: Record<string, Part>): string[] => Object.entries(parts).flatMap(([n, p]) => [...(p.slot ? [n] : []), ...(p.parts ? slotNames(p.parts) : [])]);
 
+/** Where React children go: the first required slot, else the first slot (a card's body, not its optional header meta). */
 function findFirstSlot(parts: Record<string, Part>): string | undefined {
-  for (const [name, part] of Object.entries(parts)) {
-    if (part.slot) return name;
-    const nested = part.parts && findFirstSlot(part.parts);
-    if (nested) return nested;
-  }
-  return undefined;
+  const all = (ps: Record<string, Part>): { name: string; part: Part }[] =>
+    Object.entries(ps).flatMap(([name, part]) => [...(part.slot ? [{ name, part }] : []), ...(part.parts ? all(part.parts) : [])]);
+  const slots = all(parts);
+  return (slots.find((s) => !s.part.optional) ?? slots[0])?.name;
 }

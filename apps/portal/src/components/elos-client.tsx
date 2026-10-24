@@ -30,7 +30,7 @@ export const Button = createComponent<Dom & { label: string; variant?: "primary"
 export const Badge = createComponent<Dom & { label: string; tone?: Tone; dot?: boolean }>("ds.badge");
 export const Text = createComponent<Dom & { text: string; as?: "p" | "span" | "div" | "code" | "h1" | "h2" | "h3" | "h4"; variant?: TextVariant; tone?: "primary" | "secondary" | "tertiary" }>("ds.text");
 export const Stack = createComponent<Dom & { direction?: "row" | "column"; gap?: "xs" | "sm" | "md" | "lg"; align?: "start" | "center" | "end" | "stretch" }>("ds.stack");
-export const Card = createComponent<Dom & { title?: string; heading?: "h2" | "h3"; padding?: "md" | "lg" | "xl"; tone?: "raised" | "glass"; as?: "article" | "a"; href?: string; interactive?: boolean; featured?: boolean; actions?: ReactNode; body?: ReactNode }>("ds.card");
+export const Card = createComponent<Dom & { title?: string; heading?: "h2" | "h3"; padding?: "md" | "lg" | "xl"; tone?: "raised" | "glass"; as?: "article" | "a"; href?: string; interactive?: boolean; featured?: boolean; meta?: ReactNode; actions?: ReactNode; body?: ReactNode }>("ds.card");
 export const Icon = createComponent<Dom & { name: string; size?: "xs" | "sm" | "md" | "lg" | "xl"; accent?: boolean }>("ds.icon");
 export const Illustration = createComponent<Dom & { name: string; size?: "md" | "lg"; accent?: boolean; motion?: boolean }>("ds.illustration");
 /** The Bloom header. Slots are named: nav, breadcrumb, actions, extras, tabs. */
@@ -39,7 +39,7 @@ export const Link = createComponent<Dom & { href: string; label: string; tone?: 
 export const Nav = createComponent<Dom & { label: string; orientation?: "vertical" | "horizontal"; list: ReactNode }>("ds.nav");
 export const NavItem = createComponent<Dom & { href: string; label: string; meta?: string; current?: boolean; tone?: "default" | "chip" | "bloom"; onClick?: (e: MouseEvent<HTMLAnchorElement>) => void }>("ds.nav-item");
 export const Breadcrumb = createComponent<Dom & { label?: string; list: ReactNode }>("ds.breadcrumb");
-export const BreadcrumbItem = createComponent<Dom & { href: string; label: string; current?: boolean; separator?: string }>("ds.breadcrumb-item");
+export const BreadcrumbItem = createComponent<Dom & { href: string; label: string; current?: boolean; separator?: string; tone?: "default" | "bloom" }>("ds.breadcrumb-item");
 export const Separator = createComponent<Dom & { orientation?: "horizontal" | "vertical" }>("ds.separator");
 export const Alert = createComponent<Dom & { tone?: Tone; title: string; description?: string }>("ds.alert");
 
