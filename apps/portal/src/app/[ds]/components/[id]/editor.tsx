@@ -98,28 +98,63 @@ function ScaleSlider({ label, tokenRef, tokens, onPick }: { label: string; token
   );
 }
 
-/** One property of the inspector: a token picker of the property's category, a swatch for colors, a slider for dimensions. */
+/** Color and gradient tokens as swatches, grouped the way the token paths group them: semantic groups first, primitives behind a disclosure. */
+function Palette({ choices, current, onPick }: { choices: Token[]; current: string; onPick: (ref: string) => void }) {
+  const [primitives, setPrimitives] = useState(false);
+  const groups = new Map<string, Token[]>();
+  for (const t of choices) {
+    const g = t.type === "gradient" ? "gradient" : t.alias ? t.path.split(".").slice(0, 2).join(".") : "primitives";
+    groups.set(g, [...(groups.get(g) ?? []), t]);
+  }
+  return (
+    <div className="palette">
+      {[...groups].filter(([g]) => g !== "primitives").map(([g, ts]) => (
+        <div key={g} className="palette-group">
+          <Text as="span" variant="eyebrow" tone="tertiary" text={g.replace(/^color\./, "")} />
+          <div className="swatches">{ts.map((t) => <Swatch key={t.path} token={t} on={`{${t.path}}` === current} onPick={onPick} />)}</div>
+        </div>
+      ))}
+      {groups.has("primitives") && (
+        <div className="palette-group">
+          <Button label={primitives ? "Hide primitives" : `Primitives (${groups.get("primitives")!.length})`} variant="ghost" size="sm" aria-expanded={primitives} onClick={() => setPrimitives(!primitives)} />
+          {primitives && <div className="swatches">{groups.get("primitives")!.map((t) => <Swatch key={t.path} token={t} on={`{${t.path}}` === current} onPick={onPick} />)}</div>}
+        </div>
+      )}
+    </div>
+  );
+}
+// ponytail: a native button like the handles; a contract when a second screen needs a swatch picker (ADR 0014 left the color picker for later)
+const Swatch = ({ token: t, on, onPick }: { token: Token; on: boolean; onPick: (ref: string) => void }) => (
+  <button type="button" className="swatch" aria-pressed={on} aria-label={`${t.path} ${t.value}`} title={`${t.path}\n${t.value}${t.description ? "\n" + t.description : ""}`} style={{ background: t.value }} onClick={() => onPick(`{${t.path}}`)} />
+);
+
+/** One property of the inspector: a token picker of the property's category, a swatch palette for colors, a slider for dimensions. */
 function PropRow({ prop, value, tokens, onChange, onRemove }: { prop: string; value: string; tokens: Tokens; onChange: (ref: string) => void; onRemove: () => void }) {
   const choices = tokensFor(prop, tokens);
   const bound = tokens.find((t) => `{${t.path}}` === value);
   const substituted = /\{\w+\}/.test(value.slice(1, -1));
+  const swatchable = choices.length > 0 && choices.every((t) => t.type === "color" || t.type === "gradient");
+  const [open, setOpen] = useState(false);
   return (
     <Stack gap="xs">
       <div className="prop">
         <Text as="code" variant="code" tone="secondary" text={prop} title={prop} style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} />
         {substituted || !choices.length ? (
           <Input size="sm" list="token-refs" value={value} aria-label={`${prop} binding`} onChange={(e) => onChange(e.target.value)} style={mono} title={substituted ? "Follows a prop: the placeholder picks the token per value." : undefined} />
+        ) : swatchable ? (
+          <button type="button" className="swatch-trigger" aria-expanded={open} aria-label={`${prop} token: ${bound?.path ?? (value || "none")}. Opens the palette.`} onClick={() => setOpen(!open)} onKeyDown={(e) => { if (e.key === "Escape") setOpen(false); }} style={mono}>
+            <span className="swatch" style={{ background: bound?.value ?? "transparent" }} />
+            <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{bound?.path ?? (value || "choose a token")}</span>
+          </button>
         ) : (
           <Select size="sm" value={bound ? value : ""} aria-label={`${prop} token`} onChange={(e) => onChange(e.target.value)} style={mono}>
             {!bound && <Option value="" label={value || "choose a token"} />}
-            {choices.map((t) => <Option key={t.path} value={`{${t.path}}`} label={t.type === "color" || t.type === "dimension" ? `${t.path}  ${t.value.length > 12 ? "" : t.value}` : t.path} />)}
+            {choices.map((t) => <Option key={t.path} value={`{${t.path}}`} label={t.type === "dimension" ? `${t.path}  ${t.value}` : t.path} />)}
           </Select>
         )}
-        <Stack direction="row" gap="xs" align="center">
-          {bound?.type === "color" && <span style={{ width: 16, height: 16, borderRadius: 4, flex: "none", background: bound.value, boxShadow: "inset 0 0 0 1px var(--color-border-default)" }} title={bound.value} />}
-          <Button label="×" variant="ghost" size="sm" aria-label={`Remove ${prop}`} onClick={onRemove} />
-        </Stack>
+        <Button label="×" variant="ghost" size="sm" aria-label={`Remove ${prop}`} onClick={onRemove} />
       </div>
+      {swatchable && open && <div onKeyDown={(e) => { if (e.key === "Escape") setOpen(false); }}><Palette choices={choices} current={value} onPick={(ref) => { onChange(ref); setOpen(false); }} /></div>}
       <ScaleSlider label={prop} tokenRef={value} tokens={tokens} onPick={onChange} />
     </Stack>
   );
@@ -156,7 +191,7 @@ type Axis = "x" | "y" | "d";
 const STEP = 18; // pixels of drag per stop
 const ZOOMS = [25, 50, 75, 100, 150, 200, 300, 400];
 
-/** Handles on the selected part: edges move padding and height, the corner moves radius, the dot between two children moves gap.
+/** Handles on the selected part: the top and left edges move padding, the right and bottom edges width and height, the corner moves radius, the dot between two children moves gap.
  *  Each one walks the token scale, so a drag lands on a token, never a pixel. The same operation the inspector produces. */
 function Handles({ canvas, selector, part, tokens, onOp, version }: { canvas: RefObject<HTMLDivElement | null>; selector: string; part: Part | undefined; tokens: Tokens; onOp: (property: string, ref: string) => void; version: unknown }) {
   const [geo, setGeo] = useState<{ box: DOMRect; kids: DOMRect[] } | null>(null);
@@ -182,8 +217,10 @@ function Handles({ canvas, selector, part, tokens, onOp, version }: { canvas: Re
     const property = candidates.find((p) => source[p] && stopsFor(source[p]!, tokens));
     if (property) all.push({ key, property, ref: source[property]!, axis, cursor, left, top });
   };
-  add("inline", ["padding-inline", "padding"], part.tokens ?? {}, "x", "ew-resize", box.width - 8, box.height / 2 - 8);
+  // Padding on the top and left edges, size on the bottom and right, radius on the top-left corner.
+  add("inline", ["padding-inline", "padding"], part.tokens ?? {}, "x", "ew-resize", -8, box.height / 2 - 8);
   add("block", ["padding-block", "padding"], part.tokens ?? {}, "y", "ns-resize", box.width / 2 - 8, -8);
+  add("width", ["width", "min-width", "max-width"], part.tokens ?? {}, "x", "ew-resize", box.width - 8, box.height / 2 - 8);
   add("height", ["height", "min-height"], part.tokens ?? {}, "y", "ns-resize", box.width / 2 - 8, box.height - 8);
   add("radius", ["border-radius"], part.tokens ?? {}, "d", "nwse-resize", -8, -8);
   const column = part.layout?.direction === "column";
@@ -263,7 +300,7 @@ export function ComponentEditor({ ds, contract, catalog, markdown }: { ds: strin
       return "";
     }
   }, [draft, selected, editing]);
-  const tokens = catalog.tokens.base;
+  const tokens = (canvasTheme === "light" ? catalog.tokens.base : catalog.tokens[canvasTheme]) ?? catalog.tokens.base; // the canvas theme's values, so swatches and measures show what the canvas shows
   const dirty = JSON.stringify(draft) !== JSON.stringify(baseline);
 
   const firstEnum = (names: string[]) => draft.props.find((p) => names.includes(p.name) && typeof p.type === "object") as EnumProp | undefined;
