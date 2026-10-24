@@ -1,82 +1,740 @@
 {
   "color": {
-    "$type": "color",
     "text": {
-      "primary": { "$value": "{color.gray.900}" },
-      "secondary": { "$value": "{color.gray.600}" },
-      "inverse": { "$value": "{color.white}" },
-      "link": { "$value": "{color.blue.600}", "$description": "Inline links" },
-      "danger": { "$value": "{color.red.700}", "$description": "Error messages" }
+      "primary": {
+        "$value": "{color.black}",
+        "$description": "Body copy, titles and labels on surface-canvas, surface-raised, surface-overlay and surface-sunken."
+      },
+      "secondary": {
+        "$value": "{color.gray.650}",
+        "$description": "Supporting text and metadata on every surface."
+      },
+      "tertiary": {
+        "$value": "{color.gray.600}",
+        "$description": "Counts, axis labels and placeholders on every surface. The quietest text allowed."
+      },
+      "inverse": {
+        "$value": "{color.white}",
+        "$description": "Text on color-surface-inverse and on color-action-primary-background."
+      },
+      "link": {
+        "$value": "{color.pink.700}",
+        "$description": "Allowed pink text, case 1: inline links on every surface. Underline on hover."
+      },
+      "danger": {
+        "$value": "{color.red.700}",
+        "$description": "Error messages and the danger menu item, on every surface."
+      },
+      "on-accent": {
+        "$value": "{color.black}",
+        "$description": "Text and icons on a color-accent fill (selection tag, counter)."
+      },
+      "on-bloom": {
+        "$value": "{color.black}",
+        "$description": "All text placed directly on the Bloom header gradient."
+      }
     },
     "surface": {
-      "canvas": { "$value": "{color.gray.50}", "$description": "Page background" },
-      "raised": { "$value": "{color.white}", "$description": "Cards, panels" },
-      "sunken": { "$value": "{color.gray.100}", "$description": "Skeletons, table header, track backgrounds" },
-      "inverse": { "$value": "{color.gray.900}", "$description": "Tooltips" }
+      "canvas": {
+        "$value": "{color.white}",
+        "$description": "The page."
+      },
+      "raised": {
+        "$value": "{color.gray.50}",
+        "$description": "Cards, panels and the token list, on the canvas."
+      },
+      "overlay": {
+        "$value": "{color.white}",
+        "$description": "Wells inside cards, menus, popovers, dialogs, inputs."
+      },
+      "sunken": {
+        "$value": "{color.gray.100}",
+        "$description": "Segmented-control tracks, neutral badges, secondary buttons."
+      },
+      "inverse": {
+        "$value": "{color.black}",
+        "$description": "Toasts and tooltips."
+      },
+      "glass": {
+        "$value": "{color.alpha.white-72}",
+        "$description": "Search, pills and stat tiles sitting on the Bloom header."
+      },
+      "glass-quiet": {
+        "$value": "{color.alpha.white-50}",
+        "$description": "Segmented tracks and hover fills on the Bloom header."
+      }
     },
     "border": {
-      "subtle": { "$value": "{color.gray.200}" },
-      "strong": { "$value": "{color.gray.500}", "$description": "Control boundaries: 3:1 against raised and canvas in both themes" },
-      "focus": { "$value": "{color.blue.500}" },
-      "danger": { "$value": "{color.red.500}" }
+      "subtle": {
+        "$value": "{color.gray.75}",
+        "$description": "Hairlines between rows and around white cards."
+      },
+      "default": {
+        "$value": "{color.gray.200}",
+        "$description": "Input and select borders, list dividers inside cards."
+      },
+      "strong": {
+        "$value": "{color.gray.500}",
+        "$description": "Borders that must read as a control edge (3:1 on raised surfaces)."
+      },
+      "focus": {
+        "$value": "{color.black}",
+        "$description": "The keyboard focus ring. Solid, 2px, 2px offset. Not pink: pink disappears on the Bloom header."
+      },
+      "danger": {
+        "$value": "{color.red.500}",
+        "$description": "Invalid inputs."
+      }
     },
     "overlay": {
-      "backdrop": { "$value": "{color.alpha.black-60}" }
+      "backdrop": {
+        "$value": "{color.alpha.black-60}",
+        "$description": "Behind dialogs."
+      }
+    },
+    "accent": {
+      "default": {
+        "$value": "{color.pink.500}",
+        "$description": "The brand pink as a graphic: switch on, progress, selection dots, chart lines, slider fills, current markers. Never as body text."
+      },
+      "strong": {
+        "$value": "{color.pink.600}",
+        "$description": "Accent on hover and in chart strokes that need a step more weight."
+      },
+      "soft": {
+        "$value": "{color.pink.100}",
+        "$description": "Tinted fill behind accent badges and pink icons; selected chip hover."
+      },
+      "subtle": {
+        "$value": "{color.pink.50}",
+        "$description": "Row hover and selected-row fill in lists and tables."
+      }
     },
     "status": {
-      "neutral": { "background": { "$value": "{color.gray.100}" }, "foreground": { "$value": "{color.gray.800}" } },
-      "info": { "background": { "$value": "{color.blue.100}" }, "foreground": { "$value": "{color.blue.700}" } },
-      "success": { "background": { "$value": "{color.green.100}" }, "foreground": { "$value": "{color.green.700}" } },
-      "warning": { "background": { "$value": "{color.amber.100}" }, "foreground": { "$value": "{color.amber.800}" } },
-      "danger": { "background": { "$value": "{color.red.100}" }, "foreground": { "$value": "{color.red.700}" } }
+      "neutral": {
+        "background": {
+          "$value": "{color.gray.100}",
+          "$description": "Neutral badge and toast fill."
+        },
+        "foreground": {
+          "$value": "{color.black}",
+          "$description": "Neutral badge text."
+        }
+      },
+      "accent": {
+        "background": {
+          "$value": "{color.pink.100}",
+          "$description": "Accent badge fill (Draft, MCP)."
+        },
+        "foreground": {
+          "$value": "{color.pink.700}",
+          "$description": "Allowed pink text, case 2: the accent badge label on its own tint."
+        }
+      },
+      "info": {
+        "background": {
+          "$value": "{color.blue.100}",
+          "$description": "Info badge, alert and toast fill."
+        },
+        "foreground": {
+          "$value": "{color.blue.700}",
+          "$description": "Info text and icons on color-status-info-background."
+        }
+      },
+      "success": {
+        "background": {
+          "$value": "{color.green.100}",
+          "$description": "Success badge, alert and toast fill."
+        },
+        "foreground": {
+          "$value": "{color.green.700}",
+          "$description": "Success text and icons on color-status-success-background."
+        }
+      },
+      "warning": {
+        "background": {
+          "$value": "{color.amber.100}",
+          "$description": "Warning badge, alert and toast fill."
+        },
+        "foreground": {
+          "$value": "{color.amber.800}",
+          "$description": "Warning text and icons on color-status-warning-background."
+        }
+      },
+      "danger": {
+        "background": {
+          "$value": "{color.red.100}",
+          "$description": "Danger badge, alert and toast fill."
+        },
+        "foreground": {
+          "$value": "{color.red.700}",
+          "$description": "Danger text and icons on color-status-danger-background."
+        }
+      }
     },
     "action": {
       "primary": {
-        "background": { "$value": "{color.blue.500}" },
-        "background-hover": { "$value": "{color.blue.600}" },
-        "foreground": { "$value": "{color.white}" }
+        "background": {
+          "$value": "{color.black}",
+          "$description": "The one primary action per view. Inverts per theme."
+        },
+        "background-hover": {
+          "$value": "{color.gray.900}",
+          "$description": "Primary on hover, together with shadow-glow."
+        },
+        "foreground": {
+          "$value": "{color.white}",
+          "$description": "Label on the primary fill."
+        }
       },
       "secondary": {
-        "background": { "$value": "{color.gray.100}" },
-        "background-hover": { "$value": "{color.gray.200}" },
-        "foreground": { "$value": "{color.gray.900}" }
+        "background": {
+          "$value": "{color.gray.100}",
+          "$description": "Secondary actions, like Cancel."
+        },
+        "background-hover": {
+          "$value": "{color.gray.200}",
+          "$description": "Secondary on hover."
+        },
+        "foreground": {
+          "$value": "{color.black}",
+          "$description": "Label on the secondary fill."
+        }
       },
       "ghost": {
-        "background": { "$value": "{color.transparent}" },
-        "background-hover": { "$value": "{color.gray.100}" },
-        "foreground": { "$value": "{color.gray.900}" }
+        "background": {
+          "$value": "{color.transparent}",
+          "$description": "Low emphasis actions."
+        },
+        "background-hover": {
+          "$value": "{color.gray.100}",
+          "$description": "Ghost on hover."
+        },
+        "foreground": {
+          "$value": "{color.black}",
+          "$description": "Ghost label."
+        }
       },
       "danger": {
-        "background": { "$value": "{color.red.600}", "$description": "red.600, not 500: white text needs 4.5:1" },
-        "background-hover": { "$value": "{color.red.700}" },
-        "foreground": { "$value": "{color.white}" }
+        "background": {
+          "$value": "{color.red.600}",
+          "$description": "Destructive actions."
+        },
+        "background-hover": {
+          "$value": "{color.red.700}",
+          "$description": "Destructive on hover."
+        },
+        "foreground": {
+          "$value": "{color.white}",
+          "$description": "Label on the danger fill."
+        }
       }
-    }
+    },
+    "bloom": {
+      "ground": {
+        "$value": "{color.pink.400}",
+        "$description": "Base fill of the Bloom header under its gradient lights."
+      },
+      "light-1": {
+        "$value": "{color.pink.200}",
+        "$description": "Bloom light, upper left."
+      },
+      "light-2": {
+        "$value": "{color.pink.300}",
+        "$description": "Bloom light, upper right (plum in dark)."
+      },
+      "light-3": {
+        "$value": "{color.pink.500}",
+        "$description": "Bloom light, center. The brightest pink."
+      },
+      "warm-1": {
+        "$value": "{color.coral.400}",
+        "$description": "Bloom warm light. Use at 16% (dark) or 45% (light) opacity, small."
+      },
+      "warm-2": {
+        "$value": "{color.peach.200}",
+        "$description": "Bloom warm light, light theme only, at 40% opacity, small."
+      }
+    },
+    "icon": {
+      "accent": {
+        "$value": "{color.pink.500}",
+        "$description": "The accent part of an icon (a dot, a knob, a door) when the icon is set to accent. Mono icons ignore it."
+      }
+    },
+    "illustration": {
+      "line": {
+        "$value": "{color.black}",
+        "$description": "Illustration lines and plane outlines (.ln, .pl), 1.5 units."
+      },
+      "plane": {
+        "$value": "{color.white}",
+        "$description": "Illustration plane fill (.pl): one surface step above the card."
+      },
+      "construction": {
+        "$value": "{color.gray.600}",
+        "$description": "Illustration guides, dimensions, ticks and mono labels (.cs, .tk, .lb)."
+      },
+      "grid": {
+        "$value": "{color.alpha.black-14}",
+        "$description": "Illustration dot grid (.gd). Tuned so both themes read equally soft."
+      },
+      "accent": {
+        "$value": "{color.pink.500}",
+        "$description": "The one accent part of an illustration, through --il-accent."
+      }
+    },
+    "gradient": {
+      "text-start": {
+        "$value": "{color.pink.700}",
+        "$description": "Display gradient text, start. Display sizes only (24px and up)."
+      },
+      "text-end": {
+        "$value": "{color.orange.700}",
+        "$description": "Display gradient text, end. Allowed pink text, case 3."
+      },
+      "accent-start": {
+        "$value": "{color.pink.500}",
+        "$description": "Accent gradient, start: data bars, featured edges."
+      },
+      "accent-end": {
+        "$value": "{color.coral.400}",
+        "$description": "Accent gradient, end. Only ever inside a gradient that starts pink."
+      }
+    },
+    "$type": "color"
   },
   "space": {
-    "$type": "dimension",
     "inset": {
-      "sm": { "$value": "{space.2}" },
-      "md": { "$value": "{space.3}" },
-      "lg": { "$value": "{space.4}" }
+      "sm": {
+        "$value": "{space.2}",
+        "$description": "Alias of space-2. Badge and small control padding."
+      },
+      "md": {
+        "$value": "{space.3}",
+        "$description": "Alias of space-3. Control padding, md card padding."
+      },
+      "lg": {
+        "$value": "{space.4}",
+        "$description": "Alias of space-4. Button md padding, lg card padding."
+      },
+      "xl": {
+        "$value": "{space.6}",
+        "$description": "Alias of space-6. Card padding in this system."
+      }
     },
     "stack": {
-      "xs": { "$value": "{space.1}", "$description": "Tight lists: nav items, chip rows" },
-      "sm": { "$value": "{space.2}" },
-      "md": { "$value": "{space.4}" },
-      "lg": { "$value": "{space.6}" }
-    }
+      "xs": {
+        "$value": "{space.1}",
+        "$description": "Alias of space-1. Label to help text."
+      },
+      "sm": {
+        "$value": "{space.2}",
+        "$description": "Alias of space-2. Rows in a list."
+      },
+      "md": {
+        "$value": "{space.4}",
+        "$description": "Alias of space-4. Grid gutter between cards."
+      },
+      "lg": {
+        "$value": "{space.6}",
+        "$description": "Alias of space-6. Between sections of a card."
+      }
+    },
+    "$type": "dimension"
   },
   "radius": {
-    "$type": "dimension",
-    "control": { "$value": "{radius.md}", "$description": "Buttons, inputs" },
-    "container": { "$value": "{radius.lg}", "$description": "Cards, dialogs" },
-    "pill": { "$value": "{radius.full}", "$description": "Badges, switches" }
+    "control": {
+      "$value": "{radius.full}",
+      "$description": "Buttons, chips, badges, segmented controls, nav items."
+    },
+    "field": {
+      "$value": "{radius.lg}",
+      "$description": "Inputs, selects, textareas, search."
+    },
+    "container": {
+      "$value": "{radius.xl}",
+      "$description": "Card and panel corners."
+    },
+    "inset": {
+      "$value": "{radius.lg}",
+      "$description": "Surfaces nested in a container."
+    },
+    "overlay": {
+      "$value": "{radius.xl}",
+      "$description": "Menus, popovers, dialogs, toasts."
+    },
+    "pill": {
+      "$value": "{radius.full}",
+      "$description": "Badges, switch track, progress."
+    },
+    "header": {
+      "$value": "{radius.2xl}",
+      "$description": "The Bloom header."
+    },
+    "$type": "dimension"
+  },
+  "control": {
+    "height": {
+      "sm": {
+        "$value": {
+          "value": 34,
+          "unit": "px"
+        },
+        "$description": "Small button. Keep a 44px hit area around it."
+      },
+      "md": {
+        "$value": {
+          "value": 42,
+          "unit": "px"
+        },
+        "$description": "Button, input, select."
+      },
+      "lg": {
+        "$value": {
+          "value": 50,
+          "unit": "px"
+        },
+        "$description": "Hero actions."
+      }
+    },
+    "$type": "dimension"
+  },
+  "icon": {
+    "size": {
+      "xs": {
+        "$value": {
+          "value": 12,
+          "unit": "px"
+        },
+        "$description": "Icons in badges and dense tables. 1px stroke."
+      },
+      "sm": {
+        "$value": {
+          "value": 16,
+          "unit": "px"
+        },
+        "$description": "Icons in menus, small buttons, inputs. 1.33px stroke."
+      },
+      "md": {
+        "$value": {
+          "value": 20,
+          "unit": "px"
+        },
+        "$description": "Icons in buttons and nav. 1.67px stroke. The default."
+      },
+      "lg": {
+        "$value": {
+          "value": 24,
+          "unit": "px"
+        },
+        "$description": "Icons in cards and toolbars. 2px stroke."
+      },
+      "xl": {
+        "$value": {
+          "value": 32,
+          "unit": "px"
+        },
+        "$description": "Empty states and feature tiles. 2.67px stroke."
+      }
+    },
+    "stroke": {
+      "$value": 2,
+      "$description": "Icon stroke in units of the 24 grid. Scales with the icon: never set a pixel stroke.",
+      "$type": "number"
+    },
+    "$type": "dimension"
   },
   "type": {
-    "title": { "size": { "$type": "dimension", "$value": "{font.size.xl}" }, "weight": { "$type": "fontWeight", "$value": "{font.weight.semibold}" } },
-    "heading": { "size": { "$type": "dimension", "$value": "{font.size.lg}" }, "weight": { "$type": "fontWeight", "$value": "{font.weight.semibold}" } },
-    "body": { "size": { "$type": "dimension", "$value": "{font.size.md}" }, "weight": { "$type": "fontWeight", "$value": "{font.weight.regular}" } },
-    "caption": { "size": { "$type": "dimension", "$value": "{font.size.sm}" }, "weight": { "$type": "fontWeight", "$value": "{font.weight.regular}" } }
+    "display": {
+      "family": {
+        "$type": "fontFamily",
+        "$value": "{font.family.display}"
+      },
+      "size": {
+        "$type": "dimension",
+        "$value": "{font.size.display}"
+      },
+      "weight": {
+        "$type": "fontWeight",
+        "$value": "{font.weight.extrabold}"
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": 0.92
+      },
+      "tracking": {
+        "$type": "dimension",
+        "$value": {
+          "value": -0.03,
+          "unit": "em"
+        }
+      },
+      "$description": "The home hero on the Bloom header. One per product."
+    },
+    "page-title": {
+      "family": {
+        "$type": "fontFamily",
+        "$value": "{font.family.display}"
+      },
+      "size": {
+        "$type": "dimension",
+        "$value": "{font.size.3xl}"
+      },
+      "weight": {
+        "$type": "fontWeight",
+        "$value": "{font.weight.extrabold}"
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": 0.98
+      },
+      "tracking": {
+        "$type": "dimension",
+        "$value": {
+          "value": -0.025,
+          "unit": "em"
+        }
+      },
+      "$description": "Page titles on the Bloom header."
+    },
+    "stat": {
+      "family": {
+        "$type": "fontFamily",
+        "$value": "{font.family.display}"
+      },
+      "size": {
+        "$type": "dimension",
+        "$value": "{font.size.2xl}"
+      },
+      "weight": {
+        "$type": "fontWeight",
+        "$value": "{font.weight.extrabold}"
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": 1
+      },
+      "tracking": {
+        "$type": "dimension",
+        "$value": {
+          "value": -0.025,
+          "unit": "em"
+        }
+      },
+      "$description": "Big numbers in stat tiles and KPI cards."
+    },
+    "title": {
+      "family": {
+        "$type": "fontFamily",
+        "$value": "{font.family.display}"
+      },
+      "size": {
+        "$type": "dimension",
+        "$value": "{font.size.xl}"
+      },
+      "weight": {
+        "$type": "fontWeight",
+        "$value": "{font.weight.bold}"
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": 1.2
+      },
+      "tracking": {
+        "$type": "dimension",
+        "$value": {
+          "value": -0.02,
+          "unit": "em"
+        }
+      },
+      "$description": "Text variant title. Section titles."
+    },
+    "heading": {
+      "family": {
+        "$type": "fontFamily",
+        "$value": "{font.family.display}"
+      },
+      "size": {
+        "$type": "dimension",
+        "$value": "{font.size.lg}"
+      },
+      "weight": {
+        "$type": "fontWeight",
+        "$value": "{font.weight.bold}"
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": 1.35
+      },
+      "tracking": {
+        "$type": "dimension",
+        "$value": {
+          "value": -0.01,
+          "unit": "em"
+        }
+      },
+      "$description": "Text variant heading. Card titles."
+    },
+    "lead": {
+      "family": {
+        "$type": "fontFamily",
+        "$value": "{font.family.sans}"
+      },
+      "size": {
+        "$type": "dimension",
+        "$value": "{font.size.lg}"
+      },
+      "weight": {
+        "$type": "fontWeight",
+        "$value": "{font.weight.medium}"
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": 1.45
+      },
+      "tracking": {
+        "$type": "dimension",
+        "$value": {
+          "value": 0,
+          "unit": "em"
+        }
+      },
+      "$description": "Description under a page title."
+    },
+    "body": {
+      "family": {
+        "$type": "fontFamily",
+        "$value": "{font.family.sans}"
+      },
+      "size": {
+        "$type": "dimension",
+        "$value": "{font.size.md}"
+      },
+      "weight": {
+        "$type": "fontWeight",
+        "$value": "{font.weight.regular}"
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": 1.5
+      },
+      "tracking": {
+        "$type": "dimension",
+        "$value": {
+          "value": 0,
+          "unit": "em"
+        }
+      },
+      "$description": "Text variant body."
+    },
+    "label": {
+      "family": {
+        "$type": "fontFamily",
+        "$value": "{font.family.sans}"
+      },
+      "size": {
+        "$type": "dimension",
+        "$value": "{font.size.base}"
+      },
+      "weight": {
+        "$type": "fontWeight",
+        "$value": "{font.weight.semibold}"
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": 1.3
+      },
+      "tracking": {
+        "$type": "dimension",
+        "$value": {
+          "value": 0,
+          "unit": "em"
+        }
+      },
+      "$description": "Buttons, nav, chips, field labels."
+    },
+    "caption": {
+      "family": {
+        "$type": "fontFamily",
+        "$value": "{font.family.sans}"
+      },
+      "size": {
+        "$type": "dimension",
+        "$value": "{font.size.sm}"
+      },
+      "weight": {
+        "$type": "fontWeight",
+        "$value": "{font.weight.medium}"
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": 1.4
+      },
+      "tracking": {
+        "$type": "dimension",
+        "$value": {
+          "value": 0,
+          "unit": "em"
+        }
+      },
+      "$description": "Text variant caption. Meta lines."
+    },
+    "eyebrow": {
+      "family": {
+        "$type": "fontFamily",
+        "$value": "{font.family.mono}"
+      },
+      "size": {
+        "$type": "dimension",
+        "$value": "{font.size.xs}"
+      },
+      "weight": {
+        "$type": "fontWeight",
+        "$value": "{font.weight.medium}"
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": 1.4
+      },
+      "tracking": {
+        "$type": "dimension",
+        "$value": {
+          "value": 0.07,
+          "unit": "em"
+        }
+      },
+      "transform": {
+        "$value": "uppercase",
+        "$description": "text-transform"
+      },
+      "$description": "Uppercase label above a page title."
+    },
+    "code": {
+      "family": {
+        "$type": "fontFamily",
+        "$value": "{font.family.mono}"
+      },
+      "size": {
+        "$type": "dimension",
+        "$value": "{font.size.xs}"
+      },
+      "weight": {
+        "$type": "fontWeight",
+        "$value": "{font.weight.regular}"
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": 1.65
+      },
+      "tracking": {
+        "$type": "dimension",
+        "$value": {
+          "value": 0,
+          "unit": "em"
+        }
+      },
+      "$description": "Token names, code blocks, values."
+    }
   }
 }

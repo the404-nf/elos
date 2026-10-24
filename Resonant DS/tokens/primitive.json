@@ -1,105 +1,630 @@
 {
   "color": {
-    "$type": "color",
-    "white": { "$value": "#ffffff" },
-    "black": { "$value": "#0b0b0d" },
+    "white": {
+      "$value": "#ffffff",
+      "$description": "Pure white. Text on danger fills and on the light Bloom header glass; switch thumb."
+    },
+    "black": {
+      "$value": "#0b0b0f",
+      "$description": "Ink. Primary text and primary fills in light; text on pink fills in both themes."
+    },
     "gray": {
-      "50": { "$value": "#f7f7f8" },
-      "100": { "$value": "#ececef" },
-      "200": { "$value": "#d9d9df" },
-      "400": { "$value": "#9a9aa6" },
-      "500": { "$value": "#8a8a96" },
-      "600": { "$value": "#5c5c69" },
-      "800": { "$value": "#2a2a33" },
-      "900": { "$value": "#1a1a21" }
+      "25": {
+        "$value": "#f5f4f7",
+        "$description": "Neutral ramp, warm-cool grey. Primitive: bind through a semantic token."
+      },
+      "50": {
+        "$value": "#f7f6f8",
+        "$description": "Neutral ramp, warm-cool grey. Primitive: bind through a semantic token."
+      },
+      "75": {
+        "$value": "#ececef",
+        "$description": "Neutral ramp, warm-cool grey. Primitive: bind through a semantic token."
+      },
+      "100": {
+        "$value": "#efeef1",
+        "$description": "Neutral ramp, warm-cool grey. Primitive: bind through a semantic token."
+      },
+      "200": {
+        "$value": "#e2e1e6",
+        "$description": "Neutral ramp, warm-cool grey. Primitive: bind through a semantic token."
+      },
+      "300": {
+        "$value": "#dcdbe2",
+        "$description": "Neutral ramp, warm-cool grey. Primitive: bind through a semantic token."
+      },
+      "400": {
+        "$value": "#a9a8b3",
+        "$description": "Neutral ramp, warm-cool grey. Primitive: bind through a semantic token."
+      },
+      "450": {
+        "$value": "#93929d",
+        "$description": "Neutral ramp, warm-cool grey. Primitive: bind through a semantic token."
+      },
+      "500": {
+        "$value": "#86858f",
+        "$description": "Neutral ramp, warm-cool grey. Primitive: bind through a semantic token."
+      },
+      "600": {
+        "$value": "#6b6a74",
+        "$description": "Neutral ramp, warm-cool grey. Primitive: bind through a semantic token."
+      },
+      "650": {
+        "$value": "#5c5b65",
+        "$description": "Neutral ramp, warm-cool grey. Primitive: bind through a semantic token."
+      },
+      "700": {
+        "$value": "#3a3942",
+        "$description": "Neutral ramp, warm-cool grey. Primitive: bind through a semantic token."
+      },
+      "750": {
+        "$value": "#302f37",
+        "$description": "Neutral ramp, warm-cool grey. Primitive: bind through a semantic token."
+      },
+      "800": {
+        "$value": "#26252c",
+        "$description": "Neutral ramp, warm-cool grey. Primitive: bind through a semantic token."
+      },
+      "850": {
+        "$value": "#222128",
+        "$description": "Neutral ramp, warm-cool grey. Primitive: bind through a semantic token."
+      },
+      "900": {
+        "$value": "#1d1c22",
+        "$description": "Neutral ramp, warm-cool grey. Primitive: bind through a semantic token."
+      },
+      "925": {
+        "$value": "#17161b",
+        "$description": "Neutral ramp, warm-cool grey. Primitive: bind through a semantic token."
+      },
+      "950": {
+        "$value": "#0f0e12",
+        "$description": "Neutral ramp, warm-cool grey. Primitive: bind through a semantic token."
+      }
     },
-    "blue": {
-      "100": { "$value": "#e3ecff" },
-      "500": { "$value": "#3161ff" },
-      "600": { "$value": "#244dd6" },
-      "700": { "$value": "#1c3ca8" }
+    "pink": {
+      "50": {
+        "$value": "#fff4f8",
+        "$description": "Pink ramp. 500 is the brand pink. Primitive: bind through a semantic token."
+      },
+      "100": {
+        "$value": "#ffe3ee",
+        "$description": "Pink ramp. 500 is the brand pink. Primitive: bind through a semantic token."
+      },
+      "200": {
+        "$value": "#ffb1cf",
+        "$description": "Pink ramp. 500 is the brand pink. Primitive: bind through a semantic token."
+      },
+      "300": {
+        "$value": "#ff8fbd",
+        "$description": "Pink ramp. 500 is the brand pink. Primitive: bind through a semantic token."
+      },
+      "400": {
+        "$value": "#ff5c9a",
+        "$description": "Pink ramp. 500 is the brand pink. Primitive: bind through a semantic token."
+      },
+      "500": {
+        "$value": "#ff3d8b",
+        "$description": "Pink ramp. 500 is the brand pink. Primitive: bind through a semantic token."
+      },
+      "600": {
+        "$value": "#e0106b",
+        "$description": "Pink ramp. 500 is the brand pink. Primitive: bind through a semantic token."
+      },
+      "700": {
+        "$value": "#b0124f",
+        "$description": "Pink ramp. 500 is the brand pink. Primitive: bind through a semantic token."
+      },
+      "800": {
+        "$value": "#8c1654",
+        "$description": "Pink ramp. 500 is the brand pink. Primitive: bind through a semantic token."
+      },
+      "900": {
+        "$value": "#1c0a14",
+        "$description": "Pink ramp. 500 is the brand pink. Primitive: bind through a semantic token."
+      }
     },
-    "red": {
-      "100": { "$value": "#fde7e8" },
-      "500": { "$value": "#e5484d" },
-      "600": { "$value": "#c73b40" },
-      "700": { "$value": "#a32f33" }
+    "coral": {
+      "400": {
+        "$value": "#ff7a59",
+        "$description": "Coral: a faint light inside the Bloom and the end stop of the accent gradient. Never a flat UI color."
+      }
+    },
+    "peach": {
+      "200": {
+        "$value": "#ffd2a8",
+        "$description": "Bloom only: a small, faint peach light inside the gradient. Never a UI color."
+      },
+      "300": {
+        "$value": "#ffb38a",
+        "$description": "End stop of the display gradient text in dark and of the beam."
+      }
+    },
+    "orange": {
+      "700": {
+        "$value": "#c2410c",
+        "$description": "End stop of the display gradient text in light. Never alone."
+      }
     },
     "green": {
-      "100": { "$value": "#e1f5e8" },
-      "700": { "$value": "#1f7a45" }
+      "100": {
+        "$value": "#e1f5e8",
+        "$description": "Status ramp. Primitive: bind through color-status-* tokens."
+      },
+      "400": {
+        "$value": "#5fd39a",
+        "$description": "Status ramp. Primitive: bind through color-status-* tokens."
+      },
+      "700": {
+        "$value": "#1f7a45",
+        "$description": "Status ramp. Primitive: bind through color-status-* tokens."
+      }
     },
     "amber": {
-      "100": { "$value": "#fdf1d6" },
-      "700": { "$value": "#9a6700" },
-      "800": { "$value": "#805600" }
+      "100": {
+        "$value": "#fdf1d6",
+        "$description": "Status ramp. Primitive: bind through color-status-* tokens."
+      },
+      "400": {
+        "$value": "#f5c451",
+        "$description": "Status ramp. Primitive: bind through color-status-* tokens."
+      },
+      "800": {
+        "$value": "#805600",
+        "$description": "Status ramp. Primitive: bind through color-status-* tokens."
+      }
+    },
+    "red": {
+      "100": {
+        "$value": "#fde7e8",
+        "$description": "Status ramp. Primitive: bind through color-status-* tokens."
+      },
+      "400": {
+        "$value": "#ff8b8b",
+        "$description": "Status ramp. Primitive: bind through color-status-* tokens."
+      },
+      "500": {
+        "$value": "#e5484d",
+        "$description": "Status ramp. Primitive: bind through color-status-* tokens."
+      },
+      "600": {
+        "$value": "#c73b40",
+        "$description": "Status ramp. Primitive: bind through color-status-* tokens."
+      },
+      "700": {
+        "$value": "#a32f33",
+        "$description": "Status ramp. Primitive: bind through color-status-* tokens."
+      }
+    },
+    "blue": {
+      "100": {
+        "$value": "#e3ecff",
+        "$description": "Status ramp. Primitive: bind through color-status-* tokens."
+      },
+      "400": {
+        "$value": "#8fb0ff",
+        "$description": "Status ramp. Primitive: bind through color-status-* tokens."
+      },
+      "700": {
+        "$value": "#1c3ca8",
+        "$description": "Status ramp. Primitive: bind through color-status-* tokens."
+      }
     },
     "alpha": {
-      "black-60": { "$value": "#0b0b0d99" }
+      "black-60": {
+        "$value": "#0b0b0f99",
+        "$description": "Modal backdrop."
+      },
+      "white-72": {
+        "$value": "#ffffffb8",
+        "$description": "Glass on the light Bloom header."
+      },
+      "white-10": {
+        "$value": "#ffffff1a",
+        "$description": "Glass on the dark Bloom header."
+      },
+      "white-08": {
+        "$value": "#ffffff14",
+        "$description": "Quiet glass (segmented controls) on the dark header."
+      },
+      "white-50": {
+        "$value": "#ffffff80",
+        "$description": "Quiet glass on the light header."
+      },
+      "white-20": {
+        "$value": "#ffffff33",
+        "$description": "Illustration grid dots in dark."
+      },
+      "black-14": {
+        "$value": "#0b0b0f24",
+        "$description": "Illustration grid dots in light."
+      },
+      "pink-17": {
+        "$value": "#ff3d8b2b",
+        "$description": "Accent tint in dark."
+      },
+      "pink-08": {
+        "$value": "#ff3d8b14",
+        "$description": "Row hover tint in dark."
+      },
+      "green-13": {
+        "$value": "#5fd39a21",
+        "$description": "Success tint in dark."
+      },
+      "amber-13": {
+        "$value": "#f5c45121",
+        "$description": "Warning tint in dark."
+      },
+      "red-15": {
+        "$value": "#ff6b6b26",
+        "$description": "Danger tint in dark."
+      },
+      "blue-13": {
+        "$value": "#8fb0ff21",
+        "$description": "Info tint in dark."
+      }
     },
-    "transparent": { "$value": "#00000000" }
+    "transparent": {
+      "$value": "#00000000",
+      "$description": "Ghost button fill."
+    },
+    "$type": "color"
   },
   "space": {
-    "$type": "dimension",
-    "1": { "$value": { "value": 4, "unit": "px" } },
-    "2": { "$value": { "value": 8, "unit": "px" } },
-    "3": { "$value": { "value": 12, "unit": "px" } },
-    "4": { "$value": { "value": 16, "unit": "px" } },
-    "5": { "$value": { "value": 20, "unit": "px" } },
-    "6": { "$value": { "value": 24, "unit": "px" } }
+    "1": {
+      "$value": {
+        "value": 4,
+        "unit": "px"
+      },
+      "$description": "Hairline gaps: icon to badge dot, stack xs."
+    },
+    "2": {
+      "$value": {
+        "value": 8,
+        "unit": "px"
+      },
+      "$description": "Inset sm, stack sm, gaps between chips."
+    },
+    "3": {
+      "$value": {
+        "value": 12,
+        "unit": "px"
+      },
+      "$description": "Inset md, gaps in toolbars."
+    },
+    "4": {
+      "$value": {
+        "value": 16,
+        "unit": "px"
+      },
+      "$description": "Inset lg, grid gutter between cards."
+    },
+    "5": {
+      "$value": {
+        "value": 20,
+        "unit": "px"
+      },
+      "$description": "Card padding on dense screens."
+    },
+    "6": {
+      "$value": {
+        "value": 24,
+        "unit": "px"
+      },
+      "$description": "Card padding, stack lg."
+    },
+    "8": {
+      "$value": {
+        "value": 32,
+        "unit": "px"
+      },
+      "$description": "Bloom header side padding."
+    },
+    "12": {
+      "$value": {
+        "value": 48,
+        "unit": "px"
+      },
+      "$description": "Section breaks."
+    },
+    "24": {
+      "$value": {
+        "value": 96,
+        "unit": "px"
+      },
+      "$description": "Bloom header top padding under the nav."
+    },
+    "$type": "dimension"
   },
   "radius": {
-    "$type": "dimension",
-    "sm": { "$value": { "value": 4, "unit": "px" } },
-    "md": { "$value": { "value": 8, "unit": "px" } },
-    "lg": { "$value": { "value": 12, "unit": "px" } },
-    "full": { "$value": { "value": 999, "unit": "px" } }
+    "sm": {
+      "$value": {
+        "value": 6,
+        "unit": "px"
+      },
+      "$description": "Checkbox, kbd, tags inside code."
+    },
+    "md": {
+      "$value": {
+        "value": 10,
+        "unit": "px"
+      },
+      "$description": "Inner tiles, pickers, tree rows."
+    },
+    "lg": {
+      "$value": {
+        "value": 12,
+        "unit": "px"
+      },
+      "$description": "Fields, wells inside cards, code blocks, previews."
+    },
+    "xl": {
+      "$value": {
+        "value": 16,
+        "unit": "px"
+      },
+      "$description": "Cards, panels, menus, dialogs."
+    },
+    "2xl": {
+      "$value": {
+        "value": 22,
+        "unit": "px"
+      },
+      "$description": "The Bloom header only."
+    },
+    "full": {
+      "$value": {
+        "value": 999,
+        "unit": "px"
+      },
+      "$description": "Pills and circles."
+    },
+    "$type": "dimension"
+  },
+  "shadow": {
+    "overlay": {
+      "$value": "0 30px 60px -24px #0b0b0f59, 0 0 0 1px #ececef",
+      "$description": "Menus, popovers, dialogs, drawers."
+    },
+    "glow": {
+      "$value": "0 0 0 1px #ff3d8ba6, 0 10px 30px -8px #ff3d8bbf",
+      "$description": "Hover on primary buttons: a pink ring and glow. The control never moves."
+    },
+    "glow-soft": {
+      "$value": "inset 0 0 0 1px #ff3d8b99, 0 8px 24px -10px #ff3d8b8c",
+      "$description": "Hover on secondary, ghost and glass buttons and theme toggles."
+    },
+    "ring-accent": {
+      "$value": "0 0 0 1.5px #ff3d8b99",
+      "$description": "Hover on swatches and small tiles."
+    },
+    "field-focus": {
+      "$value": "0 0 0 1.5px #ff3d8b, 0 0 0 4px #ffe3ee",
+      "$description": "Focused input, select and textarea: pink edge and soft halo, plus the focus outline when focus came from the keyboard."
+    },
+    "$type": "shadow"
   },
   "font": {
-    "family": {
-      "$type": "fontFamily",
-      "sans": { "$value": "Inter, system-ui, sans-serif" },
-      "mono": { "$value": "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace", "$description": "Token paths, ids and code" }
-    },
     "size": {
-      "$type": "dimension",
-      "sm": { "$value": { "value": 13, "unit": "px" } },
-      "md": { "$value": { "value": 15, "unit": "px" } },
-      "lg": { "$value": { "value": 17, "unit": "px" } },
-      "xl": { "$value": { "value": 20, "unit": "px" } }
+      "xs": {
+        "$value": {
+          "value": 12,
+          "unit": "px"
+        },
+        "$description": "Mono eyebrows and kbd."
+      },
+      "sm": {
+        "$value": {
+          "value": 13,
+          "unit": "px"
+        },
+        "$description": "Captions, badges, table meta."
+      },
+      "md": {
+        "$value": {
+          "value": 15,
+          "unit": "px"
+        },
+        "$description": "Body and controls."
+      },
+      "lg": {
+        "$value": {
+          "value": 17,
+          "unit": "px"
+        },
+        "$description": "Card titles and lead text."
+      },
+      "xl": {
+        "$value": {
+          "value": 22,
+          "unit": "px"
+        },
+        "$description": "Section titles."
+      },
+      "2xl": {
+        "$value": {
+          "value": 44,
+          "unit": "px"
+        },
+        "$description": "Big numbers."
+      },
+      "display": {
+        "$value": {
+          "value": 104,
+          "unit": "px"
+        },
+        "$description": "The home hero only."
+      },
+      "base": {
+        "$value": {
+          "value": 14,
+          "unit": "px"
+        },
+        "$description": "Labels, buttons, nav."
+      },
+      "3xl": {
+        "$value": {
+          "value": 56,
+          "unit": "px"
+        },
+        "$description": "Page titles."
+      },
+      "$type": "dimension"
     },
     "weight": {
-      "$type": "fontWeight",
-      "regular": { "$value": 400 },
-      "medium": { "$value": 500 },
-      "semibold": { "$value": 600 }
+      "regular": {
+        "$value": 400,
+        "$description": "Body."
+      },
+      "medium": {
+        "$value": 500,
+        "$description": "Meta, badges."
+      },
+      "semibold": {
+        "$value": 600,
+        "$description": "Controls, labels, nav."
+      },
+      "bold": {
+        "$value": 700,
+        "$description": "Card titles."
+      },
+      "extrabold": {
+        "$value": 800,
+        "$description": "Display and page titles."
+      },
+      "$type": "fontWeight"
+    },
+    "family": {
+      "display": {
+        "$value": "Inter Tight, system-ui, sans-serif",
+        "$description": "Titles: display, page titles, big numbers, section, card and dialog titles."
+      },
+      "sans": {
+        "$value": "Albert Sans, system-ui, sans-serif",
+        "$description": "Body, labels, buttons, nav, fields: everything read that is not a title or code."
+      },
+      "mono": {
+        "$value": "JetBrains Mono, ui-monospace, Menlo, Consolas, monospace",
+        "$description": "Token names, code, eyebrows, kbd, values and chart axes."
+      },
+      "$type": "fontFamily"
     }
-  },
-  "opacity": {
-    "$type": "number",
-    "disabled": { "$value": 0.5 }
-  },
-  "border": {
-    "$type": "dimension",
-    "width": { "$value": { "value": 1, "unit": "px" } }
   },
   "motion": {
     "duration": {
-      "$type": "duration",
-      "instant": { "$value": "80ms" },
-      "fast": { "$value": "150ms" },
-      "base": { "$value": "220ms" },
-      "slow": { "$value": "360ms" }
+      "instant": {
+        "$value": "80ms",
+        "$description": "Highlights: menu item, row hover."
+      },
+      "fast": {
+        "$value": "150ms",
+        "$description": "Hover and focus color changes."
+      },
+      "base": {
+        "$value": "220ms",
+        "$description": "Layout shifts, segment indicator."
+      },
+      "slow": {
+        "$value": "360ms",
+        "$description": "Drawers, dialogs entering."
+      },
+      "draw": {
+        "$value": "1800ms",
+        "$description": "Chart line draw-in and fill reveal."
+      },
+      "beam": {
+        "$value": "3200ms",
+        "$description": "One lap of the hover beam around a card."
+      },
+      "ambient": {
+        "$value": "48000ms",
+        "$description": "One turn of the Bloom gradient."
+      },
+      "$type": "duration"
     },
     "easing": {
-      "$type": "cubicBezier",
-      "standard": { "$value": [0.2, 0, 0, 1], "$description": "Most state changes" },
-      "enter": { "$value": [0, 0, 0.2, 1], "$description": "Things appearing" },
-      "exit": { "$value": [0.4, 0, 1, 1], "$description": "Things leaving" }
+      "standard": {
+        "$value": [
+          0.2,
+          0,
+          0,
+          1
+        ],
+        "$description": "Color and opacity changes."
+      },
+      "enter": {
+        "$value": [
+          0,
+          0,
+          0.2,
+          1
+        ],
+        "$description": "Things arriving."
+      },
+      "exit": {
+        "$value": [
+          0.4,
+          0,
+          1,
+          1
+        ],
+        "$description": "Things leaving."
+      },
+      "out": {
+        "$value": [
+          0.22,
+          1,
+          0.36,
+          1
+        ],
+        "$description": "Entrances, draws and reveals."
+      },
+      "spring": {
+        "$value": [
+          0.34,
+          1.56,
+          0.64,
+          1
+        ],
+        "$description": "Switch thumb and segment indicator. Never on hover."
+      },
+      "$type": "cubicBezier"
     }
   },
-  "shadow": {
-    "$type": "shadow",
-    "overlay": { "$value": "0 8px 24px #0b0b0d26", "$description": "Popovers, menus, toasts" }
+  "opacity": {
+    "disabled": {
+      "$value": 0.5,
+      "$description": "Whole disabled control."
+    },
+    "$type": "number"
+  },
+  "border": {
+    "width": {
+      "$value": {
+        "value": 1,
+        "unit": "px"
+      },
+      "$description": "Hairlines."
+    },
+    "$type": "dimension"
+  },
+  "focus": {
+    "ring": {
+      "width": {
+        "$value": {
+          "value": 2,
+          "unit": "px"
+        },
+        "$description": "Focus outline width."
+      },
+      "offset": {
+        "$value": {
+          "value": 2,
+          "unit": "px"
+        },
+        "$description": "Focus outline offset."
+      }
+    },
+    "$type": "dimension"
   }
 }

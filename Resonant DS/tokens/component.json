@@ -1,37 +1,121 @@
 {
   "switch": {
-    "$type": "dimension",
     "track": {
-      "width": { "$value": { "value": 36, "unit": "px" } },
-      "height": { "$value": { "value": 20, "unit": "px" } }
+      "width": {
+        "$value": {
+          "value": 44,
+          "unit": "px"
+        },
+        "$description": "Switch track."
+      },
+      "height": {
+        "$value": {
+          "value": 26,
+          "unit": "px"
+        },
+        "$description": "Switch track."
+      }
     },
     "thumb": {
-      "size": { "$value": { "value": 16, "unit": "px" } },
-      "offset": { "$value": { "value": 2, "unit": "px" } },
-      "travel": { "$value": { "value": 16, "unit": "px" }, "$description": "track.width - thumb.size - 2 * thumb.offset" }
-    }
+      "size": {
+        "$value": {
+          "value": 20,
+          "unit": "px"
+        },
+        "$description": "Switch thumb."
+      },
+      "offset": {
+        "$value": {
+          "value": 3,
+          "unit": "px"
+        },
+        "$description": "Switch thumb inset."
+      },
+      "travel": {
+        "$value": {
+          "value": 18,
+          "unit": "px"
+        },
+        "$description": "track width minus thumb minus two offsets."
+      }
+    },
+    "$type": "dimension"
   },
   "dialog": {
-    "$type": "dimension",
-    "width": { "$value": { "value": 480, "unit": "px" } }
+    "width": {
+      "$value": {
+        "value": 480,
+        "unit": "px"
+      },
+      "$description": "Dialog."
+    },
+    "$type": "dimension"
   },
   "avatar": {
-    "$type": "dimension",
     "size": {
-      "sm": { "$value": { "value": 24, "unit": "px" } },
-      "md": { "$value": { "value": 32, "unit": "px" } },
-      "lg": { "$value": { "value": 40, "unit": "px" } }
-    }
+      "sm": {
+        "$value": {
+          "value": 24,
+          "unit": "px"
+        },
+        "$description": "Avatar sm."
+      },
+      "md": {
+        "$value": {
+          "value": 32,
+          "unit": "px"
+        },
+        "$description": "Avatar md."
+      },
+      "lg": {
+        "$value": {
+          "value": 40,
+          "unit": "px"
+        },
+        "$description": "Avatar lg."
+      }
+    },
+    "$type": "dimension"
   },
   "progress": {
-    "$type": "dimension",
-    "height": { "$value": { "value": 6, "unit": "px" } }
+    "height": {
+      "$value": {
+        "value": 6,
+        "unit": "px"
+      },
+      "$description": "Progress track."
+    },
+    "$type": "dimension"
   },
   "overlay": {
-    "$type": "dimension",
-    "tooltip-width": { "$value": { "value": 240, "unit": "px" } },
-    "popover-width": { "$value": { "value": 280, "unit": "px" } },
-    "menu-width": { "$value": { "value": 180, "unit": "px" } },
-    "toast-width": { "$value": { "value": 320, "unit": "px" } }
+    "tooltip-width": {
+      "$value": {
+        "value": 240,
+        "unit": "px"
+      },
+      "$description": "Tooltip max width."
+    },
+    "popover-width": {
+      "$value": {
+        "value": 280,
+        "unit": "px"
+      },
+      "$description": "Popover width."
+    },
+    "menu-width": {
+      "$value": {
+        "value": 200,
+        "unit": "px"
+      },
+      "$description": "Menu min width."
+    },
+    "toast-width": {
+      "$value": {
+        "value": 340,
+        "unit": "px"
+      },
+      "$description": "Toast width."
+    },
+    "$type": "dimension"
   }
 }

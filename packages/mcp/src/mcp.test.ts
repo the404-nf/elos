@@ -34,7 +34,7 @@ test("tools expose the menu, contracts, tokens and validation over MCP", async (
   assert.equal((await call("get_component", { id: "ds.nope" })).isError, true);
 
   const dark = await call("list_tokens", { theme: "dark", prefix: "color.surface" });
-  assert.deepEqual(dark.data.map((t: { cssVar: string }) => t.cssVar), ["--color-surface-canvas", "--color-surface-raised", "--color-surface-sunken", "--color-surface-inverse"]);
+  assert.deepEqual(dark.data.map((t: { cssVar: string }) => t.cssVar), ["--color-surface-canvas", "--color-surface-raised", "--color-surface-overlay", "--color-surface-sunken", "--color-surface-inverse", "--color-surface-glass", "--color-surface-glass-quiet"]);
 
   const bad = await call("validate_composition", { tree: { component: "ds.card", slots: { actions: [{ component: "ds.card" }] } } });
   assert.equal(bad.isError, true);
