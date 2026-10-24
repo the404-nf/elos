@@ -22,3 +22,4 @@ Format: Status, Context, Decision, Consequences. Keep each under a page.
 | [0014](0014-portal-chrome-from-contracts.md) | The portal chrome is composed from Resonant contracts | Accepted |
 | [0015](0015-resonant-visual-layer-from-claude-design.md) | Resonant's visual layer from the Claude Design round; gradients, animation, fonts and assets in the spine | Accepted |
 | [0016](0016-one-operation-three-inputs.md) | The canvas edits through one operation with three inputs: mouse, values, agent | Accepted |
+| [0017](0017-canvas-is-its-own-area.md) | Canvas is its own area: a design system never contains product screens | Accepted |
