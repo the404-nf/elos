@@ -576,7 +576,7 @@ export function ComponentEditor({ ds, contract, catalog, markdown }: { ds: strin
       </Card></div>
 
       <div ref={canvasRef} className={`cv${draft.category === "overlay" ? " cv--overlay" : ""}`} data-theme={canvasTheme} data-preview-state={state === "default" ? undefined : state}
-        onClickCapture={(e) => { if (pan.current?.moved) { e.preventDefault(); e.stopPropagation(); return; } pick(e); }} onPointerDown={panDown} onPointerMove={panMove} onPointerUp={panUp} onPointerCancel={panUp} onDoubleClick={fit}>
+        onClickCapture={(e) => { if ((e.target as HTMLElement).closest(".hud, .handle")) return; if (pan.current?.moved) { e.preventDefault(); e.stopPropagation(); return; } pick(e); }} onPointerDown={panDown} onPointerMove={panMove} onPointerUp={panUp} onPointerCancel={panUp} onDoubleClick={fit}>
         <div ref={stageRef} className="stage" style={{ transform: `translate(${view.x}px, ${view.y}px) scale(${view.z})` }}>
           {tree ? (
             <div className="cset" style={{ gridTemplateColumns: `repeat(${variants.length}, auto)` }}>
