@@ -2,9 +2,32 @@
   "id": "resonant",
   "name": "Resonant DS",
   "version": "0.1.0",
-  "tokens": ["tokens/primitive.json", "tokens/semantic.json", "tokens/component.json"],
-  "themes": [
-    { "name": "dark", "kind": "mode", "selector": "[data-theme=\"dark\"]", "overlay": "themes/dark.json" }
+  "tokens": [
+    "tokens/primitive.json",
+    "tokens/semantic.json",
+    "tokens/component.json"
   ],
-  "contracts": "contracts"
+  "themes": [
+    {
+      "name": "dark",
+      "kind": "mode",
+      "selector": "[data-theme=\"dark\"]",
+      "overlay": "themes/dark.json"
+    }
+  ],
+  "contracts": "contracts",
+  "fonts": [
+    {
+      "family": "Inter Tight",
+      "url": "https://fonts.googleapis.com/css2?family=Inter+Tight:wght@600;700;800&display=swap"
+    },
+    {
+      "family": "Albert Sans",
+      "url": "https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700&display=swap"
+    },
+    {
+      "family": "JetBrains Mono",
+      "url": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"
+    }
+  ]
 }

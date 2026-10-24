@@ -5,42 +5,175 @@
   "status": "draft",
   "category": "navigation",
   "description": "Navigates to another page or location.",
-  "semantics": { "element": "a" },
+  "semantics": {
+    "element": "a"
+  },
   "props": [
-    { "name": "href", "description": "Destination.", "type": "text", "required": true, "attribute": "href" },
-    { "name": "label", "description": "Visible text; says where it goes.", "type": "text", "required": true },
-    { "name": "tone", "description": "Inline link color or the surrounding text color.", "type": { "enum": ["link", "inherit"] }, "default": "link" }
+    {
+      "name": "href",
+      "description": "Destination.",
+      "type": "text",
+      "required": true,
+      "attribute": "href"
+    },
+    {
+      "name": "label",
+      "description": "Visible text; says where it goes.",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "tone",
+      "description": "Inline link color or the surrounding text color.",
+      "type": {
+        "enum": [
+          "link",
+          "inherit"
+        ]
+      },
+      "default": "link"
+    }
   ],
-  "states": ["hover", "focus-visible"],
+  "states": [
+    "hover",
+    "focus-visible"
+  ],
   "anatomy": {
     "root": {
       "description": "The anchor itself; underlined so it reads as a link without color.",
       "element": "a",
-      "content": { "prop": "label" },
-      "tokens": { "font-family": "{font.family.sans}", "border-radius": "{radius.sm}" },
-      "tokensByProp": { "tone": { "link": { "color": "{color.text.link}" }, "inherit": { "color": "{color.text.primary}" } } },
-      "motion": { "color": { "duration": "{motion.duration.fast}", "easing": "{motion.easing.standard}" } },
-      "states": { "hover": { "color": "{color.text.primary}" }, "focus-visible": { "outline-color": "{color.border.focus}" } },
-      "styles": { "text-decoration": "underline", "text-underline-offset": "2px" }
+      "content": {
+        "prop": "label"
+      },
+      "tokens": {
+        "font-family": "{font.family.sans}",
+        "border-radius": "{radius.sm}",
+        "font-weight": "{font.weight.semibold}"
+      },
+      "tokensByProp": {
+        "tone": {
+          "link": {
+            "color": "{color.text.link}"
+          },
+          "inherit": {
+            "color": "{color.text.primary}"
+          }
+        }
+      },
+      "motion": {
+        "color": {
+          "duration": "{motion.duration.fast}",
+          "easing": "{motion.easing.standard}"
+        }
+      },
+      "states": {
+        "hover": {
+          "color": "{color.text.primary}"
+        },
+        "focus-visible": {
+          "outline-color": "{color.border.focus}"
+        }
+      },
+      "styles": {
+        "text-decoration": "underline",
+        "text-underline-offset": "3px"
+      }
     }
   },
-  "a11y": { "focusVisible": true, "contrast": "AA", "keyboard": [{ "key": "Enter", "action": "follow" }], "aria": ["the label names the destination, never 'click here'", "external destinations say so in the label"] },
-  "usage": {
-    "when": ["navigating to another page, section or resource"],
-    "whenNot": ["triggering an action (use ds.button)"],
-    "intents": ["navigate", "go to", "open page", "reference", "learn more"],
-    "alternatives": [{ "component": "ds.button", "when": "the click performs an action instead of navigating" }]
+  "a11y": {
+    "focusVisible": true,
+    "contrast": "AA",
+    "keyboard": [
+      {
+        "key": "Enter",
+        "action": "follow"
+      }
+    ],
+    "aria": [
+      "the label names the destination, never 'click here'",
+      "external destinations say so in the label"
+    ]
   },
-  "guidelines": { "do": ["name the destination in the label", "keep underline so color is not the only cue"], "dont": ["use a link for actions", "write 'here' or 'this'"] },
-  "relationships": { "pairsWith": ["ds.text"], "excludes": [], "contains": [], "within": ["ds.text", "ds.card", "ds.breadcrumb-item"] },
+  "usage": {
+    "when": [
+      "navigating to another page, section or resource"
+    ],
+    "whenNot": [
+      "triggering an action (use ds.button)"
+    ],
+    "intents": [
+      "navigate",
+      "go to",
+      "open page",
+      "reference",
+      "learn more"
+    ],
+    "alternatives": [
+      {
+        "component": "ds.button",
+        "when": "the click performs an action instead of navigating"
+      }
+    ]
+  },
+  "guidelines": {
+    "do": [
+      "name the destination in the label",
+      "keep underline so color is not the only cue"
+    ],
+    "dont": [
+      "use a link for actions",
+      "write 'here' or 'this'"
+    ]
+  },
+  "relationships": {
+    "pairsWith": [
+      "ds.text"
+    ],
+    "excludes": [],
+    "contains": [],
+    "within": [
+      "ds.text",
+      "ds.card",
+      "ds.breadcrumb-item"
+    ]
+  },
   "channels": {
-    "web": { "support": "native" },
-    "widget": { "support": "native" },
-    "slack": { "support": "native", "as": "mrkdwn link" },
-    "markdown": { "support": "native", "as": "[label](href)" }
+    "web": {
+      "support": "native"
+    },
+    "widget": {
+      "support": "native"
+    },
+    "slack": {
+      "support": "native",
+      "as": "mrkdwn link"
+    },
+    "markdown": {
+      "support": "native",
+      "as": "[label](href)"
+    }
   },
   "examples": [
-    { "name": "Inline", "tree": { "component": "ds.link", "props": { "href": "/resonant/tokens", "label": "See all tokens" } } },
-    { "name": "Inherit tone", "tree": { "component": "ds.link", "props": { "href": "/docs", "label": "Documentation", "tone": "inherit" } } }
+    {
+      "name": "Inline",
+      "tree": {
+        "component": "ds.link",
+        "props": {
+          "href": "/resonant/tokens",
+          "label": "See all tokens"
+        }
+      }
+    },
+    {
+      "name": "Inherit tone",
+      "tree": {
+        "component": "ds.link",
+        "props": {
+          "href": "/docs",
+          "label": "Documentation",
+          "tone": "inherit"
+        }
+      }
+    }
   ]
 }

@@ -13,7 +13,7 @@ const example = (id: string, name: string) => catalog.contracts.find((c) => c.id
 
 test("card example renders anatomy, data attributes and nested buttons from the contract", () => {
   const html = render(catalog.contracts.find((c) => c.id === "ds.card")!.examples[0]!.tree);
-  assert.match(html, /^<article class="ds-card__root" data-padding="md" data-heading="h3">/);
+  assert.match(html, /^<article class="ds-card__root" data-padding="xl" data-heading="h3">/);
   assert.match(html, /<h3 class="ds-card__header">Weekly report<\/h3>/);
   assert.match(html, /<button class="ds-button__root" data-variant="ghost" data-size="md"[^>]*><span class="ds-button__label">Dismiss<\/span><\/button>/);
 });

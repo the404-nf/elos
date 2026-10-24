@@ -13,8 +13,12 @@ export function emitCss(catalog: Catalog): string {
   const themes = catalog.system.themes.map((th: Theme) =>
     block(th.selector, catalog.tokens[th.name]!.filter((t) => base.get(t.path) !== `${t.alias}|${t.value}`)),
   );
-  return [block(":root", catalog.tokens.base), ...themes].join("\n");
+  const fonts = catalog.system.fonts.map((f) => `@import url("${f.url}");`);
+  return [...(fonts.length ? [fonts.join("\n") + "\n"] : []), block(":root", catalog.tokens.base), ...themes].join("\n");
 }
+
+const ref = (v: string) => (v.startsWith("{") && v.endsWith("}") ? `var(${cssVar(v.slice(1, -1))})` : v);
+export const keyframesName = (contractId: string, name: string) => `${contractId.replace(/\./g, "-")}-${name}`;
 
 const STATE_SELECTORS: Record<State, string[]> = {
   hover: [":hover"],
@@ -33,7 +37,7 @@ const LAYOUT_PROPS: Record<string, string> = { display: "display", direction: "f
 export const partClass = (contractId: string, part: string) => `${contractId.replace(/\./g, "-")}__${part}`;
 
 type Decls = Record<string, string>;
-type Rule = { attrs: Record<string, string>; state?: State; decls: Decls };
+type Rule = { attrs: Record<string, string>; state?: State; onRoot?: boolean; decls: Decls }; // onRoot: the state is the root's, the decls a child's
 
 /** `{color.action.{variant}.bg}` -> one rule per combination of the substituted props' enum values. */
 function expandBindings(bindings: Record<string, string>, enums: Map<string, string[]>, state?: State): Rule[] {
@@ -79,14 +83,17 @@ function baseDecls(part: Part): Decls {
 
 export function emitComponentCss(contract: Contract): string {
   const enums = new Map(contract.props.flatMap((p) => (typeof p.type === "object" ? [[p.name, p.type.enum] as const] : [])));
+  const booleans = new Set(contract.props.filter((p) => p.type === "boolean").map((p) => p.name));
+  const attr = (prop: string, value: string) => (booleans.has(prop) && value === "true" ? "" : value);
   const [rootName] = Object.keys(contract.anatomy);
   const rootCls = `.${partClass(contract.id, rootName)}`;
   const out: string[] = [];
 
-  const selector = (part: string, { attrs, state }: Rule) => {
-    const root = rootCls + Object.entries(attrs).map(([p, v]) => `[data-${p}="${v}"]`).join("");
-    const target = part === rootName ? root : `${root} .${partClass(contract.id, part)}`;
-    return state ? STATE_SELECTORS[state].map((s) => target + s).join(", ") : target;
+  const selector = (part: string, { attrs, state, onRoot }: Rule) => {
+    const root = rootCls + Object.entries(attrs).map(([p, v]) => (v === "" ? `[data-${p}]` : `[data-${p}="${v}"]`)).join(""); // a true boolean prop renders as data-<prop>=""
+    const child = part === rootName ? "" : ` .${partClass(contract.id, part)}`;
+    if (!state) return root + child;
+    return STATE_SELECTORS[state].map((s) => (onRoot ? root + s + child : root + child + s)).join(", ");
   };
   const write = (part: string, rule: Rule) => {
     const body = Object.entries(rule.decls).map(([k, v]) => `  ${k}: ${v};`).join("\n");
@@ -101,15 +108,27 @@ export function emitComponentCss(contract: Contract): string {
     base.decls = { ...baseDecls(part), ...base.decls };
     rules.unshift(base);
     for (const [prop, byValue] of Object.entries(part.stylesByProp ?? {}))
-      for (const [value, styles] of Object.entries(byValue)) rules.push({ attrs: { [prop]: value }, decls: { ...styles } });
+      for (const [value, styles] of Object.entries(byValue)) rules.push({ attrs: { [prop]: attr(prop, value) }, decls: { ...styles } });
     for (const [state, bindings] of Object.entries(part.states ?? {})) rules.push(...expandBindings(bindings, enums, state as State));
     for (const [state, styles] of Object.entries(part.stylesByState ?? {})) rules.push({ attrs: {}, state: state as State, decls: { ...styles } });
+    if (part.animation) {
+      const a = part.animation;
+      const decl = `${keyframesName(contract.id, a.keyframes)} ${ref(a.duration)} ${ref(a.easing)} ${a.iterations ?? 1}`;
+      if (a.on) rules.push({ attrs: {}, state: a.on, onRoot: true, decls: { animation: decl } });
+      else base.decls.animation = decl;
+    }
     for (const [prop, byValue] of Object.entries(part.tokensByProp ?? {}))
       for (const [value, bindings] of Object.entries(byValue))
-        rules.push(...expandBindings(bindings, enums).map((r) => ({ ...r, attrs: { ...r.attrs, [prop]: value } })));
+        rules.push(...expandBindings(bindings, enums).map((r) => ({ ...r, attrs: { ...r.attrs, [prop]: attr(prop, value) } })));
     for (const r of rules) write(name, r);
     for (const [childName, child] of Object.entries(part.parts ?? {})) visit(childName, child);
   };
   visit(rootName, contract.anatomy[rootName]!);
+  for (const [name, frames] of Object.entries(contract.keyframes ?? {})) {
+    const body = Object.entries(frames)
+      .map(([offset, decls]) => `  ${offset} { ${Object.entries(decls).map(([k, v]) => `${k}: ${ref(v)};`).join(" ")} }`)
+      .join("\n");
+    out.push(`@keyframes ${keyframesName(contract.id, name)} {\n${body}\n}`);
+  }
   return out.join("\n") + "\n";
 }

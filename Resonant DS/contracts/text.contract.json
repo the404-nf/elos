@@ -5,49 +5,194 @@
   "status": "draft",
   "category": "data-display",
   "description": "A run of text: titles, headings, body and captions. Element and look are independent.",
-  "semantics": { "element": "p" },
+  "semantics": {
+    "element": "p"
+  },
   "props": [
-    { "name": "as", "description": "HTML element, for document structure.", "type": { "enum": ["p", "span", "h1", "h2", "h3"] }, "default": "p" },
-    { "name": "variant", "description": "Typographic role, for looks.", "type": { "enum": ["title", "heading", "body", "caption"] }, "default": "body" },
-    { "name": "tone", "description": "Emphasis.", "type": { "enum": ["primary", "secondary"] }, "default": "primary" },
-    { "name": "text", "description": "The text.", "type": "text", "required": true }
+    {
+      "name": "as",
+      "description": "HTML element, for document structure.",
+      "type": {
+        "enum": [
+          "p",
+          "span",
+          "h1",
+          "h2",
+          "h3",
+          "h4",
+          "div",
+          "code"
+        ]
+      },
+      "default": "p"
+    },
+    {
+      "name": "variant",
+      "description": "Typographic role, for looks.",
+      "type": {
+        "enum": [
+          "display",
+          "page-title",
+          "stat",
+          "title",
+          "heading",
+          "lead",
+          "body",
+          "label",
+          "caption",
+          "eyebrow",
+          "code"
+        ]
+      },
+      "default": "body"
+    },
+    {
+      "name": "tone",
+      "description": "Emphasis.",
+      "type": {
+        "enum": [
+          "primary",
+          "secondary",
+          "tertiary"
+        ]
+      },
+      "default": "primary"
+    },
+    {
+      "name": "text",
+      "description": "The text.",
+      "type": "text",
+      "required": true
+    }
   ],
   "states": [],
   "anatomy": {
     "root": {
       "description": "The text node itself; element comes from `as`.",
       "element": "{as}",
-      "content": { "prop": "text" },
+      "content": {
+        "prop": "text"
+      },
       "tokens": {
         "color": "{color.text.{tone}}",
+        "font-family": "{type.{variant}.family}",
         "font-size": "{type.{variant}.size}",
         "font-weight": "{type.{variant}.weight}",
-        "font-family": "{font.family.sans}"
+        "line-height": "{type.{variant}.line-height}",
+        "letter-spacing": "{type.{variant}.tracking}"
       },
-      "styles": { "margin": "0", "line-height": "1.5" }
+      "styles": {
+        "margin": "0"
+      },
+      "stylesByProp": {
+        "variant": {
+          "eyebrow": {
+            "text-transform": "uppercase"
+          }
+        }
+      }
     }
   },
-  "a11y": { "focusVisible": false, "contrast": "AA", "keyboard": [], "aria": ["pick `as` so heading levels follow the document outline"] },
+  "a11y": {
+    "focusVisible": false,
+    "contrast": "AA",
+    "keyboard": [],
+    "aria": [
+      "pick `as` so heading levels follow the document outline"
+    ]
+  },
   "usage": {
-    "when": ["any static text", "headings, labels and captions"],
-    "whenNot": ["text that triggers an action", "text inside a component that already has a content slot for it"],
-    "intents": ["heading", "paragraph", "caption", "label", "describe", "explain"],
-    "alternatives": [{ "component": "ds.button", "when": "the text triggers an action" }]
+    "when": [
+      "any static text",
+      "headings, labels and captions"
+    ],
+    "whenNot": [
+      "text that triggers an action",
+      "text inside a component that already has a content slot for it"
+    ],
+    "intents": [
+      "heading",
+      "paragraph",
+      "caption",
+      "label",
+      "describe",
+      "explain"
+    ],
+    "alternatives": [
+      {
+        "component": "ds.button",
+        "when": "the text triggers an action"
+      }
+    ]
   },
   "guidelines": {
-    "do": ["choose `as` for structure and `variant` for looks, independently", "use tone secondary for supporting text"],
-    "dont": ["skip heading levels", "use title variant more than once per view"]
+    "do": [
+      "choose `as` for structure and `variant` for looks, independently",
+      "use tone secondary for supporting text"
+    ],
+    "dont": [
+      "skip heading levels",
+      "use title variant more than once per view",
+      "set display or page-title outside the page head",
+      "use pink for text: links, the accent badge and gradient display words are the only cases"
+    ]
   },
-  "relationships": { "pairsWith": [], "excludes": [], "contains": [], "within": [] },
+  "relationships": {
+    "pairsWith": [],
+    "excludes": [],
+    "contains": [],
+    "within": []
+  },
   "channels": {
-    "web": { "support": "native" },
-    "widget": { "support": "native" },
-    "slack": { "support": "native", "as": "header or section text", "note": "title and heading become header blocks; others section mrkdwn" },
-    "markdown": { "support": "native", "as": "heading or paragraph" }
+    "web": {
+      "support": "native"
+    },
+    "widget": {
+      "support": "native"
+    },
+    "slack": {
+      "support": "native",
+      "as": "header or section text",
+      "note": "title and heading become header blocks; others section mrkdwn"
+    },
+    "markdown": {
+      "support": "native",
+      "as": "heading or paragraph"
+    }
   },
   "examples": [
-    { "name": "Title", "tree": { "component": "ds.text", "props": { "as": "h1", "variant": "title", "text": "Design systems, served." } } },
-    { "name": "Body secondary", "tree": { "component": "ds.text", "props": { "tone": "secondary", "text": "Contracts are the source of truth." } } },
-    { "name": "Caption", "tree": { "component": "ds.text", "props": { "as": "span", "variant": "caption", "tone": "secondary", "text": "Updated 2 minutes ago" } } }
+    {
+      "name": "Title",
+      "tree": {
+        "component": "ds.text",
+        "props": {
+          "as": "h1",
+          "variant": "title",
+          "text": "Design systems, served."
+        }
+      }
+    },
+    {
+      "name": "Body secondary",
+      "tree": {
+        "component": "ds.text",
+        "props": {
+          "tone": "secondary",
+          "text": "Contracts are the source of truth."
+        }
+      }
+    },
+    {
+      "name": "Caption",
+      "tree": {
+        "component": "ds.text",
+        "props": {
+          "as": "span",
+          "variant": "caption",
+          "tone": "secondary",
+          "text": "Updated 2 minutes ago"
+        }
+      }
+    }
   ]
 }

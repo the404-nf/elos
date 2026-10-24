@@ -5,33 +5,138 @@
   "status": "draft",
   "category": "feedback",
   "description": "How much of a known amount is done.",
-  "semantics": { "element": "div", "role": "progressbar" },
+  "semantics": {
+    "element": "div",
+    "role": "progressbar"
+  },
   "props": [
-    { "name": "value", "description": "Percent done, 0 to 100.", "type": "number", "required": true, "attribute": "aria-valuenow", "cssVar": "--progress-value" },
-    { "name": "label", "description": "What is progressing.", "type": "text", "required": true, "attribute": "aria-label" }
+    {
+      "name": "value",
+      "description": "Percent done, 0 to 100.",
+      "type": "number",
+      "required": true,
+      "attribute": "aria-valuenow",
+      "cssVar": "--progress-value"
+    },
+    {
+      "name": "label",
+      "description": "What is progressing.",
+      "type": "text",
+      "required": true,
+      "attribute": "aria-label"
+    }
   ],
   "states": [],
   "anatomy": {
     "root": {
       "description": "The track.",
       "element": "div",
-      "tokens": { "background-color": "{color.surface.sunken}", "height": "{progress.height}", "border-radius": "{radius.pill}" },
-      "styles": { "width": "100%", "overflow": "hidden" },
+      "tokens": {
+        "background-color": "{color.surface.sunken}",
+        "height": "{progress.height}",
+        "border-radius": "{radius.pill}"
+      },
+      "styles": {
+        "width": "100%",
+        "overflow": "hidden"
+      },
       "parts": {
         "bar": {
           "description": "The filled part; width follows the value.",
           "element": "span",
-          "tokens": { "background-color": "{color.action.primary.background}", "height": "{progress.height}", "border-radius": "{radius.pill}" },
-          "motion": { "width": { "duration": "{motion.duration.base}", "easing": "{motion.easing.standard}" } },
-          "styles": { "display": "block", "width": "calc(var(--progress-value) * 1%)" }
+          "tokens": {
+            "background-color": "{color.accent.strong}",
+            "height": "{progress.height}",
+            "border-radius": "{radius.pill}"
+          },
+          "motion": {
+            "width": {
+              "duration": "{motion.duration.base}",
+              "easing": "{motion.easing.out}"
+            }
+          },
+          "styles": {
+            "display": "block",
+            "width": "calc(var(--progress-value) * 1%)"
+          }
         }
       }
     }
   },
-  "a11y": { "focusVisible": false, "contrast": "AA", "keyboard": [], "aria": ["progressbar with aria-valuenow and a label; min and max default to 0 and 100"] },
-  "usage": { "when": ["a task with a known total: upload, import, steps completed"], "whenNot": ["unknown duration (use ds.skeleton or a spinner)"], "intents": ["progress", "loading with total", "completion", "upload"], "alternatives": [{ "component": "ds.skeleton", "when": "content is loading and the amount is unknown" }] },
-  "guidelines": { "do": ["say what is progressing in the label", "animate changes with the base duration"], "dont": ["show 100% for more than a moment"] },
-  "relationships": { "pairsWith": ["ds.text"], "excludes": [], "contains": [], "within": ["ds.stack", "ds.card"] },
-  "channels": { "web": { "support": "native" }, "widget": { "support": "native" }, "slack": { "support": "degraded", "as": "text percentage" }, "markdown": { "support": "degraded", "as": "text percentage" } },
-  "examples": [{ "name": "Two thirds", "tree": { "component": "ds.progress", "props": { "value": 66, "label": "Import" } } }]
+  "a11y": {
+    "focusVisible": false,
+    "contrast": "AA",
+    "keyboard": [],
+    "aria": [
+      "progressbar with aria-valuenow and a label; min and max default to 0 and 100"
+    ]
+  },
+  "usage": {
+    "when": [
+      "a task with a known total: upload, import, steps completed"
+    ],
+    "whenNot": [
+      "unknown duration (use ds.skeleton or a spinner)"
+    ],
+    "intents": [
+      "progress",
+      "loading with total",
+      "completion",
+      "upload"
+    ],
+    "alternatives": [
+      {
+        "component": "ds.skeleton",
+        "when": "content is loading and the amount is unknown"
+      }
+    ]
+  },
+  "guidelines": {
+    "do": [
+      "say what is progressing in the label",
+      "animate changes with the base duration"
+    ],
+    "dont": [
+      "show 100% for more than a moment"
+    ]
+  },
+  "relationships": {
+    "pairsWith": [
+      "ds.text"
+    ],
+    "excludes": [],
+    "contains": [],
+    "within": [
+      "ds.stack",
+      "ds.card"
+    ]
+  },
+  "channels": {
+    "web": {
+      "support": "native"
+    },
+    "widget": {
+      "support": "native"
+    },
+    "slack": {
+      "support": "degraded",
+      "as": "text percentage"
+    },
+    "markdown": {
+      "support": "degraded",
+      "as": "text percentage"
+    }
+  },
+  "examples": [
+    {
+      "name": "Two thirds",
+      "tree": {
+        "component": "ds.progress",
+        "props": {
+          "value": 66,
+          "label": "Import"
+        }
+      }
+    }
+  ]
 }

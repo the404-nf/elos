@@ -15,9 +15,20 @@ const Scalar = z.union([z.string(), z.number(), z.boolean()]);
 
 // ---------- tokens (DTCG) ----------
 const Dimension = z.object({ value: z.number(), unit: z.enum(["px", "rem", "em", "%"]) });
+// A gradient is a recipe over color tokens: stops reference colors (so the gradient follows the theme at runtime),
+// `alpha` fades a stop without a new primitive. Several layers stack, first on top.
+const GradientStop = z.object({ color: TokenRef, position: z.string().optional(), alpha: z.number().min(0).max(1).optional() });
+export const GradientLayer = z.object({
+  kind: z.enum(["linear", "radial", "conic"]),
+  angle: z.string().optional(), // linear and conic
+  at: z.string().optional(), // radial and conic position
+  size: z.string().optional(), // radial size
+  stops: z.array(GradientStop).min(2),
+});
+export type GradientLayer = z.infer<typeof GradientLayer>;
 export const Token = z.object({
-  $type: z.enum(["color", "dimension", "fontFamily", "fontWeight", "number", "duration", "shadow", "cubicBezier"]).optional(),
-  $value: z.union([z.string(), z.number(), Dimension, z.array(z.number()).length(4), z.record(z.string(), z.unknown())]),
+  $type: z.enum(["color", "dimension", "fontFamily", "fontWeight", "number", "duration", "shadow", "cubicBezier", "gradient"]).optional(),
+  $value: z.union([z.string(), z.number(), Dimension, z.array(z.number()).length(4), GradientLayer, z.array(GradientLayer).min(1), z.record(z.string(), z.unknown())]),
   $description: z.string().optional(),
 });
 export type Token = z.infer<typeof Token>;
@@ -66,13 +77,29 @@ export const StyleKey = z.enum([
   "overflow", "overflow-y", "flex", "flex-wrap", "flex-direction", "align-items", "justify-content", "align-self", "text-align", "white-space",
   "cursor", "transform", "transition", "appearance", "box-sizing", "margin", "padding", "border", "line-height", "text-transform", "letter-spacing", "resize", "display",
   "text-decoration", "text-underline-offset", "vertical-align", "list-style", "border-collapse", "table-layout", "object-fit", "aspect-ratio", "pointer-events", "user-select",
+  // Decorative parts (lights, grain, beams) and glass: effects a token cannot carry.
+  "opacity", "mix-blend-mode", "background-image", "backdrop-filter", "filter", "mask", "-webkit-mask", "mask-composite", "-webkit-mask-composite", "clip-path", "isolation", "will-change",
+  // Inline SVG parts (icons, illustrations).
+  "fill", "stroke", "stroke-width", "stroke-linecap", "stroke-linejoin", "background-size", "background-position", "margin-left", "margin-right", "margin-top", "margin-bottom",
 ]);
-const Styles = z.partialRecord(StyleKey, z.string());
+const Styles = z.record(z.string().refine((k) => StyleKey.options.includes(k as never) || k.startsWith("--"), "not a whitelisted style key"), z.string());
 export type Styles = z.infer<typeof Styles>;
 
 // Motion: which CSS properties of a part transition, bound to duration and easing tokens.
 const Motion = z.record(z.string(), z.object({ duration: TokenRef, easing: TokenRef }));
 export type Motion = z.infer<typeof Motion>;
+// Animation: a part runs one of the contract's keyframes, always or in a state, timed by tokens. Reduced motion stops it.
+export const Animation = z.object({
+  keyframes: z.string(), // key in the contract's `keyframes`
+  duration: TokenRef,
+  easing: TokenRef,
+  iterations: z.union([z.literal("infinite"), z.number().int().positive()]).optional(), // default 1
+  on: State.optional(), // run only in this state (e.g. hover); absent = always
+});
+export type Animation = z.infer<typeof Animation>;
+// name -> offset ("from", "to", "50%") -> css property -> token ref or literal
+export const Keyframes = z.record(z.string(), z.record(z.string(), z.record(z.string(), z.string())));
+export type Keyframes = z.infer<typeof Keyframes>;
 
 export type Part = {
   description?: string;
@@ -81,6 +108,7 @@ export type Part = {
   attributes?: Record<string, string>; // constant HTML attributes (e.g. type="checkbox")
   tokens?: Record<string, string>;
   motion?: Motion;
+  animation?: Animation;
   states?: Partial<Record<State, Record<string, string>>>;
   tokensByProp?: Record<string, Record<string, Record<string, string>>>;
   styles?: Styles;
@@ -90,6 +118,7 @@ export type Part = {
   slot?: { accepts?: string[]; acceptsMode?: "prefer" | "restrict" | "open"; min?: number; max?: number; decorate?: string };
   component?: { id: string; props?: Record<string, string | number | boolean> };
   content?: { prop: string };
+  asset?: { kind: string; prop: string }; // the part is an SVG from assets/<kind>/<prop value>.svg
   optional?: boolean;
   parts?: Record<string, Part>;
 };
@@ -101,6 +130,7 @@ export const Part: z.ZodType<Part> = z.lazy(() =>
     attributes: z.record(z.string(), z.string()).optional(),
     tokens: TokenBindings.optional(),
     motion: Motion.optional(),
+    animation: Animation.optional(),
     states: z.partialRecord(State, TokenBindings).optional(),
     tokensByProp: z.record(z.string(), z.record(z.string(), TokenBindings)).optional(),
     styles: Styles.optional(),
@@ -127,6 +157,7 @@ export const Part: z.ZodType<Part> = z.lazy(() =>
       .optional(),
     component: z.object({ id: ContractId, props: z.record(z.string(), Scalar).optional() }).optional(),
     content: z.object({ prop: z.string() }).optional(),
+    asset: z.object({ kind: z.string(), prop: z.string() }).optional(),
     optional: z.boolean().optional(),
     parts: z.record(z.string(), Part).optional(),
   }),
@@ -154,6 +185,7 @@ export const Contract = z.object({
   props: z.array(Prop),
   states: z.array(State),
   anatomy: z.record(z.string(), Part),
+  keyframes: Keyframes.optional(), // what a part's `animation` can run
   a11y: z.object({
     focusVisible: z.boolean(),
     minHitArea: z.number().optional(),
@@ -207,8 +239,10 @@ export const SystemManifest = z.object({
   version: Semver,
   tokens: z.array(z.string()).min(1), // base token files, merged in order. The base IS the default theme (light).
   themes: z.array(Theme).default([]),
+  fonts: z.array(z.object({ family: z.string(), url: z.string().url() })).default([]), // faces the font tokens name; the CSS imports them
   contracts: z.string().default("contracts"), // folder of *.contract.json
   pages: z.string().default("pages"), // folder of *.page.json
+  assets: z.string().default("assets"), // folder of <kind>/<name>.svg
 });
 export type SystemManifest = z.infer<typeof SystemManifest>;
 
@@ -228,6 +262,7 @@ export const Catalog = z.object({
   tokens: z.record(z.string(), z.array(ResolvedToken)), // "base" and each theme name -> flat resolved tokens
   contracts: z.array(Contract),
   pages: z.array(PageExample).default([]),
+  assets: z.record(z.string(), z.record(z.string(), z.string())).default({}), // kind -> name -> svg source
 });
 export type Catalog = z.infer<typeof Catalog>;
 

@@ -1,0 +1,280 @@
+{
+  "version": "0.1.0",
+  "status": "draft",
+  "a11y": {
+    "focusVisible": false,
+    "contrast": "AA",
+    "keyboard": [],
+    "aria": []
+  },
+  "guidelines": {
+    "do": [
+      "use md in buttons and nav, sm in menus and fields",
+      "keep the icon and its label the same color",
+      "turn the accent on for one or two icons per view at most"
+    ],
+    "dont": [
+      "set a pixel stroke width",
+      "recolor mono parts pink",
+      "mix icons from other sets",
+      "use keyboard, command, markdown, calendar, chat, gradient, opacity, palette or hand below sm"
+    ]
+  },
+  "resources": [],
+  "relationships": {
+    "pairsWith": [],
+    "excludes": [],
+    "contains": [],
+    "within": []
+  },
+  "channels": {
+    "web": {
+      "support": "native"
+    },
+    "widget": {
+      "support": "native"
+    },
+    "slack": {
+      "support": "unsupported"
+    },
+    "markdown": {
+      "support": "unsupported"
+    }
+  },
+  "examples": [
+    {
+      "name": "Nav icon",
+      "tree": {
+        "component": "ds.icon",
+        "props": {
+          "name": "components"
+        }
+      }
+    },
+    {
+      "name": "Accent",
+      "tree": {
+        "component": "ds.icon",
+        "props": {
+          "name": "home",
+          "accent": true,
+          "size": "lg"
+        }
+      }
+    }
+  ],
+  "id": "ds.icon",
+  "name": "Icon",
+  "category": "media",
+  "description": "One of Resonant's own icons, drawn on a 24 grid with a stroke that scales with the size. Mono by default; one part may turn pink.",
+  "semantics": {
+    "element": "svg"
+  },
+  "props": [
+    {
+      "name": "name",
+      "description": "Which icon.",
+      "type": {
+        "enum": [
+          "home",
+          "dashboard",
+          "search",
+          "token",
+          "components",
+          "page",
+          "versions",
+          "settings",
+          "agent",
+          "plug",
+          "user",
+          "bell",
+          "sun",
+          "moon",
+          "menu",
+          "more",
+          "window",
+          "globe",
+          "chat",
+          "markdown",
+          "plus",
+          "minus",
+          "close",
+          "check",
+          "edit",
+          "copy",
+          "trash",
+          "download",
+          "upload",
+          "share",
+          "link",
+          "external-link",
+          "eye",
+          "eye-off",
+          "filter",
+          "sort",
+          "refresh",
+          "undo",
+          "redo",
+          "play",
+          "pause",
+          "publish",
+          "lock",
+          "unlock",
+          "chevron-down",
+          "chevron-up",
+          "chevron-left",
+          "chevron-right",
+          "arrow-right",
+          "arrow-left",
+          "arrow-up",
+          "arrow-down",
+          "arrow-up-right",
+          "info",
+          "success",
+          "warning",
+          "error",
+          "help",
+          "clock",
+          "code",
+          "terminal",
+          "folder",
+          "image",
+          "calendar",
+          "list",
+          "layers",
+          "diff",
+          "branch",
+          "chart-line",
+          "chart-bar",
+          "mail",
+          "contrast",
+          "type",
+          "radius",
+          "spacing",
+          "motion",
+          "keyboard",
+          "command",
+          "grip",
+          "cursor",
+          "hand",
+          "frame",
+          "pen-tool",
+          "shapes",
+          "eyedropper",
+          "ruler",
+          "crop",
+          "zoom-in",
+          "zoom-out",
+          "align-left",
+          "align-center",
+          "align-right",
+          "align-top",
+          "align-middle",
+          "align-bottom",
+          "distribute-horizontal",
+          "distribute-vertical",
+          "columns",
+          "auto-layout",
+          "padding",
+          "palette",
+          "fill",
+          "opacity",
+          "shadow",
+          "gradient",
+          "line-height",
+          "letter-spacing",
+          "font",
+          "component",
+          "variants",
+          "slot",
+          "comment",
+          "pin",
+          "accessibility",
+          "target",
+          "desktop",
+          "tablet",
+          "mobile",
+          "aspect-ratio"
+        ]
+      },
+      "required": true
+    },
+    {
+      "name": "size",
+      "description": "12, 16, 20, 24 or 32px. The stroke scales with it.",
+      "type": {
+        "enum": [
+          "xs",
+          "sm",
+          "md",
+          "lg",
+          "xl"
+        ]
+      },
+      "default": "md"
+    },
+    {
+      "name": "accent",
+      "description": "Paint the icon's accent part in the brand pink.",
+      "type": "boolean",
+      "default": false
+    }
+  ],
+  "states": [],
+  "anatomy": {
+    "root": {
+      "description": "The svg; its paths come from assets/icons/<name>.svg. Decorative: the control that holds it carries the name.",
+      "element": "svg",
+      "attributes": {
+        "viewBox": "0 0 24 24",
+        "aria-hidden": "true"
+      },
+      "asset": {
+        "kind": "icons",
+        "prop": "name"
+      },
+      "tokens": {
+        "width": "{icon.size.{size}}",
+        "height": "{icon.size.{size}}",
+        "stroke-width": "{icon.stroke}",
+        "--icon-accent": "{color.text.primary}"
+      },
+      "tokensByProp": {
+        "accent": {
+          "true": {
+            "--icon-accent": "{color.icon.accent}"
+          }
+        }
+      },
+      "styles": {
+        "fill": "none",
+        "stroke": "currentColor",
+        "stroke-linecap": "round",
+        "stroke-linejoin": "round",
+        "flex": "none",
+        "overflow": "visible",
+        "vertical-align": "middle"
+      }
+    }
+  },
+  "usage": {
+    "when": [
+      "next to a label in a button, nav item, menu item, field or badge",
+      "alone in an icon button that has an aria-label",
+      "next to the word that carries a status",
+      "large in an empty state or a feature tile"
+    ],
+    "whenNot": [
+      "as decoration with no meaning",
+      "as the only carrier of a status",
+      "inside body text"
+    ],
+    "intents": [
+      "icon",
+      "glyph",
+      "symbol",
+      "pictogram"
+    ],
+    "alternatives": []
+  }
+}

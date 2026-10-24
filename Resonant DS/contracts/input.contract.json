@@ -5,71 +5,238 @@
   "status": "draft",
   "category": "form",
   "description": "Single-line text entry.",
-  "semantics": { "element": "input" },
+  "semantics": {
+    "element": "input"
+  },
   "props": [
-    { "name": "type", "description": "Kind of value; drives keyboard and validation.", "type": { "enum": ["text", "email", "password", "number", "search"] }, "default": "text", "attribute": "type" },
-    { "name": "value", "description": "Current value when the page controls it; omit for a free control.", "type": "text", "attribute": "value" },
-    { "name": "name", "description": "Form field name.", "type": "text", "attribute": "name" },
-    { "name": "placeholder", "description": "Hint shown when empty. Not a replacement for a label.", "type": "text", "attribute": "placeholder" },
-    { "name": "size", "description": "Control size.", "type": { "enum": ["sm", "md"] }, "default": "md" },
-    { "name": "disabled", "description": "Prevents editing.", "type": "boolean", "default": false, "attribute": "disabled" },
-    { "name": "invalid", "description": "Marks the value as failing validation.", "type": "boolean", "default": false, "attribute": "aria-invalid" }
+    {
+      "name": "type",
+      "description": "Kind of value; drives keyboard and validation.",
+      "type": {
+        "enum": [
+          "text",
+          "email",
+          "password",
+          "number",
+          "search"
+        ]
+      },
+      "default": "text",
+      "attribute": "type"
+    },
+    {
+      "name": "value",
+      "description": "Current value when the page controls it; omit for a free control.",
+      "type": "text",
+      "attribute": "value"
+    },
+    {
+      "name": "name",
+      "description": "Form field name.",
+      "type": "text",
+      "attribute": "name"
+    },
+    {
+      "name": "placeholder",
+      "description": "Hint shown when empty. Not a replacement for a label.",
+      "type": "text",
+      "attribute": "placeholder"
+    },
+    {
+      "name": "size",
+      "description": "Control size.",
+      "type": {
+        "enum": [
+          "sm",
+          "md"
+        ]
+      },
+      "default": "md"
+    },
+    {
+      "name": "disabled",
+      "description": "Prevents editing.",
+      "type": "boolean",
+      "default": false,
+      "attribute": "disabled"
+    },
+    {
+      "name": "invalid",
+      "description": "Marks the value as failing validation.",
+      "type": "boolean",
+      "default": false,
+      "attribute": "aria-invalid"
+    }
   ],
-  "states": ["focus-visible", "disabled", "invalid"],
+  "states": [
+    "hover",
+    "focus-visible",
+    "disabled",
+    "invalid"
+  ],
   "anatomy": {
     "root": {
       "description": "The native input, styled; no wrapper so form libraries bind directly.",
       "element": "input",
       "tokens": {
-        "background-color": "{color.surface.raised}",
+        "background-color": "{color.surface.overlay}",
         "color": "{color.text.primary}",
-        "border-color": "{color.border.strong}",
+        "border-color": "{color.border.default}",
         "border-width": "{border.width}",
-        "border-radius": "{radius.control}",
+        "border-radius": "{radius.field}",
         "padding-inline": "{space.inset.{size}}",
         "padding-block": "{space.inset.sm}",
         "font-size": "{font.size.{size}}",
-        "font-family": "{font.family.sans}"
+        "font-family": "{font.family.sans}",
+        "height": "{control.height.{size}}"
       },
-      "motion": { "border-color": { "duration": "{motion.duration.fast}", "easing": "{motion.easing.standard}" } },
+      "motion": {
+        "border-color": {
+          "duration": "{motion.duration.fast}",
+          "easing": "{motion.easing.standard}"
+        },
+        "box-shadow": {
+          "duration": "{motion.duration.fast}",
+          "easing": "{motion.easing.standard}"
+        }
+      },
       "states": {
-        "focus-visible": { "border-color": "{color.border.focus}", "outline-color": "{color.border.focus}" },
-        "invalid": { "border-color": "{color.border.danger}" },
-        "disabled": { "opacity": "{opacity.disabled}" }
+        "focus-visible": {
+          "border-color": "{color.border.focus}",
+          "outline-color": "{color.border.focus}",
+          "box-shadow": "{shadow.field-focus}"
+        },
+        "invalid": {
+          "border-color": "{color.border.danger}"
+        },
+        "disabled": {
+          "opacity": "{opacity.disabled}"
+        },
+        "hover": {
+          "border-color": "{color.border.strong}"
+        }
       },
-      "styles": { "width": "100%", "box-sizing": "border-box" }
+      "styles": {
+        "width": "100%",
+        "box-sizing": "border-box"
+      }
     }
   },
   "a11y": {
     "focusVisible": true,
     "minHitArea": 44,
     "contrast": "AA",
-    "keyboard": [{ "key": "Tab", "action": "move focus" }],
-    "aria": ["always paired with a visible label or aria-label", "aria-invalid plus an error message when invalid", "placeholder is never the only label"]
+    "keyboard": [
+      {
+        "key": "Tab",
+        "action": "move focus"
+      }
+    ],
+    "aria": [
+      "always paired with a visible label or aria-label",
+      "aria-invalid plus an error message when invalid",
+      "placeholder is never the only label"
+    ]
   },
   "usage": {
-    "when": ["free text, email, password, number or search entry"],
-    "whenNot": ["choosing from a fixed set (use ds.select)", "on/off (use ds.switch)", "multi-line text"],
-    "intents": ["enter text", "search", "email", "password", "edit value", "filter"],
+    "when": [
+      "free text, email, password, number or search entry"
+    ],
+    "whenNot": [
+      "choosing from a fixed set (use ds.select)",
+      "on/off (use ds.switch)",
+      "multi-line text"
+    ],
+    "intents": [
+      "enter text",
+      "search",
+      "email",
+      "password",
+      "edit value",
+      "filter"
+    ],
     "alternatives": [
-      { "component": "ds.select", "when": "the value comes from a fixed list" },
-      { "component": "ds.switch", "when": "the value is on or off" }
+      {
+        "component": "ds.select",
+        "when": "the value comes from a fixed list"
+      },
+      {
+        "component": "ds.switch",
+        "when": "the value is on or off"
+      }
     ]
   },
   "guidelines": {
-    "do": ["use the right type so mobile keyboards match", "show the error next to the field when invalid"],
-    "dont": ["use placeholder as the label", "disable an input without saying why nearby"]
+    "do": [
+      "use the right type so mobile keyboards match",
+      "show the error next to the field when invalid"
+    ],
+    "dont": [
+      "use placeholder as the label",
+      "disable an input without saying why nearby"
+    ]
   },
-  "relationships": { "pairsWith": ["ds.text", "ds.button"], "excludes": [], "contains": [], "within": ["ds.stack", "ds.card", "ds.dialog"] },
+  "relationships": {
+    "pairsWith": [
+      "ds.text",
+      "ds.button"
+    ],
+    "excludes": [],
+    "contains": [],
+    "within": [
+      "ds.stack",
+      "ds.card",
+      "ds.dialog"
+    ]
+  },
   "channels": {
-    "web": { "support": "native" },
-    "widget": { "support": "native" },
-    "slack": { "support": "native", "as": "input block with plain_text_input" },
-    "markdown": { "support": "degraded", "as": "a question the agent asks" }
+    "web": {
+      "support": "native"
+    },
+    "widget": {
+      "support": "native"
+    },
+    "slack": {
+      "support": "native",
+      "as": "input block with plain_text_input"
+    },
+    "markdown": {
+      "support": "degraded",
+      "as": "a question the agent asks"
+    }
   },
   "examples": [
-    { "name": "Search", "tree": { "component": "ds.input", "props": { "type": "search", "placeholder": "Search components" } } },
-    { "name": "Invalid email", "tree": { "component": "ds.input", "props": { "type": "email", "placeholder": "you@example.com", "invalid": true } } },
-    { "name": "Disabled small", "tree": { "component": "ds.input", "props": { "size": "sm", "placeholder": "Read only", "disabled": true } } }
+    {
+      "name": "Search",
+      "tree": {
+        "component": "ds.input",
+        "props": {
+          "type": "search",
+          "placeholder": "Search components"
+        }
+      }
+    },
+    {
+      "name": "Invalid email",
+      "tree": {
+        "component": "ds.input",
+        "props": {
+          "type": "email",
+          "placeholder": "you@example.com",
+          "invalid": true
+        }
+      }
+    },
+    {
+      "name": "Disabled small",
+      "tree": {
+        "component": "ds.input",
+        "props": {
+          "size": "sm",
+          "placeholder": "Read only",
+          "disabled": true
+        }
+      }
+    }
   ]
 }

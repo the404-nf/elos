@@ -5,53 +5,208 @@
   "status": "draft",
   "category": "overlay",
   "description": "A list of actions that opens from a trigger.",
-  "semantics": { "element": "span" },
+  "semantics": {
+    "element": "span"
+  },
   "behavior": "menu",
   "props": [],
-  "states": ["open"],
+  "states": [
+    "open"
+  ],
   "anatomy": {
     "root": {
       "description": "Holds the trigger in flow and the list out of flow.",
       "element": "span",
-      "layout": { "display": "inline-flex" },
+      "layout": {
+        "display": "inline-flex"
+      },
       "parts": {
-        "trigger": { "description": "Exactly one button.", "element": "span", "layout": { "display": "inline-flex" }, "slot": { "accepts": ["ds.button"], "acceptsMode": "restrict", "min": 1, "max": 1, "decorate": "trigger" } },
+        "trigger": {
+          "description": "Exactly one button.",
+          "element": "span",
+          "layout": {
+            "display": "inline-flex"
+          },
+          "slot": {
+            "accepts": [
+              "ds.button"
+            ],
+            "acceptsMode": "restrict",
+            "min": 1,
+            "max": 1,
+            "decorate": "trigger"
+          }
+        },
         "positioner": {
           "description": "Placed next to the trigger by the behavior.",
           "element": "div",
-          "styles": { "z-index": "60" },
+          "styles": {
+            "z-index": "60"
+          },
           "parts": {
             "content": {
               "description": "The list, role menu.",
               "element": "div",
-              "slot": { "accepts": ["ds.menu-item", "ds.separator"], "acceptsMode": "restrict", "min": 1 },
-              "layout": { "display": "flex", "direction": "column", "gap": "{space.1}" },
-              "tokens": { "background-color": "{color.surface.raised}", "border-color": "{color.border.subtle}", "border-width": "{border.width}", "border-radius": "{radius.container}", "padding": "{space.1}", "min-width": "{overlay.menu-width}", "box-shadow": "{shadow.overlay}", "font-family": "{font.family.sans}" },
-              "motion": { "opacity": { "duration": "{motion.duration.fast}", "easing": "{motion.easing.enter}" } },
-              "styles": { "overflow": "hidden" }
+              "slot": {
+                "accepts": [
+                  "ds.menu-item",
+                  "ds.separator"
+                ],
+                "acceptsMode": "restrict",
+                "min": 1
+              },
+              "layout": {
+                "display": "flex",
+                "direction": "column",
+                "gap": "{space.1}"
+              },
+              "tokens": {
+                "background-color": "{color.surface.overlay}",
+                "border-radius": "{radius.overlay}",
+                "padding": "{space.1}",
+                "min-width": "{overlay.menu-width}",
+                "box-shadow": "{shadow.overlay}",
+                "font-family": "{font.family.sans}"
+              },
+              "motion": {
+                "opacity": {
+                  "duration": "{motion.duration.fast}",
+                  "easing": "{motion.easing.enter}"
+                }
+              },
+              "styles": {
+                "overflow": "hidden"
+              }
             }
           }
         }
       }
     }
   },
-  "a11y": { "focusVisible": true, "contrast": "AA", "keyboard": [{ "key": "ArrowUp/ArrowDown", "action": "move highlight" }, { "key": "Enter", "action": "activate item" }, { "key": "Escape", "action": "close" }], "aria": ["role menu and menuitem from the behavior", "the trigger has aria-haspopup and aria-expanded"] },
-  "usage": { "when": ["three or more actions on one object", "secondary actions that would clutter a toolbar"], "whenNot": ["one or two actions (use buttons)", "navigation (use links)", "choosing a value (use ds.select)"], "intents": ["more actions", "overflow", "context actions", "options"], "alternatives": [{ "component": "ds.select", "when": "the user picks a value rather than an action" }] },
-  "guidelines": { "do": ["put the danger action last, after a separator", "name items with verbs"], "dont": ["put more than eight items", "nest menus"] },
-  "relationships": { "pairsWith": ["ds.button"], "excludes": [], "contains": ["ds.menu-item", "ds.separator"], "within": [] },
-  "channels": { "web": { "support": "native" }, "widget": { "support": "native" }, "slack": { "support": "native", "as": "overflow menu element" }, "markdown": { "support": "degraded", "as": "numbered options" } },
+  "a11y": {
+    "focusVisible": true,
+    "contrast": "AA",
+    "keyboard": [
+      {
+        "key": "ArrowUp/ArrowDown",
+        "action": "move highlight"
+      },
+      {
+        "key": "Enter",
+        "action": "activate item"
+      },
+      {
+        "key": "Escape",
+        "action": "close"
+      }
+    ],
+    "aria": [
+      "role menu and menuitem from the behavior",
+      "the trigger has aria-haspopup and aria-expanded"
+    ]
+  },
+  "usage": {
+    "when": [
+      "three or more actions on one object",
+      "secondary actions that would clutter a toolbar"
+    ],
+    "whenNot": [
+      "one or two actions (use buttons)",
+      "navigation (use links)",
+      "choosing a value (use ds.select)"
+    ],
+    "intents": [
+      "more actions",
+      "overflow",
+      "context actions",
+      "options"
+    ],
+    "alternatives": [
+      {
+        "component": "ds.select",
+        "when": "the user picks a value rather than an action"
+      }
+    ]
+  },
+  "guidelines": {
+    "do": [
+      "put the danger action last, after a separator",
+      "name items with verbs"
+    ],
+    "dont": [
+      "put more than eight items",
+      "nest menus"
+    ]
+  },
+  "relationships": {
+    "pairsWith": [
+      "ds.button"
+    ],
+    "excludes": [],
+    "contains": [
+      "ds.menu-item",
+      "ds.separator"
+    ],
+    "within": []
+  },
+  "channels": {
+    "web": {
+      "support": "native"
+    },
+    "widget": {
+      "support": "native"
+    },
+    "slack": {
+      "support": "native",
+      "as": "overflow menu element"
+    },
+    "markdown": {
+      "support": "degraded",
+      "as": "numbered options"
+    }
+  },
   "examples": [
     {
       "name": "Row actions",
       "tree": {
         "component": "ds.menu",
         "slots": {
-          "trigger": [{ "component": "ds.button", "props": { "label": "Actions", "variant": "secondary", "size": "sm" } }],
+          "trigger": [
+            {
+              "component": "ds.button",
+              "props": {
+                "label": "Actions",
+                "variant": "secondary",
+                "size": "sm"
+              }
+            }
+          ],
           "content": [
-            { "component": "ds.menu-item", "props": { "value": "edit", "label": "Edit" } },
-            { "component": "ds.menu-item", "props": { "value": "duplicate", "label": "Duplicate" } },
-            { "component": "ds.separator" },
-            { "component": "ds.menu-item", "props": { "value": "delete", "label": "Delete", "tone": "danger" } }
+            {
+              "component": "ds.menu-item",
+              "props": {
+                "value": "edit",
+                "label": "Edit"
+              }
+            },
+            {
+              "component": "ds.menu-item",
+              "props": {
+                "value": "duplicate",
+                "label": "Duplicate"
+              }
+            },
+            {
+              "component": "ds.separator"
+            },
+            {
+              "component": "ds.menu-item",
+              "props": {
+                "value": "delete",
+                "label": "Delete",
+                "tone": "danger"
+              }
+            }
           ]
         }
       }

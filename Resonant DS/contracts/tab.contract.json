@@ -5,50 +5,125 @@
   "status": "draft",
   "category": "navigation",
   "description": "One tab trigger inside Tabs.",
-  "semantics": { "element": "button", "role": "tab" },
+  "semantics": {
+    "element": "button",
+    "role": "tab"
+  },
   "behavior": "tabs.trigger",
   "props": [
-    { "name": "value", "description": "Matches a ds.tab-panel value.", "type": "text", "required": true },
-    { "name": "label", "description": "Visible text.", "type": "text", "required": true }
+    {
+      "name": "value",
+      "description": "Matches a ds.tab-panel value.",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "label",
+      "description": "Visible text.",
+      "type": "text",
+      "required": true
+    }
   ],
-  "states": ["hover", "focus-visible", "selected"],
+  "states": [
+    "hover",
+    "focus-visible",
+    "selected"
+  ],
   "anatomy": {
     "root": {
-      "description": "The tab button; selection is shown by color and an underline.",
+      "description": "The tab button; the selected one is a raised pill on the sunken track.",
       "element": "button",
-      "content": { "prop": "label" },
+      "content": {
+        "prop": "label"
+      },
       "tokens": {
         "color": "{color.text.secondary}",
         "background-color": "{color.transparent}",
         "padding-inline": "{space.inset.md}",
         "padding-block": "{space.inset.sm}",
-        "font-size": "{font.size.md}",
-        "font-weight": "{font.weight.medium}",
-        "font-family": "{font.family.sans}",
-        "border-bottom-width": "{border.width}",
-        "border-bottom-color": "{color.transparent}"
+        "border-radius": "{radius.control}",
+        "font-size": "{font.size.sm}",
+        "font-weight": "{font.weight.semibold}",
+        "font-family": "{font.family.sans}"
       },
       "motion": {
-        "color": { "duration": "{motion.duration.fast}", "easing": "{motion.easing.standard}" },
-        "border-bottom-color": { "duration": "{motion.duration.fast}", "easing": "{motion.easing.standard}" }
+        "color": {
+          "duration": "{motion.duration.fast}",
+          "easing": "{motion.easing.standard}"
+        },
+        "background-color": {
+          "duration": "{motion.duration.base}",
+          "easing": "{motion.easing.standard}"
+        }
       },
       "states": {
-        "hover": { "color": "{color.text.primary}" },
-        "focus-visible": { "outline-color": "{color.border.focus}" },
-        "selected": { "color": "{color.text.primary}", "border-bottom-color": "{color.border.focus}" }
-      },
-      "styles": { "margin": "0 0 -1px 0" }
+        "hover": {
+          "color": "{color.text.primary}"
+        },
+        "focus-visible": {
+          "outline-color": "{color.border.focus}"
+        },
+        "selected": {
+          "color": "{color.text.primary}",
+          "background-color": "{color.surface.overlay}"
+        }
+      }
     }
   },
-  "a11y": { "focusVisible": true, "minHitArea": 44, "contrast": "AA", "keyboard": [], "aria": ["role tab, aria-selected, aria-controls from the behavior"] },
-  "usage": { "when": ["inside the list slot of ds.tabs only"], "whenNot": ["anywhere else"], "intents": ["tab"], "alternatives": [] },
-  "guidelines": { "do": ["one or two words"], "dont": ["put icons without text"] },
-  "relationships": { "pairsWith": ["ds.tab-panel"], "excludes": [], "contains": [], "within": ["ds.tabs"] },
+  "a11y": {
+    "focusVisible": true,
+    "minHitArea": 44,
+    "contrast": "AA",
+    "keyboard": [],
+    "aria": [
+      "role tab, aria-selected, aria-controls from the behavior"
+    ]
+  },
+  "usage": {
+    "when": [
+      "inside the list slot of ds.tabs only"
+    ],
+    "whenNot": [
+      "anywhere else"
+    ],
+    "intents": [
+      "tab"
+    ],
+    "alternatives": []
+  },
+  "guidelines": {
+    "do": [
+      "one or two words"
+    ],
+    "dont": [
+      "put icons without text"
+    ]
+  },
+  "relationships": {
+    "pairsWith": [
+      "ds.tab-panel"
+    ],
+    "excludes": [],
+    "contains": [],
+    "within": [
+      "ds.tabs"
+    ]
+  },
   "channels": {
-    "web": { "support": "native" },
-    "widget": { "support": "native" },
-    "slack": { "support": "degraded", "as": "button" },
-    "markdown": { "support": "degraded", "as": "heading" }
+    "web": {
+      "support": "native"
+    },
+    "widget": {
+      "support": "native"
+    },
+    "slack": {
+      "support": "degraded",
+      "as": "button"
+    },
+    "markdown": {
+      "support": "degraded",
+      "as": "heading"
+    }
   },
   "examples": []
 }

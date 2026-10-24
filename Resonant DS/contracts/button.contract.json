@@ -5,42 +5,158 @@
   "status": "draft",
   "category": "action",
   "description": "Triggers an action. One primary button per context.",
-  "semantics": { "element": "button", "role": "button" },
+  "semantics": {
+    "element": "button",
+    "role": "button"
+  },
   "props": [
-    { "name": "variant", "description": "Visual prominence of the action.", "type": { "enum": ["primary", "secondary", "ghost", "danger"] }, "default": "primary" },
-    { "name": "size", "description": "Control size.", "type": { "enum": ["sm", "md", "lg"] }, "default": "md" },
-    { "name": "type", "description": "Plain button, or the one that submits the surrounding form.", "type": { "enum": ["button", "submit"] }, "default": "button", "attribute": "type" },
-    { "name": "disabled", "description": "Prevents interaction.", "type": "boolean", "default": false, "attribute": "disabled" },
-    { "name": "label", "description": "Visible text.", "type": "text", "required": true }
+    {
+      "name": "variant",
+      "description": "Visual prominence of the action. Glass sits on the Bloom header.",
+      "type": {
+        "enum": [
+          "primary",
+          "secondary",
+          "ghost",
+          "danger",
+          "glass"
+        ]
+      },
+      "default": "primary"
+    },
+    {
+      "name": "size",
+      "description": "Control size.",
+      "type": {
+        "enum": [
+          "sm",
+          "md",
+          "lg"
+        ]
+      },
+      "default": "md"
+    },
+    {
+      "name": "type",
+      "description": "Plain button, or the one that submits the surrounding form.",
+      "type": {
+        "enum": [
+          "button",
+          "submit"
+        ]
+      },
+      "default": "button",
+      "attribute": "type"
+    },
+    {
+      "name": "disabled",
+      "description": "Prevents interaction.",
+      "type": "boolean",
+      "default": false,
+      "attribute": "disabled"
+    },
+    {
+      "name": "label",
+      "description": "Visible text.",
+      "type": "text",
+      "required": true
+    }
   ],
-  "states": ["hover", "focus-visible", "disabled"],
+  "states": [
+    "hover",
+    "focus-visible",
+    "disabled",
+    "active"
+  ],
   "anatomy": {
     "root": {
       "description": "Handles click, keyboard, focus and ARIA; carries variant and size.",
       "element": "button",
-      "layout": { "display": "inline-flex", "align": "center", "justify": "center", "gap": "{space.inset.sm}" },
+      "layout": {
+        "display": "inline-flex",
+        "align": "center",
+        "justify": "center",
+        "gap": "{space.inset.sm}"
+      },
       "tokens": {
         "background-color": "{color.action.{variant}.background}",
         "color": "{color.action.{variant}.foreground}",
         "padding-inline": "{space.inset.{size}}",
-        "padding-block": "{space.inset.sm}",
         "border-radius": "{radius.control}",
         "font-family": "{font.family.sans}",
         "font-size": "{font.size.{size}}",
-        "font-weight": "{font.weight.medium}"
+        "font-weight": "{font.weight.semibold}",
+        "height": "{control.height.{size}}",
+        "border-color": "{color.action.{variant}.border}",
+        "border-width": "{border.width}"
       },
       "motion": {
-        "background-color": { "duration": "{motion.duration.fast}", "easing": "{motion.easing.standard}" },
-        "color": { "duration": "{motion.duration.fast}", "easing": "{motion.easing.standard}" }
+        "background-color": {
+          "duration": "{motion.duration.fast}",
+          "easing": "{motion.easing.standard}"
+        },
+        "color": {
+          "duration": "{motion.duration.fast}",
+          "easing": "{motion.easing.standard}"
+        },
+        "box-shadow": {
+          "duration": "{motion.duration.fast}",
+          "easing": "{motion.easing.out}"
+        },
+        "transform": {
+          "duration": "{motion.duration.fast}",
+          "easing": "{motion.easing.out}"
+        }
       },
       "states": {
-        "hover": { "background-color": "{color.action.{variant}.background-hover}" },
-        "focus-visible": { "outline-color": "{color.border.focus}" },
-        "disabled": { "opacity": "{opacity.disabled}" }
+        "hover": {
+          "background-color": "{color.action.{variant}.background-hover}",
+          "box-shadow": "{shadow.action.{variant}}"
+        },
+        "focus-visible": {
+          "outline-color": "{color.border.focus}"
+        },
+        "disabled": {
+          "opacity": "{opacity.disabled}"
+        }
       },
       "parts": {
-        "icon": { "description": "Optional leading visual, sized to the text.", "element": "span", "optional": true, "slot": { "acceptsMode": "open", "max": 1 }, "layout": { "display": "inline-flex", "align": "center" } },
-        "label": { "description": "Concise action verb in sentence case.", "element": "span", "content": { "prop": "label" } }
+        "icon": {
+          "description": "Optional leading visual, sized to the text.",
+          "element": "span",
+          "optional": true,
+          "slot": {
+            "acceptsMode": "open",
+            "max": 1
+          },
+          "layout": {
+            "display": "inline-flex",
+            "align": "center"
+          }
+        },
+        "label": {
+          "description": "Concise action verb in sentence case.",
+          "element": "span",
+          "content": {
+            "prop": "label"
+          }
+        }
+      },
+      "stylesByState": {
+        "active": {
+          "transform": "scale(0.97)"
+        }
+      },
+      "stylesByProp": {
+        "variant": {
+          "glass": {
+            "backdrop-filter": "blur(8px)"
+          }
+        }
+      },
+      "styles": {
+        "box-sizing": "border-box",
+        "white-space": "nowrap"
       }
     }
   },
@@ -49,39 +165,116 @@
     "minHitArea": 44,
     "contrast": "AA",
     "keyboard": [
-      { "key": "Enter", "action": "activate" },
-      { "key": "Space", "action": "activate" }
+      {
+        "key": "Enter",
+        "action": "activate"
+      },
+      {
+        "key": "Space",
+        "action": "activate"
+      }
     ],
-    "aria": ["aria-pressed when used as a toggle", "aria-expanded when it opens an overlay", "aria-disabled rather than disabled when focus must stay reachable"]
+    "aria": [
+      "aria-pressed when used as a toggle",
+      "aria-expanded when it opens an overlay",
+      "aria-disabled rather than disabled when focus must stay reachable"
+    ]
   },
   "usage": {
-    "when": ["user must trigger an action", "submitting a form", "confirming or cancelling", "opening or closing an overlay"],
-    "whenNot": ["navigating to another page", "more than one primary action in a view", "a binary setting that takes effect at once"],
-    "intents": ["submit", "confirm", "cancel", "create", "delete", "retry", "open", "close"],
+    "when": [
+      "user must trigger an action",
+      "submitting a form",
+      "confirming or cancelling",
+      "opening or closing an overlay"
+    ],
+    "whenNot": [
+      "navigating to another page",
+      "more than one primary action in a view",
+      "a binary setting that takes effect at once"
+    ],
+    "intents": [
+      "submit",
+      "confirm",
+      "cancel",
+      "create",
+      "delete",
+      "retry",
+      "open",
+      "close"
+    ],
     "alternatives": []
   },
   "guidelines": {
-    "do": ["start the label with an action verb", "keep one primary button per view", "keep hit area at least 44px", "show a visible state for hover, focus and disabled"],
-    "dont": ["use vague labels like OK or Click here", "remove focus styles", "use a button for navigation", "auto-focus a danger button"]
+    "do": [
+      "start the label with an action verb",
+      "keep one primary button per view",
+      "keep hit area at least 44px",
+      "show a visible state for hover, focus and disabled",
+      "give the small size a 44px hit area through its container: it is 34px tall"
+    ],
+    "dont": [
+      "use vague labels like OK or Click here",
+      "remove focus styles",
+      "use a button for navigation",
+      "auto-focus a danger button"
+    ]
   },
   "resources": [
-    { "title": "UX Patterns for Devs: Button", "url": "https://uxpatterns.dev/patterns/forms/button" },
-    { "title": "MDN: button element", "url": "https://developer.mozilla.org/docs/Web/HTML/Element/button" }
+    {
+      "title": "UX Patterns for Devs: Button",
+      "url": "https://uxpatterns.dev/patterns/forms/button"
+    },
+    {
+      "title": "MDN: button element",
+      "url": "https://developer.mozilla.org/docs/Web/HTML/Element/button"
+    }
   ],
   "relationships": {
     "pairsWith": [],
     "excludes": [],
     "contains": [],
-    "within": ["ds.card"]
+    "within": [
+      "ds.card"
+    ]
   },
   "channels": {
-    "web": { "support": "native" },
-    "widget": { "support": "native" },
-    "slack": { "support": "native", "as": "actions.button", "note": "danger maps to style=danger, primary to style=primary, others plain" },
-    "markdown": { "support": "degraded", "as": "link or numbered option", "note": "no interaction; render label as an option the agent can act on" }
+    "web": {
+      "support": "native"
+    },
+    "widget": {
+      "support": "native"
+    },
+    "slack": {
+      "support": "native",
+      "as": "actions.button",
+      "note": "danger maps to style=danger, primary to style=primary, others plain"
+    },
+    "markdown": {
+      "support": "degraded",
+      "as": "link or numbered option",
+      "note": "no interaction; render label as an option the agent can act on"
+    }
   },
   "examples": [
-    { "name": "Primary", "tree": { "component": "ds.button", "props": { "label": "Save changes" } } },
-    { "name": "Danger small", "tree": { "component": "ds.button", "props": { "label": "Delete", "variant": "danger", "size": "sm" } } }
+    {
+      "name": "Primary",
+      "tree": {
+        "component": "ds.button",
+        "props": {
+          "label": "Save changes"
+        }
+      }
+    },
+    {
+      "name": "Danger small",
+      "tree": {
+        "component": "ds.button",
+        "props": {
+          "label": "Delete",
+          "variant": "danger",
+          "size": "sm"
+        }
+      }
+    }
   ]
 }

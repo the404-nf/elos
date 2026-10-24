@@ -402,7 +402,14 @@
       "$value": "0 0 0 1.5px #ff3d8b, 0 0 0 4px #ffe3ee",
       "$description": "Focused input, select and textarea: pink edge and soft halo, plus the focus outline when focus came from the keyboard."
     },
-    "$type": "shadow"
+    "$type": "shadow",
+    "none": {
+      "$value": "none"
+    },
+    "row-selected": {
+      "$value": "inset 3px 0 0 #ff3d8b",
+      "$description": "Selected table row: a pink inset line on the left. A graphic, not text."
+    }
   },
   "font": {
     "size": {
@@ -540,7 +547,11 @@
         "$value": "48000ms",
         "$description": "One turn of the Bloom gradient."
       },
-      "$type": "duration"
+      "$type": "duration",
+      "settle": {
+        "$value": "450ms",
+        "$description": "The switch thumb settling with a small overshoot."
+      }
     },
     "easing": {
       "standard": {
@@ -588,7 +599,16 @@
         ],
         "$description": "Switch thumb and segment indicator. Never on hover."
       },
-      "$type": "cubicBezier"
+      "$type": "cubicBezier",
+      "linear": {
+        "$value": [
+          0,
+          0,
+          1,
+          1
+        ],
+        "$description": "Ambient loops: the Bloom turning, the beam running."
+      }
     }
   },
   "opacity": {

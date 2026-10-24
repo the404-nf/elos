@@ -5,38 +5,176 @@
   "status": "draft",
   "category": "overlay",
   "description": "A short label that appears on hover or focus of its trigger.",
-  "semantics": { "element": "span" },
+  "semantics": {
+    "element": "span"
+  },
   "behavior": "tooltip",
-  "props": [{ "name": "label", "description": "One line; never essential information.", "type": "text", "required": true }],
-  "states": ["open"],
+  "props": [
+    {
+      "name": "label",
+      "description": "One line; never essential information.",
+      "type": "text",
+      "required": true
+    }
+  ],
+  "states": [
+    "open"
+  ],
   "anatomy": {
     "root": {
       "description": "Holds the trigger in flow and the tip out of flow.",
       "element": "span",
-      "layout": { "display": "inline-flex" },
+      "layout": {
+        "display": "inline-flex"
+      },
       "parts": {
-        "trigger": { "description": "Exactly one focusable child; the behavior's trigger props are merged onto it.", "element": "span", "layout": { "display": "inline-flex" }, "slot": { "accepts": ["ds.button", "ds.link", "ds.avatar"], "acceptsMode": "restrict", "min": 1, "max": 1, "decorate": "trigger" } },
+        "trigger": {
+          "description": "Exactly one focusable child; the behavior's trigger props are merged onto it.",
+          "element": "span",
+          "layout": {
+            "display": "inline-flex"
+          },
+          "slot": {
+            "accepts": [
+              "ds.button",
+              "ds.link",
+              "ds.avatar"
+            ],
+            "acceptsMode": "restrict",
+            "min": 1,
+            "max": 1,
+            "decorate": "trigger"
+          }
+        },
         "positioner": {
           "description": "Placed next to the trigger by the behavior.",
           "element": "div",
-          "styles": { "z-index": "60" },
+          "styles": {
+            "z-index": "60"
+          },
           "parts": {
             "content": {
               "description": "The tip, role tooltip.",
               "element": "div",
-              "content": { "prop": "label" },
-              "tokens": { "background-color": "{color.surface.inverse}", "color": "{color.text.inverse}", "padding-inline": "{space.inset.sm}", "padding-block": "{space.1}", "border-radius": "{radius.sm}", "font-size": "{font.size.sm}", "font-family": "{font.family.sans}", "max-width": "{overlay.tooltip-width}", "box-shadow": "{shadow.overlay}" },
-              "motion": { "opacity": { "duration": "{motion.duration.instant}", "easing": "{motion.easing.enter}" } }
+              "content": {
+                "prop": "label"
+              },
+              "tokens": {
+                "background-color": "{color.surface.inverse}",
+                "color": "{color.text.inverse}",
+                "padding-inline": "{space.inset.sm}",
+                "padding-block": "{space.1}",
+                "border-radius": "{radius.md}",
+                "font-size": "{font.size.sm}",
+                "font-family": "{font.family.sans}",
+                "max-width": "{overlay.tooltip-width}",
+                "box-shadow": "{shadow.overlay}",
+                "font-weight": "{font.weight.semibold}"
+              },
+              "motion": {
+                "opacity": {
+                  "duration": "{motion.duration.instant}",
+                  "easing": "{motion.easing.enter}"
+                }
+              }
             }
           }
         }
       }
     }
   },
-  "a11y": { "focusVisible": false, "contrast": "AA", "keyboard": [{ "key": "Escape", "action": "close" }], "aria": ["role tooltip linked by aria-describedby from the behavior", "opens on focus as well as hover"] },
-  "usage": { "when": ["naming an icon-only control", "a short clarification"], "whenNot": ["essential information", "long text (use ds.popover)", "touch-only targets"], "intents": ["hint", "label an icon", "clarify"], "alternatives": [{ "component": "ds.popover", "when": "the content is more than one line or interactive" }] },
-  "guidelines": { "do": ["keep it to a few words"], "dont": ["put links or buttons in a tooltip", "repeat the visible label"] },
-  "relationships": { "pairsWith": ["ds.button"], "excludes": [], "contains": ["ds.button", "ds.link", "ds.avatar"], "within": [] },
-  "channels": { "web": { "support": "native" }, "widget": { "support": "native" }, "slack": { "support": "unsupported" }, "markdown": { "support": "degraded", "as": "text in parentheses" } },
-  "examples": [{ "name": "On a button", "tree": { "component": "ds.tooltip", "props": { "label": "Publishes a new version" }, "slots": { "trigger": [{ "component": "ds.button", "props": { "label": "Publish", "variant": "secondary" } }] } } }]
+  "a11y": {
+    "focusVisible": false,
+    "contrast": "AA",
+    "keyboard": [
+      {
+        "key": "Escape",
+        "action": "close"
+      }
+    ],
+    "aria": [
+      "role tooltip linked by aria-describedby from the behavior",
+      "opens on focus as well as hover"
+    ]
+  },
+  "usage": {
+    "when": [
+      "naming an icon-only control",
+      "a short clarification"
+    ],
+    "whenNot": [
+      "essential information",
+      "long text (use ds.popover)",
+      "touch-only targets"
+    ],
+    "intents": [
+      "hint",
+      "label an icon",
+      "clarify"
+    ],
+    "alternatives": [
+      {
+        "component": "ds.popover",
+        "when": "the content is more than one line or interactive"
+      }
+    ]
+  },
+  "guidelines": {
+    "do": [
+      "keep it to a few words"
+    ],
+    "dont": [
+      "put links or buttons in a tooltip",
+      "repeat the visible label"
+    ]
+  },
+  "relationships": {
+    "pairsWith": [
+      "ds.button"
+    ],
+    "excludes": [],
+    "contains": [
+      "ds.button",
+      "ds.link",
+      "ds.avatar"
+    ],
+    "within": []
+  },
+  "channels": {
+    "web": {
+      "support": "native"
+    },
+    "widget": {
+      "support": "native"
+    },
+    "slack": {
+      "support": "unsupported"
+    },
+    "markdown": {
+      "support": "degraded",
+      "as": "text in parentheses"
+    }
+  },
+  "examples": [
+    {
+      "name": "On a button",
+      "tree": {
+        "component": "ds.tooltip",
+        "props": {
+          "label": "Publishes a new version"
+        },
+        "slots": {
+          "trigger": [
+            {
+              "component": "ds.button",
+              "props": {
+                "label": "Publish",
+                "variant": "secondary"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
 }

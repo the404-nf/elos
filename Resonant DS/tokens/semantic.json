@@ -84,6 +84,10 @@
       "danger": {
         "$value": "{color.red.500}",
         "$description": "Invalid inputs."
+      },
+      "card": {
+        "$value": "{color.border.subtle}",
+        "$description": "Cards are a fill step; the hairline shows in light only."
       }
     },
     "overlay": {
@@ -185,6 +189,9 @@
         "foreground": {
           "$value": "{color.white}",
           "$description": "Label on the primary fill."
+        },
+        "border": {
+          "$value": "{color.transparent}"
         }
       },
       "secondary": {
@@ -199,6 +206,9 @@
         "foreground": {
           "$value": "{color.black}",
           "$description": "Label on the secondary fill."
+        },
+        "border": {
+          "$value": "{color.transparent}"
         }
       },
       "ghost": {
@@ -213,6 +223,10 @@
         "foreground": {
           "$value": "{color.black}",
           "$description": "Ghost label."
+        },
+        "border": {
+          "$value": "{color.border.default}",
+          "$description": "Ghost is the one outlined button."
         }
       },
       "danger": {
@@ -227,6 +241,24 @@
         "foreground": {
           "$value": "{color.white}",
           "$description": "Label on the danger fill."
+        },
+        "border": {
+          "$value": "{color.transparent}"
+        }
+      },
+      "glass": {
+        "background": {
+          "$value": "{color.surface.glass}",
+          "$description": "Actions on the Bloom header."
+        },
+        "background-hover": {
+          "$value": "{color.surface.glass}"
+        },
+        "foreground": {
+          "$value": "{color.text.on-bloom}"
+        },
+        "border": {
+          "$value": "{color.transparent}"
         }
       }
     },
@@ -735,6 +767,369 @@
         }
       },
       "$description": "Token names, code blocks, values."
+    }
+  },
+  "gradient": {
+    "$type": "gradient",
+    "bloom": {
+      "$value": [
+        {
+          "kind": "radial",
+          "size": "18% 18%",
+          "at": "32% 42%",
+          "stops": [
+            {
+              "color": "{color.bloom.light-1}",
+              "position": "0%"
+            },
+            {
+              "color": "{color.bloom.light-1}",
+              "alpha": 0.82,
+              "position": "25%"
+            },
+            {
+              "color": "{color.bloom.light-1}",
+              "alpha": 0.45,
+              "position": "50%"
+            },
+            {
+              "color": "{color.bloom.light-1}",
+              "alpha": 0.14,
+              "position": "75%"
+            },
+            {
+              "color": "{color.transparent}",
+              "position": "100%"
+            }
+          ]
+        },
+        {
+          "kind": "radial",
+          "size": "21% 21%",
+          "at": "68% 44%",
+          "stops": [
+            {
+              "color": "{color.bloom.light-2}",
+              "position": "0%"
+            },
+            {
+              "color": "{color.bloom.light-2}",
+              "alpha": 0.82,
+              "position": "25%"
+            },
+            {
+              "color": "{color.bloom.light-2}",
+              "alpha": 0.45,
+              "position": "50%"
+            },
+            {
+              "color": "{color.bloom.light-2}",
+              "alpha": 0.14,
+              "position": "75%"
+            },
+            {
+              "color": "{color.transparent}",
+              "position": "100%"
+            }
+          ]
+        },
+        {
+          "kind": "radial",
+          "size": "23% 23%",
+          "at": "55% 58%",
+          "stops": [
+            {
+              "color": "{color.bloom.light-3}",
+              "position": "0%"
+            },
+            {
+              "color": "{color.bloom.light-3}",
+              "alpha": 0.82,
+              "position": "25%"
+            },
+            {
+              "color": "{color.bloom.light-3}",
+              "alpha": 0.45,
+              "position": "50%"
+            },
+            {
+              "color": "{color.bloom.light-3}",
+              "alpha": 0.14,
+              "position": "75%"
+            },
+            {
+              "color": "{color.transparent}",
+              "position": "100%"
+            }
+          ]
+        },
+        {
+          "kind": "radial",
+          "size": "10% 10%",
+          "at": "72% 52%",
+          "stops": [
+            {
+              "color": "{color.bloom.warm-1}",
+              "alpha": 0.3,
+              "position": "0%"
+            },
+            {
+              "color": "{color.bloom.warm-1}",
+              "alpha": 0.15,
+              "position": "50%"
+            },
+            {
+              "color": "{color.transparent}",
+              "position": "100%"
+            }
+          ]
+        }
+      ],
+      "$description": "The four lights of the Bloom header, over color.bloom.ground. One per screen."
+    },
+    "text": {
+      "$value": {
+        "kind": "linear",
+        "angle": "100deg",
+        "stops": [
+          {
+            "color": "{color.gradient.text-start}"
+          },
+          {
+            "color": "{color.gradient.text-end}"
+          }
+        ]
+      },
+      "$description": "Display words at 24px and up. Never labels, body, links or buttons."
+    },
+    "accent": {
+      "$value": {
+        "kind": "linear",
+        "angle": "90deg",
+        "stops": [
+          {
+            "color": "{color.gradient.accent-start}"
+          },
+          {
+            "color": "{color.gradient.accent-end}"
+          }
+        ]
+      },
+      "$description": "Data bars and meters that show amount. Not task progress or status."
+    },
+    "edge": {
+      "$value": {
+        "kind": "linear",
+        "angle": "135deg",
+        "stops": [
+          {
+            "color": "{color.gradient.accent-start}"
+          },
+          {
+            "color": "{color.gradient.accent-end}",
+            "position": "60%"
+          },
+          {
+            "color": "{color.gradient.text-end}"
+          }
+        ]
+      },
+      "$description": "The 1.5px border of one featured card per view."
+    },
+    "fade": {
+      "$value": {
+        "kind": "linear",
+        "angle": "180deg",
+        "stops": [
+          {
+            "color": "{color.accent.default}",
+            "alpha": 0.34,
+            "position": "0%"
+          },
+          {
+            "color": "{color.accent.default}",
+            "alpha": 0.29,
+            "position": "10%"
+          },
+          {
+            "color": "{color.accent.default}",
+            "alpha": 0.24,
+            "position": "20%"
+          },
+          {
+            "color": "{color.accent.default}",
+            "alpha": 0.19,
+            "position": "30%"
+          },
+          {
+            "color": "{color.accent.default}",
+            "alpha": 0.15,
+            "position": "40%"
+          },
+          {
+            "color": "{color.accent.default}",
+            "alpha": 0.11,
+            "position": "50%"
+          },
+          {
+            "color": "{color.accent.default}",
+            "alpha": 0.08,
+            "position": "60%"
+          },
+          {
+            "color": "{color.accent.default}",
+            "alpha": 0.05,
+            "position": "70%"
+          },
+          {
+            "color": "{color.accent.default}",
+            "alpha": 0.03,
+            "position": "80%"
+          },
+          {
+            "color": "{color.accent.default}",
+            "alpha": 0.01,
+            "position": "90%"
+          },
+          {
+            "color": "{color.transparent}",
+            "position": "100%"
+          }
+        ]
+      },
+      "$description": "The area under a chart line."
+    },
+    "trail": {
+      "$value": {
+        "kind": "linear",
+        "angle": "180deg",
+        "stops": [
+          {
+            "color": "{color.transparent}"
+          },
+          {
+            "color": "{color.accent.default}",
+            "position": "60%"
+          },
+          {
+            "color": "{color.transparent}"
+          }
+        ]
+      },
+      "$description": "The light running down a timeline."
+    },
+    "glow": {
+      "$value": {
+        "kind": "radial",
+        "size": "78% 65%",
+        "at": "50% 120%",
+        "stops": [
+          {
+            "color": "{color.accent.default}",
+            "alpha": 0.1
+          },
+          {
+            "color": "{color.transparent}"
+          }
+        ]
+      },
+      "$description": "Inside the featured card, with gradient.edge."
+    },
+    "shimmer": {
+      "$value": {
+        "kind": "linear",
+        "angle": "90deg",
+        "stops": [
+          {
+            "color": "{color.surface.sunken}",
+            "position": "0%"
+          },
+          {
+            "color": "{color.surface.sunken}",
+            "position": "40%"
+          },
+          {
+            "color": "{color.surface.overlay}",
+            "position": "50%"
+          },
+          {
+            "color": "{color.surface.sunken}",
+            "position": "60%"
+          },
+          {
+            "color": "{color.surface.sunken}",
+            "position": "100%"
+          }
+        ]
+      },
+      "$description": "Skeleton loading."
+    },
+    "beam": {
+      "$value": {
+        "kind": "conic",
+        "angle": "0deg",
+        "stops": [
+          {
+            "color": "{color.transparent}",
+            "position": "0%"
+          },
+          {
+            "color": "{color.transparent}",
+            "position": "55%"
+          },
+          {
+            "color": "{color.accent.default}",
+            "position": "72%"
+          },
+          {
+            "color": "{color.gradient.text-end}",
+            "position": "80%"
+          },
+          {
+            "color": "{color.transparent}",
+            "position": "90%"
+          }
+        ]
+      },
+      "$description": "The light that runs around an interactive card on hover; the beam part rotates it."
+    }
+  },
+  "shadow": {
+    "$type": "shadow",
+    "action": {
+      "primary": {
+        "$value": "{shadow.glow}",
+        "$description": "Hover glow per button variant. The control never moves."
+      },
+      "secondary": {
+        "$value": "{shadow.glow-soft}"
+      },
+      "ghost": {
+        "$value": "{shadow.glow-soft}"
+      },
+      "glass": {
+        "$value": "{shadow.glow-soft}"
+      },
+      "danger": {
+        "$value": "{shadow.none}"
+      }
+    }
+  },
+  "opacity": {
+    "$type": "number",
+    "bloom": {
+      "$value": 1,
+      "$description": "The Bloom lights layer. Dimmed in dark so the header glows rather than shouts."
+    }
+  },
+  "size": {
+    "$type": "dimension",
+    "lead": {
+      "$value": {
+        "value": 560,
+        "unit": "px"
+      },
+      "$description": "Longest line of a lead sentence."
     }
   }
 }

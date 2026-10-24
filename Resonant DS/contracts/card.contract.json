@@ -5,91 +5,309 @@
   "status": "draft",
   "category": "layout",
   "description": "Groups related content and actions on a raised surface.",
-  "semantics": { "element": "article" },
+  "semantics": {
+    "element": "article"
+  },
   "props": [
-    { "name": "title", "description": "Heading shown in the header.", "type": "text" },
-    { "name": "padding", "description": "Inner spacing.", "type": { "enum": ["md", "lg"] }, "default": "md" },
-    { "name": "heading", "description": "Heading level of the title, so cards follow the document outline.", "type": { "enum": ["h2", "h3"] }, "default": "h3" }
+    {
+      "name": "title",
+      "description": "Heading shown in the header.",
+      "type": "text"
+    },
+    {
+      "name": "padding",
+      "description": "Inner spacing. xl (24px) is the default; lg for dense panes and sidebars.",
+      "type": {
+        "enum": [
+          "md",
+          "lg",
+          "xl"
+        ]
+      },
+      "default": "xl"
+    },
+    {
+      "name": "heading",
+      "description": "Heading level of the title, so cards follow the document outline.",
+      "type": {
+        "enum": [
+          "h2",
+          "h3"
+        ]
+      },
+      "default": "h3"
+    },
+    {
+      "name": "interactive",
+      "description": "The whole card is one target (a link or a button): the beam runs around its border on hover and focus. No buttons inside.",
+      "type": "boolean",
+      "default": false
+    }
   ],
-  "states": [],
+  "states": [
+    "hover",
+    "focus-visible"
+  ],
   "anatomy": {
     "root": {
       "description": "Raised surface with border and padding; stacks header, body and actions.",
       "element": "article",
-      "layout": { "display": "flex", "direction": "column", "gap": "{space.stack.md}" },
+      "layout": {
+        "display": "flex",
+        "direction": "column",
+        "gap": "{space.stack.md}"
+      },
       "tokens": {
         "background-color": "{color.surface.raised}",
         "color": "{color.text.primary}",
-        "border-color": "{color.border.subtle}",
+        "border-color": "{color.border.card}",
         "border-width": "{border.width}",
         "border-radius": "{radius.container}",
         "padding": "{space.inset.{padding}}",
         "font-family": "{font.family.sans}"
       },
       "parts": {
+        "frame": {
+          "description": "The beam's window: a 1.5px ring masked out of the card edge, visible only while an interactive card is hovered or focused.",
+          "element": "span",
+          "attributes": {
+            "aria-hidden": "true"
+          },
+          "styles": {
+            "display": "none",
+            "position": "absolute",
+            "inset": "0",
+            "overflow": "hidden",
+            "padding": "1.5px",
+            "pointer-events": "none",
+            "opacity": "var(--card-beam, 0)",
+            "-webkit-mask": "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
+            "-webkit-mask-composite": "xor",
+            "mask-composite": "exclude"
+          },
+          "tokens": {
+            "border-radius": "{radius.container}"
+          },
+          "motion": {
+            "opacity": {
+              "duration": "{motion.duration.slow}",
+              "easing": "{motion.easing.standard}"
+            }
+          },
+          "stylesByProp": {
+            "interactive": {
+              "true": {
+                "display": "block"
+              }
+            }
+          },
+          "parts": {
+            "beam": {
+              "description": "The light: a conic gradient that turns once per beam duration.",
+              "element": "span",
+              "styles": {
+                "display": "block",
+                "position": "absolute",
+                "inset": "-100%"
+              },
+              "tokens": {
+                "background": "{gradient.beam}"
+              },
+              "animation": {
+                "keyframes": "turn",
+                "duration": "{motion.duration.beam}",
+                "easing": "{motion.easing.linear}",
+                "iterations": "infinite",
+                "on": "hover"
+              }
+            }
+          }
+        },
         "header": {
           "description": "Title of the group. Omit when the surrounding context already names it.",
           "element": "{heading}",
           "optional": true,
-          "content": { "prop": "title" },
-          "tokens": { "font-size": "{font.size.lg}", "font-weight": "{font.weight.semibold}" }
+          "content": {
+            "prop": "title"
+          },
+          "tokens": {
+            "font-family": "{type.heading.family}",
+            "font-size": "{font.size.md}",
+            "font-weight": "{type.heading.weight}",
+            "letter-spacing": "{type.heading.tracking}"
+          },
+          "styles": {
+            "margin": "0"
+          }
         },
         "body": {
           "description": "Main content. Any component or text.",
           "element": "div",
-          "slot": { "acceptsMode": "open" },
-          "tokens": { "font-size": "{font.size.md}", "color": "{color.text.secondary}" }
+          "slot": {
+            "acceptsMode": "open"
+          },
+          "tokens": {
+            "font-size": "{font.size.md}",
+            "color": "{color.text.secondary}"
+          }
         },
         "actions": {
           "description": "Up to three buttons, trailing-aligned. One primary at most.",
           "element": "footer",
           "optional": true,
-          "layout": { "display": "flex", "direction": "row", "gap": "{space.inset.sm}", "justify": "end" },
-          "slot": { "accepts": ["ds.button"], "acceptsMode": "restrict", "max": 3 }
+          "layout": {
+            "display": "flex",
+            "direction": "row",
+            "gap": "{space.inset.sm}",
+            "justify": "end"
+          },
+          "slot": {
+            "accepts": [
+              "ds.button"
+            ],
+            "acceptsMode": "restrict",
+            "max": 3
+          }
+        }
+      },
+      "styles": {
+        "position": "relative",
+        "box-sizing": "border-box"
+      },
+      "stylesByProp": {
+        "interactive": {
+          "true": {
+            "cursor": "pointer"
+          }
+        }
+      },
+      "states": {
+        "focus-visible": {
+          "outline-color": "{color.border.focus}"
+        }
+      },
+      "stylesByState": {
+        "hover": {
+          "--card-beam": "1"
+        },
+        "focus-visible": {
+          "--card-beam": "1"
         }
       }
     }
   },
-  "a11y": { "focusVisible": false, "contrast": "AA", "keyboard": [], "aria": ["use a heading element for the title so screen readers can navigate between cards"] },
+  "a11y": {
+    "focusVisible": false,
+    "contrast": "AA",
+    "keyboard": [],
+    "aria": [
+      "use a heading element for the title so screen readers can navigate between cards"
+    ]
+  },
   "usage": {
-    "when": ["grouping a summary with its actions", "showing one item of a collection", "a report section"],
-    "whenNot": ["wrapping an entire page", "nesting cards inside cards", "a single sentence that needs no grouping"],
-    "intents": ["summarize", "report", "list-item", "detail", "group"],
+    "when": [
+      "grouping a summary with its actions",
+      "showing one item of a collection",
+      "a report section"
+    ],
+    "whenNot": [
+      "wrapping an entire page",
+      "nesting cards inside cards",
+      "a single sentence that needs no grouping"
+    ],
+    "intents": [
+      "summarize",
+      "report",
+      "list-item",
+      "detail",
+      "group"
+    ],
     "alternatives": []
   },
   "guidelines": {
-    "do": ["keep one topic per card", "put the primary action last in the actions slot", "use the title to name the content, not the component"],
-    "dont": ["nest cards", "put more than three actions in a card", "make the whole card clickable when it also contains buttons"]
+    "do": [
+      "keep one topic per card",
+      "put the primary action last in the actions slot",
+      "use the title to name the content, not the component"
+    ],
+    "dont": [
+      "nest cards",
+      "put more than three actions in a card",
+      "make the whole card clickable when it also contains buttons",
+      "put buttons or links inside an interactive card",
+      "lift or shadow a card on hover: the beam is the hover"
+    ]
   },
   "resources": [
-    { "title": "UX Patterns for Devs: Card Grid", "url": "https://uxpatterns.dev/patterns/data-display/card-grid" }
+    {
+      "title": "UX Patterns for Devs: Card Grid",
+      "url": "https://uxpatterns.dev/patterns/data-display/card-grid"
+    }
   ],
   "relationships": {
     "pairsWith": [],
-    "excludes": ["ds.card"],
-    "contains": ["ds.button"],
+    "excludes": [
+      "ds.card"
+    ],
+    "contains": [
+      "ds.button"
+    ],
     "within": []
   },
   "channels": {
-    "web": { "support": "native" },
-    "widget": { "support": "native" },
-    "slack": { "support": "degraded", "as": "header + section + actions blocks", "note": "no surface or border; title becomes a header block" },
-    "markdown": { "support": "degraded", "as": "heading + paragraph + options", "note": "actions become a numbered list" }
+    "web": {
+      "support": "native"
+    },
+    "widget": {
+      "support": "native"
+    },
+    "slack": {
+      "support": "degraded",
+      "as": "header + section + actions blocks",
+      "note": "no surface or border; title becomes a header block"
+    },
+    "markdown": {
+      "support": "degraded",
+      "as": "heading + paragraph + options",
+      "note": "actions become a numbered list"
+    }
   },
   "examples": [
     {
       "name": "Report summary",
       "tree": {
         "component": "ds.card",
-        "props": { "title": "Weekly report" },
+        "props": {
+          "title": "Weekly report"
+        },
         "slots": {
-          "body": ["12 components changed, 3 tokens added."],
+          "body": [
+            "12 components changed, 3 tokens added."
+          ],
           "actions": [
-            { "component": "ds.button", "props": { "label": "Open report" } },
-            { "component": "ds.button", "props": { "label": "Dismiss", "variant": "ghost" } }
+            {
+              "component": "ds.button",
+              "props": {
+                "label": "Open report"
+              }
+            },
+            {
+              "component": "ds.button",
+              "props": {
+                "label": "Dismiss",
+                "variant": "ghost"
+              }
+            }
           ]
         }
       }
     }
-  ]
+  ],
+  "keyframes": {
+    "turn": {
+      "to": {
+        "transform": "rotate(360deg)"
+      }
+    }
+  }
 }

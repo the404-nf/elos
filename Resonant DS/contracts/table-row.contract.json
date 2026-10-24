@@ -5,22 +5,102 @@
   "status": "draft",
   "category": "data-display",
   "description": "One record in a Table.",
-  "semantics": { "element": "tr" },
-  "props": [],
-  "states": ["hover"],
+  "semantics": {
+    "element": "tr"
+  },
+  "props": [
+    {
+      "name": "selected",
+      "description": "The row the page is about (open in a drawer, chosen in a list).",
+      "type": "boolean",
+      "default": false
+    }
+  ],
+  "states": [
+    "hover",
+    "selected"
+  ],
   "anatomy": {
     "root": {
       "description": "Row of ds.table-cell.",
       "element": "tr",
-      "slot": { "accepts": ["ds.table-cell"], "acceptsMode": "restrict", "min": 1 },
-      "motion": { "background-color": { "duration": "{motion.duration.fast}", "easing": "{motion.easing.standard}" } },
-      "states": { "hover": { "background-color": "{color.surface.canvas}" } }
+      "slot": {
+        "accepts": [
+          "ds.table-cell"
+        ],
+        "acceptsMode": "restrict",
+        "min": 1
+      },
+      "motion": {
+        "background-color": {
+          "duration": "{motion.duration.instant}",
+          "easing": "{motion.easing.standard}"
+        }
+      },
+      "states": {
+        "hover": {
+          "background-color": "{color.accent.subtle}"
+        },
+        "selected": {
+          "background-color": "{color.accent.subtle}",
+          "box-shadow": "{shadow.row-selected}"
+        }
+      },
+      "attrs": {
+        "data-selected": "selected"
+      }
     }
   },
-  "a11y": { "focusVisible": false, "contrast": "AA", "keyboard": [], "aria": [] },
-  "usage": { "when": ["inside ds.table only"], "whenNot": ["anywhere else"], "intents": ["row", "record"], "alternatives": [] },
-  "guidelines": { "do": ["keep the same cells in every row"], "dont": [] },
-  "relationships": { "pairsWith": [], "excludes": [], "contains": ["ds.table-cell"], "within": ["ds.table"] },
-  "channels": { "web": { "support": "native" }, "widget": { "support": "native" }, "slack": { "support": "degraded", "as": "line" }, "markdown": { "support": "native", "as": "table row" } },
+  "a11y": {
+    "focusVisible": false,
+    "contrast": "AA",
+    "keyboard": [],
+    "aria": []
+  },
+  "usage": {
+    "when": [
+      "inside ds.table only"
+    ],
+    "whenNot": [
+      "anywhere else"
+    ],
+    "intents": [
+      "row",
+      "record"
+    ],
+    "alternatives": []
+  },
+  "guidelines": {
+    "do": [
+      "keep the same cells in every row"
+    ],
+    "dont": []
+  },
+  "relationships": {
+    "pairsWith": [],
+    "excludes": [],
+    "contains": [
+      "ds.table-cell"
+    ],
+    "within": [
+      "ds.table"
+    ]
+  },
+  "channels": {
+    "web": {
+      "support": "native"
+    },
+    "widget": {
+      "support": "native"
+    },
+    "slack": {
+      "support": "degraded",
+      "as": "line"
+    },
+    "markdown": {
+      "support": "native",
+      "as": "table row"
+    }
+  },
   "examples": []
 }

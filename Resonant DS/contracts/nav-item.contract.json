@@ -5,20 +5,51 @@
   "status": "draft",
   "category": "navigation",
   "description": "One destination inside Nav. The current one is marked, not just colored.",
-  "semantics": { "element": "a" },
+  "semantics": {
+    "element": "a"
+  },
   "props": [
-    { "name": "href", "description": "Destination.", "type": "text", "required": true, "attribute": "href" },
-    { "name": "label", "description": "Name of the area, one or two words.", "type": "text", "required": true },
-    { "name": "current", "description": "True on the item for the area being viewed; sets aria-current.", "type": "boolean", "default": false, "attribute": "aria-current" }
+    {
+      "name": "href",
+      "description": "Destination.",
+      "type": "text",
+      "required": true,
+      "attribute": "href"
+    },
+    {
+      "name": "label",
+      "description": "Name of the area, one or two words.",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "current",
+      "description": "True on the item for the area being viewed; sets aria-current.",
+      "type": "boolean",
+      "default": false,
+      "attribute": "aria-current"
+    }
   ],
-  "states": ["hover", "focus-visible", "selected"],
+  "states": [
+    "hover",
+    "focus-visible",
+    "selected"
+  ],
   "anatomy": {
     "root": {
       "description": "The anchor; the selected state follows `current`.",
       "element": "a",
-      "content": { "prop": "label" },
-      "attrs": { "data-selected": "current" },
-      "layout": { "display": "flex", "align": "center", "gap": "{space.inset.sm}" },
+      "content": {
+        "prop": "label"
+      },
+      "attrs": {
+        "data-selected": "current"
+      },
+      "layout": {
+        "display": "flex",
+        "align": "center",
+        "gap": "{space.inset.sm}"
+      },
       "tokens": {
         "color": "{color.text.secondary}",
         "background-color": "{color.transparent}",
@@ -26,30 +57,98 @@
         "padding-block": "{space.inset.sm}",
         "border-radius": "{radius.control}",
         "font-family": "{font.family.sans}",
-        "font-size": "{font.size.md}",
-        "font-weight": "{font.weight.medium}"
+        "font-size": "{font.size.base}",
+        "font-weight": "{font.weight.semibold}"
       },
       "motion": {
-        "color": { "duration": "{motion.duration.fast}", "easing": "{motion.easing.standard}" },
-        "background-color": { "duration": "{motion.duration.fast}", "easing": "{motion.easing.standard}" }
+        "color": {
+          "duration": "{motion.duration.fast}",
+          "easing": "{motion.easing.standard}"
+        },
+        "background-color": {
+          "duration": "{motion.duration.fast}",
+          "easing": "{motion.easing.standard}"
+        }
       },
       "states": {
-        "hover": { "color": "{color.text.primary}", "background-color": "{color.action.ghost.background-hover}" },
-        "selected": { "color": "{color.text.primary}", "background-color": "{color.surface.sunken}", "font-weight": "{font.weight.semibold}" },
-        "focus-visible": { "outline-color": "{color.border.focus}" }
+        "hover": {
+          "color": "{color.text.primary}",
+          "background-color": "{color.surface.sunken}"
+        },
+        "selected": {
+          "color": "{color.action.primary.foreground}",
+          "background-color": "{color.action.primary.background}"
+        },
+        "focus-visible": {
+          "outline-color": "{color.border.focus}"
+        }
       },
-      "styles": { "text-decoration": "none", "min-height": "36px", "box-sizing": "border-box" }
+      "styles": {
+        "text-decoration": "none",
+        "min-height": "36px",
+        "box-sizing": "border-box"
+      }
     }
   },
-  "a11y": { "focusVisible": true, "minHitArea": 36, "contrast": "AA", "keyboard": [{ "key": "Enter", "action": "follow" }], "aria": ["aria-current on the item for the current area"] },
-  "usage": { "when": ["inside ds.nav only"], "whenNot": ["anywhere else"], "intents": ["area", "section link"], "alternatives": [] },
-  "guidelines": { "do": ["mark exactly one item current per nav"], "dont": ["use it for actions"] },
-  "relationships": { "pairsWith": [], "excludes": [], "contains": [], "within": ["ds.nav"] },
+  "a11y": {
+    "focusVisible": true,
+    "minHitArea": 36,
+    "contrast": "AA",
+    "keyboard": [
+      {
+        "key": "Enter",
+        "action": "follow"
+      }
+    ],
+    "aria": [
+      "aria-current on the item for the current area"
+    ]
+  },
+  "usage": {
+    "when": [
+      "inside ds.nav only"
+    ],
+    "whenNot": [
+      "anywhere else"
+    ],
+    "intents": [
+      "area",
+      "section link"
+    ],
+    "alternatives": []
+  },
+  "guidelines": {
+    "do": [
+      "mark exactly one item current per nav"
+    ],
+    "dont": [
+      "use it for actions"
+    ]
+  },
+  "relationships": {
+    "pairsWith": [],
+    "excludes": [],
+    "contains": [],
+    "within": [
+      "ds.nav"
+    ]
+  },
   "channels": {
-    "web": { "support": "native" },
-    "widget": { "support": "degraded", "as": "link" },
-    "slack": { "support": "degraded", "as": "link" },
-    "markdown": { "support": "native", "as": "link" }
+    "web": {
+      "support": "native"
+    },
+    "widget": {
+      "support": "degraded",
+      "as": "link"
+    },
+    "slack": {
+      "support": "degraded",
+      "as": "link"
+    },
+    "markdown": {
+      "support": "native",
+      "as": "link"
+    }
   },
   "examples": []
 }

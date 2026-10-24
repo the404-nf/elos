@@ -1,0 +1,376 @@
+{
+  "version": "0.1.0",
+  "status": "draft",
+  "a11y": {
+    "focusVisible": false,
+    "contrast": "AA",
+    "keyboard": [],
+    "aria": [
+      "one h1 per page: the title",
+      "text on the header is color.text.on-bloom only, which holds 4.5:1 against the brightest light in each theme"
+    ]
+  },
+  "guidelines": {
+    "do": [
+      "start every screen with it",
+      "keep the lead to one sentence",
+      "put search, switchers and stat tiles on glass"
+    ],
+    "dont": [
+      "put pink text or pink controls on it",
+      "stack two, or use one inside a card",
+      "use the display variant outside the home"
+    ]
+  },
+  "resources": [],
+  "relationships": {
+    "pairsWith": [
+      "ds.button",
+      "ds.breadcrumb",
+      "ds.tabs",
+      "ds.nav"
+    ],
+    "excludes": [],
+    "contains": [
+      "ds.button",
+      "ds.breadcrumb",
+      "ds.tabs"
+    ],
+    "within": []
+  },
+  "channels": {
+    "web": {
+      "support": "native"
+    },
+    "widget": {
+      "support": "native"
+    },
+    "slack": {
+      "support": "unsupported"
+    },
+    "markdown": {
+      "support": "unsupported"
+    }
+  },
+  "examples": [
+    {
+      "name": "Library page",
+      "tree": {
+        "component": "ds.page-head",
+        "props": {
+          "eyebrow": "Resonant DS",
+          "title": "Components",
+          "lead": "36 contracts. Agents compose screens only from these, so every tree they write is checked against them."
+        },
+        "slots": {
+          "actions": [
+            {
+              "component": "ds.button",
+              "props": {
+                "label": "New contract"
+              }
+            },
+            {
+              "component": "ds.button",
+              "props": {
+                "label": "Copy catalog for agent",
+                "variant": "glass"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "id": "ds.page-head",
+  "name": "Page head",
+  "category": "layout",
+  "description": "The Bloom header: the one surface where the brand pink is a field. Every screen starts with it: eyebrow, title, one-sentence lead, at most two actions.",
+  "semantics": {
+    "element": "header"
+  },
+  "props": [
+    {
+      "name": "title",
+      "description": "The page name.",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "eyebrow",
+      "description": "Mono uppercase line above the title: the system name or a status.",
+      "type": "text"
+    },
+    {
+      "name": "lead",
+      "description": "One sentence under the title.",
+      "type": "text"
+    },
+    {
+      "name": "variant",
+      "description": "Title scale: page-title on every page, display on the home only.",
+      "type": {
+        "enum": [
+          "page-title",
+          "display"
+        ]
+      },
+      "default": "page-title"
+    }
+  ],
+  "states": [],
+  "keyframes": {
+    "turn": {
+      "to": {
+        "transform": "rotate(360deg)"
+      }
+    }
+  },
+  "anatomy": {
+    "root": {
+      "description": "The header surface: ground color, header radius, the lights turning behind, grain over them.",
+      "element": "header",
+      "layout": {
+        "display": "flex",
+        "direction": "column",
+        "gap": "{space.3}"
+      },
+      "tokens": {
+        "background-color": "{color.bloom.ground}",
+        "color": "{color.text.on-bloom}",
+        "border-radius": "{radius.header}",
+        "padding": "{space.8}",
+        "font-family": "{font.family.sans}"
+      },
+      "styles": {
+        "position": "relative",
+        "isolation": "isolate",
+        "overflow": "hidden",
+        "box-sizing": "border-box"
+      },
+      "parts": {
+        "lights": {
+          "description": "Four soft lights on a 2000px square, turning once per ambient duration. Dimmed in dark.",
+          "element": "span",
+          "attributes": {
+            "aria-hidden": "true"
+          },
+          "tokens": {
+            "background": "{gradient.bloom}",
+            "opacity": "{opacity.bloom}"
+          },
+          "styles": {
+            "position": "absolute",
+            "z-index": "-2",
+            "left": "50%",
+            "top": "50%",
+            "width": "2000px",
+            "height": "2000px",
+            "margin": "-1000px 0 0 -1000px",
+            "pointer-events": "none"
+          },
+          "animation": {
+            "keyframes": "turn",
+            "duration": "{motion.duration.ambient}",
+            "easing": "{motion.easing.linear}",
+            "iterations": "infinite"
+          }
+        },
+        "grain": {
+          "description": "Fractal noise at 14%, overlay blend.",
+          "element": "span",
+          "attributes": {
+            "aria-hidden": "true"
+          },
+          "styles": {
+            "position": "absolute",
+            "inset": "0",
+            "z-index": "-1",
+            "opacity": "0.14",
+            "mix-blend-mode": "overlay",
+            "background-image": "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+            "pointer-events": "none"
+          }
+        },
+        "nav": {
+          "description": "The app nav row on top of the Bloom: logo, system switcher, links, search, theme, avatar.",
+          "element": "div",
+          "optional": true,
+          "slot": {
+            "acceptsMode": "open"
+          },
+          "layout": {
+            "display": "flex",
+            "direction": "row",
+            "align": "center",
+            "gap": "{space.3}"
+          },
+          "tokens": {
+            "margin-bottom": "{space.12}"
+          }
+        },
+        "breadcrumb": {
+          "description": "Where this page sits, on detail and editor pages.",
+          "element": "div",
+          "optional": true,
+          "slot": {
+            "accepts": [
+              "ds.breadcrumb"
+            ],
+            "acceptsMode": "restrict",
+            "max": 1
+          }
+        },
+        "eyebrow": {
+          "description": "Mono, uppercase.",
+          "element": "p",
+          "optional": true,
+          "content": {
+            "prop": "eyebrow"
+          },
+          "tokens": {
+            "font-family": "{type.eyebrow.family}",
+            "font-size": "{type.eyebrow.size}",
+            "font-weight": "{type.eyebrow.weight}",
+            "letter-spacing": "{type.eyebrow.tracking}",
+            "line-height": "{type.eyebrow.line-height}"
+          },
+          "styles": {
+            "margin": "0",
+            "text-transform": "uppercase"
+          }
+        },
+        "main": {
+          "description": "Title and lead on the left, actions bottom right.",
+          "element": "div",
+          "layout": {
+            "display": "flex",
+            "direction": "row",
+            "align": "end",
+            "gap": "{space.5}"
+          },
+          "styles": {
+            "flex-wrap": "wrap"
+          },
+          "parts": {
+            "text": {
+              "description": "Title then lead.",
+              "element": "div",
+              "layout": {
+                "display": "flex",
+                "direction": "column",
+                "gap": "{space.3}"
+              },
+              "styles": {
+                "flex": "1 1 320px",
+                "min-width": "0"
+              },
+              "parts": {
+                "title": {
+                  "description": "The page name, display type.",
+                  "element": "h1",
+                  "content": {
+                    "prop": "title"
+                  },
+                  "tokens": {
+                    "font-family": "{type.{variant}.family}",
+                    "font-size": "{type.{variant}.size}",
+                    "font-weight": "{type.{variant}.weight}",
+                    "line-height": "{type.{variant}.line-height}",
+                    "letter-spacing": "{type.{variant}.tracking}"
+                  },
+                  "styles": {
+                    "margin": "0"
+                  }
+                },
+                "lead": {
+                  "description": "One sentence, capped at the lead width.",
+                  "element": "p",
+                  "optional": true,
+                  "content": {
+                    "prop": "lead"
+                  },
+                  "tokens": {
+                    "font-size": "{type.lead.size}",
+                    "font-weight": "{type.lead.weight}",
+                    "line-height": "{type.lead.line-height}",
+                    "max-width": "{size.lead}"
+                  },
+                  "styles": {
+                    "margin": "0"
+                  }
+                }
+              }
+            },
+            "actions": {
+              "description": "At most two: one primary and one glass.",
+              "element": "div",
+              "optional": true,
+              "slot": {
+                "accepts": [
+                  "ds.button"
+                ],
+                "acceptsMode": "restrict",
+                "max": 2
+              },
+              "layout": {
+                "display": "flex",
+                "direction": "row",
+                "gap": "{space.2}"
+              },
+              "styles": {
+                "margin-left": "auto"
+              }
+            }
+          }
+        },
+        "extras": {
+          "description": "Glass stat tiles, a segmented control or a note under the lead.",
+          "element": "div",
+          "optional": true,
+          "slot": {
+            "acceptsMode": "open"
+          },
+          "layout": {
+            "display": "flex",
+            "direction": "row",
+            "align": "center",
+            "gap": "{space.3}"
+          },
+          "styles": {
+            "flex-wrap": "wrap"
+          }
+        },
+        "tabs": {
+          "description": "Section tabs on detail pages.",
+          "element": "div",
+          "optional": true,
+          "slot": {
+            "accepts": [
+              "ds.tabs"
+            ],
+            "acceptsMode": "restrict",
+            "max": 1
+          }
+        }
+      }
+    }
+  },
+  "usage": {
+    "when": [
+      "the top of every screen: home, dashboard, libraries, detail and editor pages"
+    ],
+    "whenNot": [
+      "inside cards, dialogs or drawers",
+      "as a banner further down a page",
+      "twice on one screen"
+    ],
+    "intents": [
+      "page header",
+      "hero",
+      "title",
+      "bloom"
+    ],
+    "alternatives": []
+  }
+}

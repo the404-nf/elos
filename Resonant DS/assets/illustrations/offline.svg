@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="rs-il" width="240" height="160" viewBox="0 0 240 160" aria-hidden="true"><style>.rs-il{color:var(--color-illustration-line,#0b0b0f)}
+.rs-il .ln{fill:none;stroke:var(--color-illustration-line,#0b0b0f);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.rs-il .pl{fill:var(--color-illustration-plane,#fff);stroke:var(--color-illustration-line,#0b0b0f);stroke-width:1.5;stroke-linejoin:round}
+.rs-il .cs{fill:none;stroke:var(--color-illustration-construction,#6b6a74);stroke-width:1;stroke-dasharray:3 3;stroke-linecap:round}
+.rs-il rect.cs{fill:var(--il-ground,var(--color-surface-overlay,#fff))}
+.rs-il .tk{fill:none;stroke:var(--color-illustration-construction,#6b6a74);stroke-width:1;stroke-linecap:round}
+.rs-il .ac{fill:var(--il-accent,var(--color-illustration-line,#0b0b0f))}
+.rs-il .acl{fill:var(--il-ground,var(--color-surface-overlay,#fff));stroke:var(--il-accent,var(--color-illustration-line,#0b0b0f));stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.rs-il path.acl{fill:none}
+.rs-il .cut{fill:none;stroke:var(--il-ground,var(--color-surface-overlay,#fff));stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.rs-il .lb{font:500 7px var(--font-family-mono,'JetBrains Mono',ui-monospace,monospace);letter-spacing:.06em;text-transform:uppercase;fill:var(--color-illustration-construction,#6b6a74);paint-order:stroke;stroke:var(--il-ground,var(--color-surface-overlay,#fff));stroke-width:3px;stroke-linejoin:round}
+.rs-il .gl{font:800 22px var(--font-family-display,'Inter Tight',sans-serif);letter-spacing:-.04em}
+.rs-il .gd{fill:var(--color-illustration-grid,#0b0b0f24)}</style><defs><pattern id="rs-il-dots-offline" width="8" height="8" patternUnits="userSpaceOnUse"><circle class="gd" cx="4" cy="4" r=".65"/></pattern><radialGradient id="rs-il-fade-offline"><stop offset="0" stop-color="#fff"/><stop offset=".55" stop-color="#fff" stop-opacity=".7"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient><mask id="rs-il-mask-offline"><rect width="240" height="160" fill="url(#rs-il-fade-offline)"/></mask></defs><rect width="240" height="160" fill="url(#rs-il-dots-offline)" mask="url(#rs-il-mask-offline)"/><rect class="pl" x="24" y="48" width="64" height="64" rx="10"/><path class="ln" d="M24 62h64M36 76h40M36 88h28M36 100h34"/><circle class="pl" cx="190" cy="80" r="24"/><path class="ln" d="M190 68c1 7 4.6 10.5 11.5 11.5-7 1-10.5 4.5-11.5 11.5-1-7-4.5-10.5-11.5-11.5 7-1 10.5-4.5 11.5-11.5z"/><path class="cs" d="M92 80h22M140 80h22"/><path class="acl" d="m124 72-3 16M133 72l-3 16"/><text class="lb" x="127" y="104" text-anchor="middle">offline</text></svg>

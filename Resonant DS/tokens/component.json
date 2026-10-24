@@ -117,5 +117,22 @@
       "$description": "Toast width."
     },
     "$type": "dimension"
+  },
+  "illustration": {
+    "$type": "dimension",
+    "size": {
+      "md": {
+        "$value": {
+          "value": 240,
+          "unit": "px"
+        }
+      },
+      "lg": {
+        "$value": {
+          "value": 360,
+          "unit": "px"
+        }
+      }
+    }
   }
 }

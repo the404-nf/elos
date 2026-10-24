@@ -58,13 +58,13 @@ function WithBehavior({ tree, contract, props }: Omit<BodyProps, "parts">) {
 
 function Body({ tree, contract, props, parts }: BodyProps) {
   const decoration = useContext(Decoration);
-  const { elements } = useElos();
+  const { elements, catalog } = useElos();
   const [rootName, root] = Object.entries(contract.anatomy)[0]!;
   // Reset decoration for everything below: it was meant for this component's root only.
-  return h(Decoration.Provider, { value: undefined }, renderPart({ contract, props, tree, parts, decoration, elements }, rootName, root, true));
+  return h(Decoration.Provider, { value: undefined }, renderPart({ contract, props, tree, parts, decoration, elements, catalog }, rootName, root, true));
 }
 
-type PartCtx = BodyProps & { decoration?: DomProps; elements: Record<string, ElementType> };
+type PartCtx = BodyProps & { decoration?: DomProps; elements: Record<string, ElementType>; catalog: Catalog };
 
 function renderPart(ctx: PartCtx, name: string, part: Part, isRoot: boolean): ReactNode {
   const { contract, props, tree, parts } = ctx;
@@ -92,7 +92,13 @@ function renderPart(ctx: PartCtx, name: string, part: Part, isRoot: boolean): Re
   for (const [childName, child] of Object.entries(part.parts ?? {}))
     children.push(h(Fragment, { key: childName }, renderPart(ctx, childName, child, false)));
 
-  const attrs: DomProps = { className: partClass(contract.id, name), ...part.attributes };
+  const { class: extraClass, ...constants } = part.attributes ?? {};
+  const attrs: DomProps = { className: extraClass ? `${partClass(contract.id, name)} ${extraClass}` : partClass(contract.id, name), ...constants };
+  if (part.asset) {
+    // The SVG file's children, so the root keeps the contract's class, size tokens and attributes.
+    const src = ctx.catalog.assets[part.asset.kind]?.[String(props[part.asset.prop])] ?? "";
+    attrs.dangerouslySetInnerHTML = { __html: src.replace(/^[^]*?<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "") };
+  }
   for (const [attr, propName] of Object.entries(part.attrs ?? {})) {
     const v = props[propName];
     if (v === undefined || v === false || v === "") continue;

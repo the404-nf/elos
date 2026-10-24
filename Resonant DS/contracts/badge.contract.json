@@ -5,51 +5,197 @@
   "status": "draft",
   "category": "feedback",
   "description": "Short status or category label.",
-  "semantics": { "element": "span", "role": "status" },
+  "semantics": {
+    "element": "span",
+    "role": "status"
+  },
   "props": [
-    { "name": "tone", "description": "Meaning of the status.", "type": { "enum": ["neutral", "info", "success", "warning", "danger"] }, "default": "neutral" },
-    { "name": "label", "description": "One or two words.", "type": "text", "required": true }
+    {
+      "name": "tone",
+      "description": "Meaning of the status.",
+      "type": {
+        "enum": [
+          "neutral",
+          "info",
+          "success",
+          "warning",
+          "danger",
+          "accent"
+        ]
+      },
+      "default": "neutral"
+    },
+    {
+      "name": "label",
+      "description": "One or two words.",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "dot",
+      "description": "A leading dot in the tone color.",
+      "type": "boolean",
+      "default": false
+    }
   ],
   "states": [],
   "anatomy": {
     "root": {
       "description": "Pill with tinted background; color alone never carries the meaning, the label does.",
       "element": "span",
-      "content": { "prop": "label" },
-      "layout": { "display": "inline-flex", "align": "center" },
+      "layout": {
+        "display": "inline-flex",
+        "align": "center",
+        "gap": "{space.1}"
+      },
       "tokens": {
         "background-color": "{color.status.{tone}.background}",
         "color": "{color.status.{tone}.foreground}",
         "padding-inline": "{space.inset.sm}",
         "border-radius": "{radius.pill}",
         "font-size": "{font.size.sm}",
-        "font-weight": "{font.weight.medium}",
-        "font-family": "{font.family.sans}"
+        "font-weight": "{font.weight.semibold}",
+        "font-family": "{font.family.sans}",
+        "padding-block": "{space.1}"
       },
-      "styles": { "line-height": "1.6", "white-space": "nowrap" }
+      "styles": {
+        "line-height": "1.6",
+        "white-space": "nowrap"
+      },
+      "parts": {
+        "dot": {
+          "description": "Tone marker, shown when `dot` is set.",
+          "element": "span",
+          "attributes": {
+            "aria-hidden": "true"
+          },
+          "tokens": {
+            "background-color": "{color.status.{tone}.foreground}",
+            "width": "{space.1}",
+            "height": "{space.1}",
+            "border-radius": "{radius.pill}"
+          },
+          "styles": {
+            "display": "none"
+          },
+          "stylesByProp": {
+            "dot": {
+              "true": {
+                "display": "inline-block"
+              }
+            }
+          }
+        },
+        "label": {
+          "description": "One or two words.",
+          "element": "span",
+          "content": {
+            "prop": "label"
+          }
+        }
+      }
     }
   },
-  "a11y": { "focusVisible": false, "contrast": "AA", "keyboard": [], "aria": ["the label must make sense without its color"] },
+  "a11y": {
+    "focusVisible": false,
+    "contrast": "AA",
+    "keyboard": [],
+    "aria": [
+      "the label must make sense without its color"
+    ]
+  },
   "usage": {
-    "when": ["showing a status (draft, stable, failed)", "tagging an item with a category", "a small count"],
-    "whenNot": ["interactive filters (use ds.button)", "long text"],
-    "intents": ["status", "tag", "label", "count", "category"],
-    "alternatives": [{ "component": "ds.button", "when": "the user can click it to filter or act" }]
+    "when": [
+      "showing a status (draft, stable, failed)",
+      "tagging an item with a category",
+      "a small count",
+      "product states: draft, published, MCP (accent tone)"
+    ],
+    "whenNot": [
+      "interactive filters (use ds.button)",
+      "long text"
+    ],
+    "intents": [
+      "status",
+      "tag",
+      "label",
+      "count",
+      "category"
+    ],
+    "alternatives": [
+      {
+        "component": "ds.button",
+        "when": "the user can click it to filter or act"
+      }
+    ]
   },
   "guidelines": {
-    "do": ["keep labels to one or two words", "use tone for meaning, not decoration"],
-    "dont": ["rely on color alone", "stack more than three badges on one item"]
+    "do": [
+      "keep labels to one or two words",
+      "use tone for meaning, not decoration"
+    ],
+    "dont": [
+      "rely on color alone",
+      "stack more than three badges on one item"
+    ]
   },
-  "relationships": { "pairsWith": ["ds.text"], "excludes": [], "contains": [], "within": ["ds.card", "ds.stack"] },
+  "relationships": {
+    "pairsWith": [
+      "ds.text"
+    ],
+    "excludes": [],
+    "contains": [],
+    "within": [
+      "ds.card",
+      "ds.stack"
+    ]
+  },
   "channels": {
-    "web": { "support": "native" },
-    "widget": { "support": "native" },
-    "slack": { "support": "degraded", "as": "inline text", "note": "tone becomes an emoji prefix" },
-    "markdown": { "support": "degraded", "as": "inline code or bold text" }
+    "web": {
+      "support": "native"
+    },
+    "widget": {
+      "support": "native"
+    },
+    "slack": {
+      "support": "degraded",
+      "as": "inline text",
+      "note": "tone becomes an emoji prefix"
+    },
+    "markdown": {
+      "support": "degraded",
+      "as": "inline code or bold text"
+    }
   },
   "examples": [
-    { "name": "Neutral", "tree": { "component": "ds.badge", "props": { "label": "draft" } } },
-    { "name": "Success", "tree": { "component": "ds.badge", "props": { "label": "stable", "tone": "success" } } },
-    { "name": "Danger", "tree": { "component": "ds.badge", "props": { "label": "deprecated", "tone": "danger" } } }
+    {
+      "name": "Neutral",
+      "tree": {
+        "component": "ds.badge",
+        "props": {
+          "label": "draft"
+        }
+      }
+    },
+    {
+      "name": "Success",
+      "tree": {
+        "component": "ds.badge",
+        "props": {
+          "label": "stable",
+          "tone": "success"
+        }
+      }
+    },
+    {
+      "name": "Danger",
+      "tree": {
+        "component": "ds.badge",
+        "props": {
+          "label": "deprecated",
+          "tone": "danger"
+        }
+      }
+    }
   ]
 }

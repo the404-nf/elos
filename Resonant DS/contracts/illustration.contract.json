@@ -1,0 +1,183 @@
+{
+  "version": "0.1.0",
+  "status": "draft",
+  "a11y": {
+    "focusVisible": false,
+    "contrast": "AA",
+    "keyboard": [],
+    "aria": []
+  },
+  "guidelines": {
+    "do": [
+      "pair it with a heading and one sentence",
+      "use md in cards and dialogs, lg on full empty pages",
+      "set --il-ground to the surface it sits on"
+    ],
+    "dont": [
+      "recolor parts or add a second accent",
+      "crop, rotate or stretch it",
+      "place it next to the Bloom header"
+    ]
+  },
+  "resources": [],
+  "relationships": {
+    "pairsWith": [],
+    "excludes": [],
+    "contains": [],
+    "within": []
+  },
+  "channels": {
+    "web": {
+      "support": "native"
+    },
+    "widget": {
+      "support": "native"
+    },
+    "slack": {
+      "support": "unsupported"
+    },
+    "markdown": {
+      "support": "unsupported"
+    }
+  },
+  "examples": [
+    {
+      "name": "Empty library",
+      "tree": {
+        "component": "ds.illustration",
+        "props": {
+          "name": "empty-components"
+        }
+      }
+    }
+  ],
+  "id": "ds.illustration",
+  "name": "Illustration",
+  "category": "media",
+  "description": "A spot illustration drawn like a spec: the product's objects, grey construction, one pink accent. For empty, blocked and confirmed states.",
+  "semantics": {
+    "element": "svg"
+  },
+  "props": [
+    {
+      "name": "name",
+      "description": "Which illustration.",
+      "type": {
+        "enum": [
+          "empty-components",
+          "no-results",
+          "no-access",
+          "offline",
+          "not-found",
+          "error",
+          "contrast-check",
+          "token-chain",
+          "import-directory",
+          "themes",
+          "blocks",
+          "audit-passed",
+          "new-system",
+          "published",
+          "diff-versions",
+          "rollback",
+          "agent-connected",
+          "channels",
+          "principles",
+          "compose",
+          "openapi-binding",
+          "journey"
+        ]
+      },
+      "required": true
+    },
+    {
+      "name": "size",
+      "description": "240 or 360px wide.",
+      "type": {
+        "enum": [
+          "md",
+          "lg"
+        ]
+      },
+      "default": "md"
+    },
+    {
+      "name": "accent",
+      "description": "The one accent part in pink; off, it takes the line color.",
+      "type": "boolean",
+      "default": true
+    },
+    {
+      "name": "motion",
+      "description": "The small motion (a travelling dot, a dropping check). Off shows the still frame; reduced motion always does.",
+      "type": "boolean",
+      "default": true
+    }
+  ],
+  "states": [],
+  "anatomy": {
+    "root": {
+      "description": "The svg; its drawing comes from assets/illustrations/<name>.svg and carries its own layer styles. Always decorative.",
+      "element": "svg",
+      "attributes": {
+        "viewBox": "0 0 240 160",
+        "aria-hidden": "true",
+        "class": "rs-il"
+      },
+      "asset": {
+        "kind": "illustrations",
+        "prop": "name"
+      },
+      "tokens": {
+        "width": "{illustration.size.{size}}",
+        "color": "{color.illustration.line}",
+        "--il-accent": "{color.illustration.line}",
+        "--il-ground": "{color.surface.overlay}"
+      },
+      "tokensByProp": {
+        "accent": {
+          "true": {
+            "--il-accent": "{color.illustration.accent}"
+          }
+        }
+      },
+      "stylesByProp": {
+        "motion": {
+          "false": {
+            "--il-travel": "none",
+            "--il-drop": "none"
+          }
+        }
+      },
+      "styles": {
+        "display": "block",
+        "max-width": "100%",
+        "height": "auto",
+        "aspect-ratio": "3 / 2",
+        "overflow": "visible"
+      }
+    }
+  },
+  "usage": {
+    "when": [
+      "an empty library, no results, a new system",
+      "not found, no access, offline, an invalid tree",
+      "published, audit passed, agent connected",
+      "onboarding and feature intros"
+    ],
+    "whenNot": [
+      "as decoration on a page that already has content",
+      "more than one per view",
+      "inside tables, menus or toasts",
+      "to carry information the copy does not repeat"
+    ],
+    "intents": [
+      "empty state",
+      "illustration",
+      "spot",
+      "onboarding",
+      "confirmation"
+    ],
+    "alternatives": []
+  }
+}

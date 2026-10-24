@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="rs-il" width="240" height="160" viewBox="0 0 240 160" aria-hidden="true"><style>.rs-il{color:var(--color-illustration-line,#0b0b0f)}
+.rs-il .ln{fill:none;stroke:var(--color-illustration-line,#0b0b0f);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.rs-il .pl{fill:var(--color-illustration-plane,#fff);stroke:var(--color-illustration-line,#0b0b0f);stroke-width:1.5;stroke-linejoin:round}
+.rs-il .cs{fill:none;stroke:var(--color-illustration-construction,#6b6a74);stroke-width:1;stroke-dasharray:3 3;stroke-linecap:round}
+.rs-il rect.cs{fill:var(--il-ground,var(--color-surface-overlay,#fff))}
+.rs-il .tk{fill:none;stroke:var(--color-illustration-construction,#6b6a74);stroke-width:1;stroke-linecap:round}
+.rs-il .ac{fill:var(--il-accent,var(--color-illustration-line,#0b0b0f))}
+.rs-il .acl{fill:var(--il-ground,var(--color-surface-overlay,#fff));stroke:var(--il-accent,var(--color-illustration-line,#0b0b0f));stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.rs-il path.acl{fill:none}
+.rs-il .cut{fill:none;stroke:var(--il-ground,var(--color-surface-overlay,#fff));stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.rs-il .lb{font:500 7px var(--font-family-mono,'JetBrains Mono',ui-monospace,monospace);letter-spacing:.06em;text-transform:uppercase;fill:var(--color-illustration-construction,#6b6a74);paint-order:stroke;stroke:var(--il-ground,var(--color-surface-overlay,#fff));stroke-width:3px;stroke-linejoin:round}
+.rs-il .gl{font:800 22px var(--font-family-display,'Inter Tight',sans-serif);letter-spacing:-.04em}
+.rs-il .gd{fill:var(--color-illustration-grid,#0b0b0f24)}@keyframes rs-il-travel { from { offset-distance: 0%; } to { offset-distance: 100%; } }
+@keyframes rs-il-drop { from { transform: translateY(-6px); opacity: 0; } to { transform: none; opacity: 1; } }
+.rs-il .il-travel { offset-rotate: 0deg; offset-distance: var(--il-rest, 50%); animation: var(--il-travel, rs-il-travel) var(--il-travel-duration, 2.4s) cubic-bezier(.45, 0, .55, 1) infinite; }
+.rs-il .il-drop { animation: var(--il-drop, rs-il-drop) .6s cubic-bezier(.34, 1.56, .64, 1) both; }
+[data-motion="static"] { --il-travel: none; --il-drop: none; }
+[data-motion="motion"] { --il-travel: rs-il-travel; --il-drop: rs-il-drop; }
+@media (prefers-reduced-motion: reduce) { .rs-il { --il-travel: none; --il-drop: none; } }
+</style><defs><pattern id="rs-il-dots-published" width="8" height="8" patternUnits="userSpaceOnUse"><circle class="gd" cx="4" cy="4" r=".65"/></pattern><radialGradient id="rs-il-fade-published"><stop offset="0" stop-color="#fff"/><stop offset=".55" stop-color="#fff" stop-opacity=".7"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient><mask id="rs-il-mask-published"><rect width="240" height="160" fill="url(#rs-il-fade-published)"/></mask></defs><rect width="240" height="160" fill="url(#rs-il-dots-published)" mask="url(#rs-il-mask-published)"/><rect class="cs" x="76" y="26" width="96" height="60" rx="10"/><rect class="pl" x="66" y="38" width="112" height="70" rx="10"/><path class="ln" d="M78 52h40"/><rect class="pl" x="56" y="52" width="128" height="80" rx="10"/><path class="ln" d="M70 70h56M70 82h80M70 94h44"/><rect class="ln" x="70" y="110" width="42" height="12" rx="6"/><text class="lb" x="91" y="118.5" text-anchor="middle" style="fill:var(--color-illustration-line,#0b0b0f)">v0.2.0</text><text class="lb" x="124" y="34" text-anchor="middle">v0.1.0</text><g class="il-drop"><circle class="ac" cx="204" cy="40" r="13"/><path class="cut" d="m198 40.5 4 4 8-8.5"/></g></svg>

@@ -55,6 +55,9 @@
       },
       "focus": {
         "$value": "{color.white}"
+      },
+      "card": {
+        "$value": "{color.transparent}"
       }
     },
     "accent": {
@@ -193,5 +196,11 @@
       "$value": "0 0 0 1.5px #ff3d8b, 0 0 0 4px #ff3d8b2b"
     },
     "$type": "shadow"
+  },
+  "opacity": {
+    "$type": "number",
+    "bloom": {
+      "$value": 0.62
+    }
   }
 }

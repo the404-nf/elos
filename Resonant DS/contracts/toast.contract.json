@@ -5,42 +5,210 @@
   "status": "draft",
   "category": "feedback",
   "description": "A brief confirmation that appears, then leaves on its own.",
-  "semantics": { "element": "div", "role": "status" },
+  "semantics": {
+    "element": "div",
+    "role": "status"
+  },
   "props": [
-    { "name": "tone", "description": "Meaning of the message.", "type": { "enum": ["neutral", "info", "success", "warning", "danger"] }, "default": "neutral" },
-    { "name": "title", "description": "What happened, in one line.", "type": "text", "required": true },
-    { "name": "description", "description": "Optional detail.", "type": "text" }
+    {
+      "name": "tone",
+      "description": "Meaning of the message.",
+      "type": {
+        "enum": [
+          "neutral",
+          "info",
+          "success",
+          "warning",
+          "danger"
+        ]
+      },
+      "default": "neutral"
+    },
+    {
+      "name": "title",
+      "description": "What happened, in one line.",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "description",
+      "description": "Optional detail.",
+      "type": "text"
+    }
   ],
   "states": [],
   "anatomy": {
     "root": {
       "description": "Raised card with a tone dot; placement and timing belong to the toaster region that shows it.",
       "element": "div",
-      "layout": { "display": "flex", "direction": "row", "align": "start", "gap": "{space.inset.md}" },
-      "tokens": { "background-color": "{color.surface.raised}", "color": "{color.text.primary}", "border-color": "{color.border.subtle}", "border-width": "{border.width}", "border-radius": "{radius.container}", "padding": "{space.inset.md}", "width": "{overlay.toast-width}", "box-shadow": "{shadow.overlay}", "font-family": "{font.family.sans}", "font-size": "{font.size.md}" },
-      "motion": { "opacity": { "duration": "{motion.duration.base}", "easing": "{motion.easing.enter}" }, "transform": { "duration": "{motion.duration.base}", "easing": "{motion.easing.enter}" } },
-      "styles": { "box-sizing": "border-box" },
+      "layout": {
+        "display": "flex",
+        "direction": "row",
+        "align": "center",
+        "gap": "{space.inset.md}"
+      },
+      "tokens": {
+        "background-color": "{color.surface.inverse}",
+        "color": "{color.text.inverse}",
+        "border-radius": "{radius.overlay}",
+        "width": "{overlay.toast-width}",
+        "box-shadow": "{shadow.overlay}",
+        "font-family": "{font.family.sans}",
+        "font-size": "{font.size.base}",
+        "padding-inline": "{space.inset.lg}",
+        "padding-block": "{space.inset.md}"
+      },
+      "motion": {
+        "opacity": {
+          "duration": "{motion.duration.base}",
+          "easing": "{motion.easing.enter}"
+        },
+        "transform": {
+          "duration": "{motion.duration.base}",
+          "easing": "{motion.easing.enter}"
+        }
+      },
+      "styles": {
+        "box-sizing": "border-box"
+      },
       "parts": {
-        "dot": { "description": "Tone indicator.", "element": "span", "tokens": { "width": "{space.2}", "height": "{space.2}", "background-color": "{color.status.{tone}.foreground}", "border-radius": "{radius.pill}" }, "styles": { "display": "block", "margin": "6px 0 0" } },
+        "dot": {
+          "description": "Tone indicator.",
+          "element": "span",
+          "tokens": {
+            "width": "{space.2}",
+            "height": "{space.2}",
+            "background-color": "{color.status.{tone}.foreground}",
+            "border-radius": "{radius.pill}"
+          },
+          "styles": {
+            "display": "block"
+          }
+        },
         "text": {
           "description": "Title and detail.",
           "element": "div",
-          "layout": { "display": "flex", "direction": "column", "gap": "{space.1}" },
+          "layout": {
+            "display": "flex",
+            "direction": "column",
+            "gap": "{space.1}"
+          },
           "parts": {
-            "title": { "description": "Message.", "element": "strong", "content": { "prop": "title" }, "tokens": { "font-weight": "{font.weight.semibold}" } },
-            "description": { "description": "Detail.", "element": "p", "optional": true, "content": { "prop": "description" }, "tokens": { "color": "{color.text.secondary}", "font-size": "{font.size.sm}" }, "styles": { "margin": "0" } }
+            "title": {
+              "description": "Message.",
+              "element": "strong",
+              "content": {
+                "prop": "title"
+              },
+              "tokens": {
+                "font-weight": "{font.weight.semibold}"
+              }
+            },
+            "description": {
+              "description": "Detail.",
+              "element": "p",
+              "optional": true,
+              "content": {
+                "prop": "description"
+              },
+              "tokens": {
+                "color": "{color.text.inverse}",
+                "font-size": "{font.size.sm}"
+              },
+              "styles": {
+                "margin": "0"
+              }
+            }
           }
         }
       }
     }
   },
-  "a11y": { "focusVisible": false, "contrast": "AA", "keyboard": [], "aria": ["role status; never the only place a result is shown", "stays long enough to read, at least five seconds"] },
-  "usage": { "when": ["confirming an action that succeeded", "a non-blocking notice"], "whenNot": ["errors the user must act on (use ds.alert or ds.dialog)", "anything with a required action"], "intents": ["confirm", "saved", "done", "notice", "undo"], "alternatives": [{ "component": "ds.alert", "when": "the message must stay" }] },
-  "guidelines": { "do": ["say what was done, in past tense", "one toast at a time per corner"], "dont": ["ask questions in a toast", "use it for errors that need action"] },
-  "relationships": { "pairsWith": [], "excludes": [], "contains": [], "within": [] },
-  "channels": { "web": { "support": "native" }, "widget": { "support": "native" }, "slack": { "support": "degraded", "as": "ephemeral message" }, "markdown": { "support": "degraded", "as": "one-line confirmation" } },
+  "a11y": {
+    "focusVisible": false,
+    "contrast": "AA",
+    "keyboard": [],
+    "aria": [
+      "role status; never the only place a result is shown",
+      "stays long enough to read, at least five seconds"
+    ]
+  },
+  "usage": {
+    "when": [
+      "confirming an action that succeeded",
+      "a non-blocking notice"
+    ],
+    "whenNot": [
+      "errors the user must act on (use ds.alert or ds.dialog)",
+      "anything with a required action"
+    ],
+    "intents": [
+      "confirm",
+      "saved",
+      "done",
+      "notice",
+      "undo"
+    ],
+    "alternatives": [
+      {
+        "component": "ds.alert",
+        "when": "the message must stay"
+      }
+    ]
+  },
+  "guidelines": {
+    "do": [
+      "say what was done, in past tense",
+      "one toast at a time per corner"
+    ],
+    "dont": [
+      "ask questions in a toast",
+      "use it for errors that need action"
+    ]
+  },
+  "relationships": {
+    "pairsWith": [],
+    "excludes": [],
+    "contains": [],
+    "within": []
+  },
+  "channels": {
+    "web": {
+      "support": "native"
+    },
+    "widget": {
+      "support": "native"
+    },
+    "slack": {
+      "support": "degraded",
+      "as": "ephemeral message"
+    },
+    "markdown": {
+      "support": "degraded",
+      "as": "one-line confirmation"
+    }
+  },
   "examples": [
-    { "name": "Saved", "tree": { "component": "ds.toast", "props": { "tone": "success", "title": "Saved to draft" } } },
-    { "name": "With detail", "tree": { "component": "ds.toast", "props": { "tone": "info", "title": "Version 0.1.2 published", "description": "Agents see it on their next request." } } }
+    {
+      "name": "Saved",
+      "tree": {
+        "component": "ds.toast",
+        "props": {
+          "tone": "success",
+          "title": "Saved to draft"
+        }
+      }
+    },
+    {
+      "name": "With detail",
+      "tree": {
+        "component": "ds.toast",
+        "props": {
+          "tone": "info",
+          "title": "Version 0.1.2 published",
+          "description": "Agents see it on their next request."
+        }
+      }
+    }
   ]
 }
