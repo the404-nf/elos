@@ -93,7 +93,8 @@ export function emitComponentCss(contract: Contract): string {
     const root = rootCls + Object.entries(attrs).map(([p, v]) => (v === "" ? `[data-${p}]` : `[data-${p}="${v}"]`)).join(""); // a true boolean prop renders as data-<prop>=""
     const child = part === rootName ? "" : ` .${partClass(contract.id, part)}`;
     if (!state) return root + child;
-    return STATE_SELECTORS[state].map((s) => (onRoot ? root + s + child : root + child + s)).join(", ");
+    // An editor previews a state by wrapping the component in [data-preview-state]: the same rules apply without the real interaction.
+    return [...STATE_SELECTORS[state].map((s) => (onRoot ? root + s + child : root + child + s)), `[data-preview-state="${state}"] ${root}${child}`].join(", ");
   };
   const write = (part: string, rule: Rule) => {
     const body = Object.entries(rule.decls).map(([k, v]) => `  ${k}: ${v};`).join("\n");

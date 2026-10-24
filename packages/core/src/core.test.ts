@@ -62,7 +62,7 @@ test("gradients resolve to var() stops, keyframes and fonts are emitted", () => 
     guidelines: { do: [], dont: [] }, resources: [], relationships: { pairsWith: [], excludes: [], contains: [], within: [] }, channels: {}, examples: [],
   } as const;
   const css = emitComponentCss(Contract.parse(contract));
-  assert.match(css, /\.ds-x__root:hover \.ds-x__beam \{\n  animation: ds-x-spin var\(--motion-duration-beam\) var\(--motion-easing-linear\) infinite;/);
+  assert.match(css, /\.ds-x__root:hover \.ds-x__beam, \[data-preview-state="hover"\] \.ds-x__root \.ds-x__beam \{\n  animation: ds-x-spin var\(--motion-duration-beam\) var\(--motion-easing-linear\) infinite;/); // the editor previews a state through a wrapper attribute
   assert.match(css, /@keyframes ds-x-spin \{\n  to \{ transform: rotate\(360deg\); color: var\(--color-a\); \}\n\}/);
   assert.deepEqual(validateContracts([Contract.parse({ ...contract, anatomy: { root: { animation: { keyframes: "nope", duration: "{d}", easing: "{e}" } } } })], new Set(["d", "e", "color.a"])), ["ds.x: animation runs unknown keyframes nope"]);
 

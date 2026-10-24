@@ -1,7 +1,7 @@
 "use client";
 // Client side of the portal: the Resonant provider with behaviors, the typed components the chrome is
 // composed from, and the theme switch. The portal is built from the system it shows; nothing here is markup.
-import { useEffect, useState, type ChangeEvent, type CSSProperties, type ElementType, type FocusEvent, type MouseEvent, type ReactNode } from "react";
+import { useEffect, useState, type ChangeEvent, type CSSProperties, type ElementType, type FocusEvent, type KeyboardEvent, type MouseEvent, type ReactNode } from "react";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import type { Catalog } from "@elos/contracts";
@@ -52,6 +52,7 @@ type Control = Dom & {
   list?: string;
   onChange?: (e: ChangeEvent<HTMLInputElement & HTMLSelectElement & HTMLTextAreaElement>) => void;
   onBlur?: (e: FocusEvent<HTMLTextAreaElement & HTMLInputElement>) => void;
+  onKeyDown?: (e: KeyboardEvent<HTMLInputElement>) => void;
 };
 export const Input = createComponent<Control & { type?: "text" | "email" | "password" | "number" | "search"; placeholder?: string; size?: "sm" | "md" }>("ds.input");
 export const Textarea = createComponent<Control & { placeholder?: string; rows?: number }>("ds.textarea");
