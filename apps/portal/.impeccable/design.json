@@ -1,131 +1,72 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-23T18:00:00Z",
+  "generatedAt": "2026-10-24T18:00:00Z",
   "title": "Design System: Elos portal (Resonant DS)",
   "extensions": {
     "colorMeta": {
-      "action-blue": { "role": "primary", "displayName": "Action blue", "canonical": "#3161ff", "tonalRamp": ["#1c3ca8", "#244dd6", "#3161ff", "#5a82ff", "#85a3ff", "#adc2ff", "#e3ecff", "#f2f6ff"] },
-      "ink": { "role": "neutral", "displayName": "Ink", "canonical": "#1a1a21", "tonalRamp": ["#0b0b0d", "#1a1a21", "#2a2a33", "#5c5c69", "#9a9aa6", "#d9d9df", "#ececef", "#f7f7f8"] },
-      "danger-red": { "role": "status", "displayName": "Danger red", "canonical": "#e5484d", "tonalRamp": ["#a32f33", "#c73b40", "#e5484d", "#ea6d71", "#f09397", "#f6b9bb", "#fde7e8", "#fff3f3"] },
-      "success-green-deep": { "role": "status", "displayName": "Success green", "canonical": "#1f7a45", "tonalRamp": ["#14532e", "#1f7a45", "#2a9a5a", "#4db37a", "#7cc99c", "#aedfc0", "#e1f5e8", "#f1faf4"] },
-      "warning-amber-deep": { "role": "status", "displayName": "Warning amber", "canonical": "#9a6700", "tonalRamp": ["#6b4700", "#9a6700", "#c48300", "#e0a21f", "#ecbb55", "#f4d48f", "#fdf1d6", "#fef8ea"] }
+      "pink": { "role": "primary", "displayName": "Pink", "canonical": "#ff3d8b", "tonalRamp": ["#1c0a14", "#8c1654", "#b0124f", "#e0106b", "#ff3d8b", "#ff5c9a", "#ff8fbd", "#ffb1cf", "#ffe3ee", "#fff4f8"] },
+      "ink": { "role": "neutral", "displayName": "Ink", "canonical": "#0b0b0f", "tonalRamp": ["#0b0b0f", "#0f0e12", "#17161b", "#1d1c22", "#222128", "#26252c", "#302f37", "#3a3942", "#5c5b65", "#6b6a74", "#86858f", "#93929d", "#a9a8b3", "#dcdbe2", "#e2e1e6", "#efeef1", "#ececef", "#f7f6f8", "#f5f4f7", "#ffffff"] },
+      "coral": { "role": "accent", "displayName": "Coral", "canonical": "#ff7a59", "tonalRamp": ["#c2410c", "#ff7a59", "#ffb38a", "#ffd2a8"] },
+      "danger-red": { "role": "status", "displayName": "Danger red", "canonical": "#e5484d", "tonalRamp": ["#a32f33", "#c73b40", "#e5484d", "#ff8b8b", "#fde7e8"] },
+      "success-green": { "role": "status", "displayName": "Success green", "canonical": "#5fd39a", "tonalRamp": ["#1f7a45", "#5fd39a", "#e1f5e8"] },
+      "warning-amber": { "role": "status", "displayName": "Warning amber", "canonical": "#f5c451", "tonalRamp": ["#805600", "#f5c451", "#fdf1d6"] },
+      "info-blue": { "role": "status", "displayName": "Info blue", "canonical": "#8fb0ff", "tonalRamp": ["#1c3ca8", "#8fb0ff", "#e3ecff"] }
     },
     "typographyMeta": {
-      "title": { "displayName": "Title", "purpose": "One per screen: the screen's name." },
-      "heading": { "displayName": "Heading", "purpose": "Sections and panel titles." },
-      "body": { "displayName": "Body", "purpose": "Readable text; 72ch measure." },
-      "caption": { "displayName": "Caption", "purpose": "Descriptions, table headers, help text, metadata." },
-      "label": { "displayName": "Label", "purpose": "Buttons and tabs." }
+      "display": { "displayName": "Display", "purpose": "The home hero on the Bloom header. One per product." },
+      "page-title": { "displayName": "Page title", "purpose": "Page titles on the Bloom header." },
+      "stat": { "displayName": "Stat", "purpose": "Big numbers in stat tiles and KPI cards." },
+      "title": { "displayName": "Title", "purpose": "Section and dialog titles." },
+      "heading": { "displayName": "Heading", "purpose": "Card titles." },
+      "lead": { "displayName": "Lead", "purpose": "The sentence under a page title." },
+      "body": { "displayName": "Body", "purpose": "Readable text." },
+      "label": { "displayName": "Label", "purpose": "Buttons, nav, chips, field labels." },
+      "caption": { "displayName": "Caption", "purpose": "Meta lines, badges, table meta." },
+      "eyebrow": { "displayName": "Eyebrow", "purpose": "Uppercase mono line above a page title." },
+      "code": { "displayName": "Code", "purpose": "Token names, values, code blocks." }
     },
     "shadows": [
-      { "name": "shadow-overlay", "value": "0 8px 24px #0b0b0d26", "purpose": "Popovers, menus and toasts only; nothing at rest casts a shadow." }
+      { "name": "shadow-overlay", "value": "0 30px 60px -24px #000000b3, 0 0 0 1px #26252c", "purpose": "Menus, popovers, dialogs, drawers." },
+      { "name": "shadow-glow", "value": "0 0 0 1px #ff3d8ba6, 0 10px 30px -8px #ff3d8bbf", "purpose": "Primary button hover: a pink ring and glow; the control never moves." },
+      { "name": "shadow-glow-soft", "value": "inset 0 0 0 1px #ff3d8b99, 0 8px 24px -10px #ff3d8b8c", "purpose": "Secondary, ghost and glass hover." },
+      { "name": "shadow-field-focus", "value": "0 0 0 1.5px #ff3d8b, 0 0 0 4px #ff3d8b2b", "purpose": "Focused fields: pink edge and halo." }
+    ],
+    "gradients": [
+      { "name": "gradient-bloom", "purpose": "The four lights of the page head. One per screen." },
+      { "name": "gradient-text", "purpose": "Display words at 24px and up." },
+      { "name": "gradient-accent", "purpose": "Data bars and meters." },
+      { "name": "gradient-edge", "purpose": "The border of one featured card per view." },
+      { "name": "gradient-fade", "purpose": "The area under a chart line." },
+      { "name": "gradient-trail", "purpose": "The light running down a timeline." },
+      { "name": "gradient-glow", "purpose": "Inside the featured card." },
+      { "name": "gradient-shimmer", "purpose": "Skeleton loading." },
+      { "name": "gradient-beam", "purpose": "The light running around an interactive card." }
     ],
     "motion": [
-      { "name": "duration-instant", "value": "80ms", "purpose": "Highlights." },
+      { "name": "duration-instant", "value": "80ms", "purpose": "Highlights: menu item, row hover." },
       { "name": "duration-fast", "value": "150ms", "purpose": "Hover and focus color changes." },
-      { "name": "duration-base", "value": "220ms", "purpose": "Layout and overlay changes." },
-      { "name": "duration-slow", "value": "360ms", "purpose": "Reserved for large movements." },
-      { "name": "easing-standard", "value": "cubic-bezier(0.2, 0, 0, 1)", "purpose": "Most state changes." },
-      { "name": "easing-enter", "value": "cubic-bezier(0, 0, 0.2, 1)", "purpose": "Things appearing." },
-      { "name": "easing-exit", "value": "cubic-bezier(0.4, 0, 1, 1)", "purpose": "Things leaving." }
+      { "name": "duration-base", "value": "220ms", "purpose": "Layout shifts, segment indicator." },
+      { "name": "duration-slow", "value": "360ms", "purpose": "Drawers and dialogs entering." },
+      { "name": "duration-settle", "value": "450ms", "purpose": "The switch thumb settling with a spring." },
+      { "name": "duration-draw", "value": "1800ms", "purpose": "A chart drawing in; the skeleton shimmer." },
+      { "name": "duration-beam", "value": "3200ms", "purpose": "One turn of the beam around a card." },
+      { "name": "duration-ambient", "value": "48000ms", "purpose": "One turn of the Bloom lights." },
+      { "name": "easing-standard", "value": "cubic-bezier(0.2, 0, 0, 1)", "purpose": "Color and opacity changes." },
+      { "name": "easing-out", "value": "cubic-bezier(0.22, 1, 0.36, 1)", "purpose": "Entrances, glows, draws." },
+      { "name": "easing-spring", "value": "cubic-bezier(0.34, 1.56, 0.64, 1)", "purpose": "The switch thumb and segment indicators only." }
     ],
     "breakpoints": [
-      { "name": "sidebar-collapse", "value": "760px" },
-      { "name": "editor-single-column", "value": "1100px" }
+      { "name": "one-column", "value": "760px" },
+      { "name": "two-columns", "value": "1180px" }
     ]
   },
   "components": [
-    {
-      "name": "Primary button",
-      "kind": "button",
-      "refersTo": "button-primary",
-      "description": "The one primary action on a screen.",
-      "html": "<button class=\"ds-btn ds-btn-primary\">Save to draft</button>",
-      "css": ".ds-btn { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border: 0; border-radius: var(--radius-control, 8px); font: 500 15px/1.5 Inter, system-ui, sans-serif; cursor: pointer; outline: 2px solid transparent; outline-offset: 2px; transition: background-color 150ms cubic-bezier(0.2,0,0,1), color 150ms cubic-bezier(0.2,0,0,1); } .ds-btn-primary { background: var(--color-action-primary-background, #3161ff); color: var(--color-action-primary-foreground, #fff); } .ds-btn-primary:hover { background: var(--color-action-primary-background-hover, #244dd6); } .ds-btn:focus-visible { outline-color: var(--color-border-focus, #3161ff); } .ds-btn:disabled { opacity: 0.5; }"
-    },
-    {
-      "name": "Secondary button",
-      "kind": "button",
-      "refersTo": "button-secondary",
-      "description": "A supporting action next to the primary one.",
-      "html": "<button class=\"ds-btn ds-btn-secondary\">Discard</button>",
-      "css": ".ds-btn { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border: 0; border-radius: var(--radius-control, 8px); font: 500 15px/1.5 Inter, system-ui, sans-serif; cursor: pointer; outline: 2px solid transparent; outline-offset: 2px; transition: background-color 150ms cubic-bezier(0.2,0,0,1); } .ds-btn-secondary { background: var(--color-action-secondary-background, #ececef); color: var(--color-action-secondary-foreground, #1a1a21); } .ds-btn-secondary:hover { background: var(--color-action-secondary-background-hover, #d9d9df); } .ds-btn:focus-visible { outline-color: var(--color-border-focus, #3161ff); }"
-    },
-    {
-      "name": "Ghost button",
-      "kind": "button",
-      "refersTo": "button-ghost",
-      "description": "Inline and tertiary actions: copy, remove, tree.",
-      "html": "<button class=\"ds-btn ds-btn-ghost\">Copy tree</button>",
-      "css": ".ds-btn { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border: 0; border-radius: var(--radius-control, 8px); font: 500 15px/1.5 Inter, system-ui, sans-serif; cursor: pointer; outline: 2px solid transparent; outline-offset: 2px; transition: background-color 150ms cubic-bezier(0.2,0,0,1); } .ds-btn-ghost { background: transparent; color: var(--color-action-ghost-foreground, #1a1a21); } .ds-btn-ghost:hover { background: var(--color-action-ghost-background-hover, #ececef); } .ds-btn:focus-visible { outline-color: var(--color-border-focus, #3161ff); }"
-    },
-    {
-      "name": "Danger button",
-      "kind": "button",
-      "refersTo": "button-danger",
-      "description": "A destructive action; never auto-focused.",
-      "html": "<button class=\"ds-btn ds-btn-danger\">Delete</button>",
-      "css": ".ds-btn { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border: 0; border-radius: var(--radius-control, 8px); font: 500 15px/1.5 Inter, system-ui, sans-serif; cursor: pointer; outline: 2px solid transparent; outline-offset: 2px; transition: background-color 150ms cubic-bezier(0.2,0,0,1); } .ds-btn-danger { background: var(--color-action-danger-background, #c73b40); color: var(--color-action-danger-foreground, #fff); } .ds-btn-danger:hover { background: var(--color-action-danger-background-hover, #a32f33); } .ds-btn:focus-visible { outline-color: var(--color-border-focus, #3161ff); }"
-    },
-    {
-      "name": "Input",
-      "kind": "input",
-      "refersTo": "input",
-      "description": "Single-line text entry; the border carries focus and error.",
-      "html": "<input class=\"ds-input\" placeholder=\"Workspace name\" aria-label=\"Workspace name\" />",
-      "css": ".ds-input { width: 100%; box-sizing: border-box; padding: 8px 12px; background: var(--color-surface-raised, #fff); color: var(--color-text-primary, #1a1a21); border: 1px solid var(--color-border-strong, #8a8a96); border-radius: var(--radius-control, 8px); font: 400 15px/1.5 Inter, system-ui, sans-serif; outline: 2px solid transparent; outline-offset: 2px; transition: border-color 150ms cubic-bezier(0.2,0,0,1); } .ds-input::placeholder { color: var(--color-text-secondary, #5c5c69); } .ds-input:focus-visible { border-color: var(--color-border-focus, #3161ff); outline-color: var(--color-border-focus, #3161ff); } .ds-input[aria-invalid=\"true\"] { border-color: var(--color-border-danger, #e5484d); }"
-    },
-    {
-      "name": "Badge",
-      "kind": "chip",
-      "refersTo": "badge-neutral",
-      "description": "Status pill; the label carries the meaning.",
-      "html": "<span class=\"ds-badge\" data-tone=\"success\">stable</span> <span class=\"ds-badge\" data-tone=\"neutral\">draft</span>",
-      "css": ".ds-badge { display: inline-flex; align-items: center; padding: 0 8px; border-radius: 999px; font: 500 13px/1.6 Inter, system-ui, sans-serif; white-space: nowrap; } .ds-badge[data-tone=\"neutral\"] { background: var(--color-status-neutral-background, #ececef); color: var(--color-status-neutral-foreground, #2a2a33); } .ds-badge[data-tone=\"success\"] { background: var(--color-status-success-background, #e1f5e8); color: var(--color-status-success-foreground, #1f7a45); }"
-    },
-    {
-      "name": "Card",
-      "kind": "card",
-      "refersTo": "card",
-      "description": "A raised surface with a hairline; stacks header, body and actions.",
-      "html": "<article class=\"ds-card\"><h3 class=\"ds-card-header\">Weekly report</h3><div class=\"ds-card-body\">12 components changed, 3 tokens added.</div><footer class=\"ds-card-actions\"><button class=\"ds-btn ds-btn-ghost\">Dismiss</button><button class=\"ds-btn ds-btn-primary\">Open report</button></footer></article>",
-      "css": ".ds-card { display: flex; flex-direction: column; gap: 16px; padding: 12px; background: var(--color-surface-raised, #fff); color: var(--color-text-primary, #1a1a21); border: 1px solid var(--color-border-subtle, #d9d9df); border-radius: var(--radius-container, 12px); font-family: Inter, system-ui, sans-serif; } .ds-card-header { margin: 0; font-size: 17px; font-weight: 600; } .ds-card-body { font-size: 15px; color: var(--color-text-secondary, #5c5c69); } .ds-card-actions { display: flex; justify-content: flex-end; gap: 8px; } .ds-btn { display: inline-flex; align-items: center; padding: 8px 12px; border: 0; border-radius: 8px; font: 500 15px/1.5 Inter, system-ui, sans-serif; cursor: pointer; } .ds-btn-primary { background: #3161ff; color: #fff; } .ds-btn-ghost { background: transparent; color: #1a1a21; } .ds-btn-ghost:hover { background: #ececef; }"
-    },
-    {
-      "name": "Tabs",
-      "kind": "nav",
-      "refersTo": "tab",
-      "description": "Peer views of one subject; selection is color plus a 1px underline.",
-      "html": "<div class=\"ds-tablist\" role=\"tablist\"><button class=\"ds-tab\" role=\"tab\" aria-selected=\"true\" data-selected>Preview</button><button class=\"ds-tab\" role=\"tab\">Contract</button><button class=\"ds-tab\" role=\"tab\">Usage</button></div>",
-      "css": ".ds-tablist { display: flex; gap: 8px; border-bottom: 1px solid var(--color-border-subtle, #d9d9df); } .ds-tab { margin: 0 0 -1px; padding: 8px 12px; background: transparent; border: 0; border-bottom: 1px solid transparent; color: var(--color-text-secondary, #5c5c69); font: 500 15px/1.5 Inter, system-ui, sans-serif; cursor: pointer; outline: 2px solid transparent; outline-offset: 2px; transition: color 150ms cubic-bezier(0.2,0,0,1), border-bottom-color 150ms cubic-bezier(0.2,0,0,1); } .ds-tab:hover, .ds-tab[data-selected] { color: var(--color-text-primary, #1a1a21); } .ds-tab[data-selected] { border-bottom-color: var(--color-border-focus, #3161ff); } .ds-tab:focus-visible { outline-color: var(--color-border-focus, #3161ff); }"
-    }
-  ],
-  "narrative": {
-    "northStar": "The Calibrated Workbench",
-    "overview": "The portal is a bench where a designer tunes a design system against real pages. Everything on it is an instrument or the thing being measured, so the chrome recedes and the catalog reads. Resonant describes itself as calm, precise and unhurried: neutral surfaces, one blue for action, status colors only where a state must be read, small radii, hairline borders, generous inset. The portal is built from Resonant and edits Resonant, so the portal's own look is nothing more than Resonant applied to a tool; when the system changes, the chrome changes with it.\n\nDensity is moderate: tables and lists run dense, editing panels stay roomy. Hierarchy comes from weight and surface, not size; the four type roles sit within a 13 to 20px band. Light is the base theme; dark is an overlay that swaps surfaces, text, borders and status tints and leaves the action blue alone.",
-    "keyCharacteristics": [
-      "One family (Inter), four roles, weight does the hierarchy work.",
-      "One blue, used for actions, focus and the current selection only.",
-      "Flat surfaces separated by hairlines; a shadow appears only under overlays.",
-      "Tokens, not values: the portal's CSS binds to --color-*, --space-*, --radius-* variables that Resonant emits."
-    ],
-    "rules": [
-      { "name": "The One Blue Rule", "body": "The action blue marks what the user can do next or where they are: primary action, focus, selection, link. It never tints a heading, a panel or a decoration.", "section": "colors" },
-      { "name": "The Pair Rule", "body": "A status color is always a background and foreground pair from the same hue; text on a tint is the hue's deep step, never gray.", "section": "colors" },
-      { "name": "The Close Sizes Rule", "body": "No text on the portal is larger than 24px or smaller than 12px. Emphasis is weight or tone, never size.", "section": "typography" },
-      { "name": "The Hairline Rule", "body": "Depth is a 1px border or a tone step. A shadow means the element floats above the page and can be dismissed.", "section": "elevation" }
-    ],
-    "dos": [
-      "Do bind every color, space, radius and type value in the portal to a Resonant token variable.",
-      "Do keep one primary button per screen and put it last in a row of actions.",
-      "Do show the current place twice: the sidebar item and the breadcrumb or title.",
-      "Do separate groups with spacing first and a hairline only when they still blur."
-    ],
-    "donts": [
-      "Don't write a raw color or pixel value into portal styles; add a token to Resonant instead.",
-      "Don't use the action blue for anything that is not an action, focus, selection or link.",
-      "Don't add shadows to resting surfaces or nest cards inside cards.",
-      "Don't use exclamation marks, emoji or a component's name as a title in product copy."
-    ]
-  }
+    { "name": "Primary button", "kind": "button", "backgroundColor": "#f5f4f7", "textColor": "#0b0b0f", "typography": "label", "rounded": "999px", "height": "42px" },
+    { "name": "Glass button", "kind": "button", "backgroundColor": "#ffffff1a", "textColor": "#f5f4f7", "typography": "label", "rounded": "999px", "height": "42px" },
+    { "name": "Card", "kind": "card", "backgroundColor": "#17161b", "textColor": "#f5f4f7", "rounded": "16px", "padding": "24px" },
+    { "name": "Glass tile", "kind": "card", "backgroundColor": "#ffffff1a", "textColor": "#f5f4f7", "rounded": "16px", "padding": "16px" },
+    { "name": "Input", "kind": "input", "backgroundColor": "#1d1c22", "textColor": "#f5f4f7", "rounded": "12px", "height": "42px" },
+    { "name": "Accent badge", "kind": "badge", "backgroundColor": "#ff3d8b2b", "textColor": "#ff8fbd", "typography": "caption", "rounded": "999px" },
+    { "name": "Page head", "kind": "header", "backgroundColor": "#1c0a14", "textColor": "#f5f4f7", "rounded": "22px", "padding": "32px" }
+  ]
 }
