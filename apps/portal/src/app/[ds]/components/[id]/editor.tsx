@@ -242,6 +242,9 @@ export function ComponentEditor({ ds, contract, catalog, markdown }: { ds: strin
   const [instance, setInstance] = useState<{ variant?: string; size?: string }>({});
   const [state, setState] = useState<string>("default");
   const [canvasTheme, setCanvasTheme] = useState<"light" | "dark">("dark");
+  const [view, setView] = useState({ x: 0, y: 0, z: 1 }); // the stage's translate and scale inside the canvas
+  const stageRef = useRef<HTMLDivElement>(null);
+  const pan = useRef<{ x: number; y: number; vx: number; vy: number; moved: boolean } | null>(null);
   const [partAsJson, setPartAsJson] = useState(false);
   const [contractView, setContractView] = useState<"code" | "form">("code");
   const [error, setError] = useState<string | null>(null);
@@ -320,6 +323,47 @@ export function ComponentEditor({ ds, contract, catalog, markdown }: { ds: strin
     const cls = [...el.classList].find((c) => c.startsWith(prefix));
     if (cls) setSelected(cls.slice(prefix.length));
   };
+  /** Scales the set to fit the canvas and centers it. */
+  const fit = () => {
+    const c = canvasRef.current, st = stageRef.current;
+    if (!c || !st) return;
+    const w = st.offsetWidth, h = st.offsetHeight;
+    const z = Math.min(1, (c.clientWidth - 64) / w, (c.clientHeight - 160) / h);
+    setView({ z, x: (c.clientWidth - w * z) / 2, y: (c.clientHeight - h * z) / 2 });
+  };
+  const zoomTo = (z: number, cx?: number, cy?: number) => {
+    const c = canvasRef.current;
+    const nz = Math.max(0.25, Math.min(4, z));
+    const px = cx ?? (c?.clientWidth ?? 0) / 2, py = cy ?? (c?.clientHeight ?? 0) / 2;
+    setView((v) => ({ z: nz, x: px - ((px - v.x) * nz) / v.z, y: py - ((py - v.y) * nz) / v.z }));
+  };
+  useEffect(() => { if (editing) fit(); }, [editing, example, variants.length, sizes.length]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    const c = canvasRef.current;
+    if (!c || !editing) return;
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      const r = c.getBoundingClientRect();
+      if (e.ctrlKey || e.metaKey) zoomTo(view.z * Math.exp(-e.deltaY * 0.0025), e.clientX - r.left, e.clientY - r.top);
+      else setView((v) => ({ ...v, x: v.x - e.deltaX, y: v.y - e.deltaY }));
+    };
+    c.addEventListener("wheel", onWheel, { passive: false });
+    return () => c.removeEventListener("wheel", onWheel);
+  });
+  const panDown = (e: PointerEvent<HTMLDivElement>) => {
+    const t = e.target as HTMLElement;
+    if (t.closest("[data-cell], .handle, button, a, input, select")) return;
+    pan.current = { x: e.clientX, y: e.clientY, vx: view.x, vy: view.y, moved: false };
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+  };
+  const panMove = (e: PointerEvent<HTMLDivElement>) => {
+    const d = pan.current;
+    if (!d) return;
+    const dx = e.clientX - d.x, dy = e.clientY - d.y;
+    if (Math.abs(dx) + Math.abs(dy) > 3) d.moved = true;
+    if (d.moved) setView((v) => ({ ...v, x: d.vx + dx, y: d.vy + dy }));
+  };
+  const panUp = () => { pan.current = null; };
   const update = (fn: (p: Part) => Part) => change({ ...draft, anatomy: mapPart(draft.anatomy, selected, fn) });
   /** The one operation (ADR 0016): a part, a property, a token reference. gap lives in the part's layout. */
   const operate = (property: string, ref: string) => update((p) => (property === "gap" ? { ...p, layout: { ...p.layout, gap: ref } } : { ...p, tokens: { ...p.tokens, [property]: ref } }));
@@ -520,45 +564,45 @@ export function ComponentEditor({ ds, contract, catalog, markdown }: { ds: strin
         </Stack>
       </Card></div>
 
-      <Stack gap="md">
-        <Card padding="lg">
-          <Stack gap="sm">
-            <div className="cv-top">
-              <Text as="span" variant="caption" tone="secondary" text={`${variants.length * sizes.length} ${variants.length * sizes.length === 1 ? "instance" : "instances"}${state !== "default" ? ` · ${state}` : ""}`} />
-              <span style={{ flex: 1 }} />
-              {chipNav("Canvas theme", (["light", "dark"] as const).map((t) => ({ key: t, label: cap(t), on: canvasTheme === t, go: () => setCanvasTheme(t) })))}
+      <div ref={canvasRef} className={`cv${draft.category === "overlay" ? " cv--overlay" : ""}`} data-theme={canvasTheme} data-preview-state={state === "default" ? undefined : state}
+        onClickCapture={(e) => { if (pan.current?.moved) { e.preventDefault(); e.stopPropagation(); return; } pick(e); }} onPointerDown={panDown} onPointerMove={panMove} onPointerUp={panUp} onPointerCancel={panUp} onDoubleClick={fit}>
+        <div ref={stageRef} className="stage" style={{ transform: `translate(${view.x}px, ${view.y}px) scale(${view.z})` }}>
+          {tree ? (
+            <div className="cset" style={{ gridTemplateColumns: `repeat(${variants.length}, auto)` }}>
+              {sizes.flatMap((sz) => variants.map((v) => {
+                const on = (v ?? "") === shown.variant && (sz ?? "") === shown.size;
+                return (
+                  <div key={`${v}-${sz}`} className={`cell${on ? " cell--on" : ""}`} data-cell data-variant={v ?? ""} data-size={sz ?? ""}>
+                    {on && <span className="cell-label">{[v, sz].filter(Boolean).join(" · ") || "default"}</span>}
+                    <Render tree={treeFor(v, sz)!} />
+                  </div>
+                );
+              }))}
             </div>
-            <div ref={canvasRef} className={`canvas cv${draft.category === "overlay" ? " canvas--overlay" : ""}`} data-theme={canvasTheme} data-preview-state={state === "default" ? undefined : state} onClickCapture={pick} style={{ cursor: "crosshair" }}>
-              {tree ? (
-                <div className="cset" style={{ gridTemplateColumns: `repeat(${variants.length}, auto)` }}>
-                  {sizes.flatMap((s) => variants.map((v) => {
-                    const on = (v ?? "") === shown.variant && (s ?? "") === shown.size;
-                    return (
-                      <div key={`${v}-${s}`} className={`cell${on ? " cell--on" : ""}`} data-cell data-variant={v ?? ""} data-size={s ?? ""}>
-                        {on && <span className="cell-label">{[v, s].filter(Boolean).join(" · ") || "default"}</span>}
-                        <Render tree={treeFor(v, s)!} />
-                      </div>
-                    );
-                  }))}
-                </div>
-              ) : (
-                <Text tone="secondary" text={`No standalone example; it renders inside ${draft.relationships.within.join(", ")}.`} />
-              )}
-              <Handles canvas={canvasRef} selector={`.cell--on .${partClass(draft.id, selected)}`} part={part} tokens={tokens} onOp={operate} version={[draft, shown, canvasTheme, state]} />
-              {measures.length > 0 && <div className="measure">{measures.map((m) => <Badge key={m.k} label={`${m.k} ${m.v}`} tone="neutral" />)}</div>}
-            </div>
-          </Stack>
-        </Card>
-        <div className="savebar">
+          ) : (
+            <div className="cset"><Text tone="secondary" text={`No standalone example; it renders inside ${draft.relationships.within.join(", ")}.`} /></div>
+          )}
+        </div>
+        <Handles canvas={canvasRef} selector={`.cell--on .${partClass(draft.id, selected)}`} part={part} tokens={tokens} onOp={operate} version={[draft, shown, canvasTheme, state, view]} />
+        <div className="hud hud-tl">
+          <Badge label={`${variants.length * sizes.length} ${variants.length * sizes.length === 1 ? "instance" : "instances"}${state !== "default" ? ` · ${state}` : ""}`} />
+          {measures.map((m) => <Badge key={m.k} label={`${m.k} ${m.v}`} />)}
+        </div>
+        <div className="hud hud-tr">{chipNav("Canvas theme", (["light", "dark"] as const).map((t) => ({ key: t, label: cap(t), on: canvasTheme === t, go: () => setCanvasTheme(t) })))}</div>
+        <div className="hud hud-br">
+          <Button label="Zoom out" shape="circle" variant="secondary" size="sm" aria-label="Zoom out" icon={<Icon name="zoom-out" size="sm" />} onClick={() => zoomTo(view.z / 1.25)} />
+          <Button label={`${Math.round(view.z * 100)}%`} variant="secondary" size="sm" title="Fit (double-click the canvas does the same)" onClick={fit} />
+          <Button label="Zoom in" shape="circle" variant="secondary" size="sm" aria-label="Zoom in" icon={<Icon name="zoom-in" size="sm" />} onClick={() => zoomTo(view.z * 1.25)} />
+        </div>
+        <div className="hud hud-bc savebar">
           <Text as="span" variant="label" text={String(history.length)} />
-          <Text as="span" variant="caption" text={dirty ? "unsaved changes to the draft" : "no unsaved changes"} style={{ opacity: 0.8 }} />
-          <span style={{ flex: 1 }} />
+          <Text as="span" variant="caption" text={dirty ? "unsaved changes" : "no changes"} style={{ opacity: 0.8 }} />
           {error && <Text as="span" variant="caption" text={error.split("\n")[0]!} style={{ color: "var(--color-status-danger-foreground)" }} />}
           <Button label="Undo" variant="ghost" size="sm" disabled={history.length === 0} onClick={undo} />
           <Button label="Discard" variant="ghost" size="sm" disabled={!dirty} onClick={() => { change(baseline); setHistory([]); }} />
           <Button label={pending ? "Saving…" : "Save to draft"} size="sm" disabled={!dirty || pending} onClick={save} />
         </div>
-      </Stack>
+      </div>
 
       <div className="pane"><Card padding="lg">
         <Stack gap="md">
