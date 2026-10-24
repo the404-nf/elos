@@ -370,6 +370,9 @@
         },
         "hover-foreground": {
           "$value": "{color.text.primary}"
+        },
+        "background": {
+          "$value": "{color.transparent}"
         }
       },
       "bloom": {
@@ -382,6 +385,24 @@
         },
         "hover-foreground": {
           "$value": "{color.text.on-bloom}"
+        },
+        "background": {
+          "$value": "{color.transparent}"
+        }
+      },
+      "chip": {
+        "foreground": {
+          "$value": "{color.text.primary}",
+          "$description": "Filter chips on the page canvas: a grey pill, the current one inverted."
+        },
+        "background": {
+          "$value": "{color.surface.sunken}"
+        },
+        "hover-background": {
+          "$value": "{color.border.default}"
+        },
+        "hover-foreground": {
+          "$value": "{color.text.primary}"
         }
       }
     }

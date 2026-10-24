@@ -37,7 +37,7 @@ export const Illustration = createComponent<Dom & { name: string; size?: "md" | 
 export const PageHeadBase = createComponent<Dom & { title: string; eyebrow?: string; lead?: string; variant?: "page-title" | "display"; nav?: ReactNode; breadcrumb?: ReactNode; actions?: ReactNode; extras?: ReactNode; tabs?: ReactNode }>("ds.page-head");
 export const Link = createComponent<Dom & { href: string; label: string; tone?: "link" | "inherit" }>("ds.link");
 export const Nav = createComponent<Dom & { label: string; orientation?: "vertical" | "horizontal"; list: ReactNode }>("ds.nav");
-export const NavItem = createComponent<Dom & { href: string; label: string; current?: boolean; tone?: "default" | "bloom"; onClick?: (e: MouseEvent<HTMLAnchorElement>) => void }>("ds.nav-item");
+export const NavItem = createComponent<Dom & { href: string; label: string; current?: boolean; tone?: "default" | "chip" | "bloom"; onClick?: (e: MouseEvent<HTMLAnchorElement>) => void }>("ds.nav-item");
 export const Breadcrumb = createComponent<Dom & { label?: string; list: ReactNode }>("ds.breadcrumb");
 export const BreadcrumbItem = createComponent<Dom & { href: string; label: string; current?: boolean; separator?: string }>("ds.breadcrumb-item");
 export const Separator = createComponent<Dom & { orientation?: "horizontal" | "vertical" }>("ds.separator");

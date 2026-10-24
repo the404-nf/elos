@@ -28,8 +28,8 @@ export default async function Components({ params, searchParams }: { params: Pro
           label="Categories"
           orientation="horizontal"
           list={[
-            <NavItem key="all" href={`/${ds}/components`} label={`All ${catalog.contracts.length}`} current={!category} />,
-            ...[...counts].map(([cat, count]) => <NavItem key={cat} href={`/${ds}/components?category=${cat}`} label={`${title(cat)} ${count}`} current={category === cat} />),
+            <NavItem key="all" href={`/${ds}/components`} label={`All ${catalog.contracts.length}`} tone="chip" current={!category} />,
+            ...[...counts].map(([cat, count]) => <NavItem key={cat} href={`/${ds}/components?category=${cat}`} label={`${title(cat)} ${count}`} tone="chip" current={category === cat} />),
           ]}
         />
         {parts > 0 && <Text as="span" variant="caption" tone="secondary" text={`+ ${n(parts, "part")} used inside these`} />}

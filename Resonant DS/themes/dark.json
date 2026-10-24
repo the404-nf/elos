@@ -186,7 +186,17 @@
         "$value": "{color.peach.300}"
       }
     },
-    "$type": "color"
+    "$type": "color",
+    "nav": {
+      "chip": {
+        "background": {
+          "$value": "{color.surface.overlay}"
+        },
+        "hover-background": {
+          "$value": "{color.surface.sunken}"
+        }
+      }
+    }
   },
   "shadow": {
     "overlay": {

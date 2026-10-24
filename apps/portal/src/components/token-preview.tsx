@@ -3,7 +3,7 @@ import type { ResolvedToken } from "@elos/contracts";
 
 export function TokenPreview({ token, size = 36 }: { token: ResolvedToken; size?: number }) {
   const { type, value, path } = token;
-  const box = { display: "inline-block", width: size, height: size, borderRadius: "var(--radius-control)", border: "var(--border-width) solid var(--color-border-subtle)", flex: "none", verticalAlign: "middle" } as const;
+  const box = { display: "inline-block", width: size, height: size, borderRadius: "var(--radius-md)", border: "var(--border-width) solid var(--color-border-subtle)", flex: "none", verticalAlign: "middle" } as const;
 
   if (type === "color") return <span style={{ ...box, background: value }} title={value} />;
 

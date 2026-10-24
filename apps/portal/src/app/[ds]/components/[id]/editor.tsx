@@ -8,14 +8,14 @@ import { StyleKey, type Catalog, type Contract, type Part } from "@elos/contract
 import { emitComponentCss, partClass } from "@elos/core/css";
 import { ElosProvider, Render } from "@elos/react";
 import { zagBehaviors } from "@elos/react/behaviors";
-import { Badge, Button, Card, Checkbox, Field, Input, Nav, NavItem, Option, Select, Stack, Table, TableCell, TableRow, Text, Textarea, elements, options } from "@/components/elos-client.tsx";
+import { Badge, Button, Card, Checkbox, Field, Icon, Input, Nav, NavItem, Option, Select, Stack, Table, TableCell, TableRow, Text, Textarea, elements, options } from "@/components/elos-client.tsx";
 import { PageHead } from "@/components/page-head.tsx";
 import { saveContract } from "../actions.ts";
 import { ContractForm } from "./contract-form.tsx";
 
 type Bindings = Record<string, string>;
 type Stop = { path: string; value: number; label: string };
-const TABS = ["preview", "contract", "usage"] as const;
+const TABS = ["overview", "contract", "accessibility", "usage"] as const;
 type Tab = (typeof TABS)[number];
 const STATES = ["hover", "focus-visible", "active", "disabled", "selected", "checked", "open", "invalid"] as const;
 const SUPPORT_TONE = { native: "success", degraded: "warning", unsupported: "danger" } as const;
@@ -114,7 +114,8 @@ export function ComponentEditor({ ds, contract, catalog, markdown, usageHtml }: 
   const [baseline, setBaseline] = useState<Contract>(contract); // what the draft holds, updated on save
   const router = useRouter();
   const params = useSearchParams();
-  const [tab, setTab] = useState<Tab>((TABS as readonly string[]).includes(params.get("tab") ?? "") ? (params.get("tab") as Tab) : "preview");
+  const [tab, setTab] = useState<Tab>((TABS as readonly string[]).includes(params.get("tab") ?? "") ? (params.get("tab") as Tab) : "overview");
+  const [editing, setEditing] = useState(params.get("edit") === "1");
   const [selected, setSelected] = useState<string | null>(null);
   const [example, setExample] = useState(0);
   const [selectMode, setSelectMode] = useState(true);
@@ -164,9 +165,123 @@ export function ComponentEditor({ ds, contract, catalog, markdown, usageHtml }: 
       router.refresh();
     });
 
+  const firstEnum = (names: string[]) => draft.props.find((p) => names.includes(p.name) && typeof p.type === "object") as (Contract["props"][number] & { type: { enum: string[] } }) | undefined;
+  const variantProp = firstEnum(["variant", "tone", "kind"]);
+  const sizeProp = firstEnum(["size"]);
+  const withProp = (name: string, value: string) => tree && { ...tree, props: { ...tree.props, [name]: value } };
+  const rootPart = Object.values(draft.anatomy)[0]!;
+  const partList = (anatomy: Record<string, Part>, depth = 0): { name: string; part: Part; depth: number }[] =>
+    Object.entries(anatomy).flatMap(([name, part]) => [{ name, part, depth }, ...(part.parts ? partList(part.parts, depth + 1) : [])]);
+  const Rules = ({ items, kind }: { items: string[]; kind: "do" | "dont" }) => (
+    <ul className="rules">{items.map((r) => <li key={r} data-kind={kind}>{r}</li>)}</ul>
+  );
+  const overviewPanel = (
+    <>
+      <div className="grid grid--wide">
+        <Card title="Variants" heading="h2">
+          <Stack gap="md">
+            <div className="canvas">
+              {previewTree ? (
+                <Stack gap="md" align="center">
+                  {variantProp && <Stack direction="row" gap="sm" align="center" style={{ justifyContent: "center", flexWrap: "wrap" }}>{variantProp.type.enum.map((v) => <Render key={v} tree={withProp(variantProp.name, v)!} />)}</Stack>}
+                  {sizeProp && <Stack direction="row" gap="sm" align="center" style={{ justifyContent: "center", flexWrap: "wrap" }}>{sizeProp.type.enum.map((v) => <Render key={v} tree={withProp(sizeProp.name, v)!} />)}</Stack>}
+                  {!variantProp && !sizeProp && <Render tree={previewTree} />}
+                </Stack>
+              ) : (
+                <Text tone="secondary" text={`This component has no standalone example; it renders inside ${draft.relationships.within.join(", ")}.`} />
+              )}
+            </div>
+            {(variantProp || sizeProp) && (
+              <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))" }}>
+                {[variantProp, sizeProp].filter(Boolean).map((p) => (
+                  <Stack key={p!.name} gap="xs">
+                    <Text as="span" variant="label" text={p!.name} />
+                    <Text variant="caption" tone="secondary" text={`${p!.description} Values: ${p!.type.enum.join(", ")}. Default ${String(p!.default)}.`} />
+                  </Stack>
+                ))}
+              </div>
+            )}
+            {tree && (
+              <Stack direction="row" gap="xs" style={{ justifyContent: "flex-end" }}>
+                <Button label={showTree ? "Hide tree" : "Tree"} variant="ghost" size="sm" onClick={() => setShowTree(!showTree)} />
+                <CopyButton label="Copy tree" text={JSON.stringify(tree, null, 2)} />
+                <CopyButton label="Copy guidelines" text={markdown} />
+              </Stack>
+            )}
+            {showTree && tree && <pre className="code">{JSON.stringify(tree, null, 2)}</pre>}
+          </Stack>
+        </Card>
+        <Card title="Channels" heading="h2">
+          <Table caption="Channel support" body={Object.entries(draft.channels).map(([ch, s]) => (
+            <TableRow key={ch}>
+              <TableCell><Stack gap="xs"><Text as="span" variant="label" text={ch} /><Text as="span" variant="caption" tone="secondary" text={`${s.as ? `as ${s.as}` : s.support}${s.note ? ` · ${s.note}` : ""}`} /></Stack></TableCell>
+              <TableCell align="end"><Badge label={s.support} tone={SUPPORT_TONE[s.support]} /></TableCell>
+            </TableRow>
+          ))} />
+        </Card>
+      </div>
+      <div className="grid grid--wide">
+        <Card title="Anatomy and bindings" heading="h2">
+          <div className="grid" style={{ gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1.2fr)" }}>
+            <Stack gap="sm">
+              {partList(draft.anatomy).map(({ name, part, depth }, i) => (
+                <Stack key={name} direction="row" gap="sm" align="start" style={{ paddingLeft: depth * 16 }}>
+                  <Badge label={String(i + 1)} tone="accent" />
+                  <Stack gap="xs">
+                    <Text as="span" variant="label" text={`${name}${part.optional ? " · optional" : ""}${part.slot ? " · slot" : ""}`} />
+                    {part.description && <Text variant="caption" tone="secondary" text={part.description} />}
+                  </Stack>
+                </Stack>
+              ))}
+            </Stack>
+            <Table caption="Root token bindings" body={Object.entries(rootPart.tokens ?? {}).map(([prop, ref]) => (
+              <TableRow key={prop}>
+                <TableCell><Text as="code" variant="code" tone="secondary" text={prop} /></TableCell>
+                <TableCell align="end"><Text as="code" variant="code" text={ref} /></TableCell>
+              </TableRow>
+            ))} />
+          </div>
+        </Card>
+        <Card title="Keyboard and focus" heading="h2">
+          <Stack gap="xs">
+            {draft.a11y.keyboard.map((k) => <Stack key={k.key} direction="row" gap="sm" align="center"><Text as="code" variant="code" text={k.key} /><Text as="span" variant="caption" tone="secondary" text={k.action} /></Stack>)}
+            <ul className="rules">
+              {draft.a11y.minHitArea && <li data-kind="do">Hit area at least {draft.a11y.minHitArea}px</li>}
+              <li data-kind={draft.a11y.focusVisible ? "do" : "dont"}>{draft.a11y.focusVisible ? "Visible focus ring on color.border.focus" : "No focus ring"}</li>
+              <li data-kind="do">{draft.a11y.contrast} contrast in light and dark</li>
+            </ul>
+          </Stack>
+        </Card>
+      </div>
+      <div className="grid" style={{ gridTemplateColumns: "1fr 1fr" }}>
+        <Card heading="h2" title="Do"><Rules items={[...draft.guidelines.do, ...draft.usage.when.map((w) => `Use it when ${w}`)]} kind="do" /></Card>
+        <Card heading="h2" title="Don't"><Rules items={[...draft.guidelines.dont, ...draft.usage.whenNot.map((w) => `Not for ${w}`)]} kind="dont" /></Card>
+      </div>
+    </>
+  );
+  const accessibilityPanel = (
+    <div className="grid grid--wide">
+      <Card title="Keyboard and ARIA" heading="h2">
+        <Stack gap="sm">
+          {draft.a11y.keyboard.length === 0 && <Text tone="secondary" text="Not interactive: no keyboard map." />}
+          {draft.a11y.keyboard.map((k) => <Stack key={k.key} direction="row" gap="sm" align="center"><Text as="code" variant="code" text={k.key} /><Text as="span" text={k.action} /></Stack>)}
+          <ul className="rules">{draft.a11y.aria.map((a) => <li key={a} data-kind="do">{a}</li>)}</ul>
+        </Stack>
+      </Card>
+      <Card title="Targets" heading="h2">
+        <ul className="rules">
+          <li data-kind="do">{draft.a11y.contrast} contrast in light and dark</li>
+          {draft.a11y.minHitArea && <li data-kind="do">Hit area at least {draft.a11y.minHitArea}px</li>}
+          <li data-kind={draft.a11y.focusVisible ? "do" : "dont"}>{draft.a11y.focusVisible ? "Focus ring: 2px color.border.focus, 2px offset" : "No focus ring"}</li>
+          <li data-kind="do">Every transition and animation stops under prefers-reduced-motion</li>
+        </ul>
+      </Card>
+    </div>
+  );
+
   const previewPanel = (
     <div className="editor">
-      <Card title="Variants" heading="h2">
+      <Card title="Canvas" heading="h2">
       <Stack gap="sm">
         <Stack direction="row" gap="md" align="end" style={{ justifyContent: "space-between" }}>
           <Field label="Example">
@@ -285,34 +400,38 @@ export function ComponentEditor({ ds, contract, catalog, markdown, usageHtml }: 
       <datalist id="style-keys">{StyleKey.options.map((k) => <option key={k} value={k} />)}</datalist>
 
       <PageHead
-        title={draft.name}
-        description={draft.description}
-        crumbs={[{ href: `/${ds}/components`, label: "Components" }, { href: `/${ds}/components/${draft.id}`, label: draft.name }]}
+        title={editing ? `Editing ${draft.name}` : draft.name}
+        description={editing ? "Every control writes a token binding to the contract. Sliders snap to the scale." : draft.description}
+        crumbs={[{ href: `/${ds}/components`, label: "Components" }, { href: `/${ds}/components/${draft.id}`, label: draft.name }, ...(editing ? [{ href: `/${ds}/components/${draft.id}?edit=1`, label: "Edit" }] : [])]}
         actions={
-          <>
-            {dirty && <Button label="Discard" variant="glass" onClick={() => change(baseline)} />}
-            {!dirty && <CopyButton label="Copy for agent" text={JSON.stringify(draft, null, 2)} variant="glass" size="md" />}
-            <Button label={pending ? "Saving…" : !dirty && saved ? "Saved" : "Save to draft"} disabled={!dirty || pending} onClick={save} />
-          </>
+          editing ? (
+            <>
+              <Button label={dirty ? "Discard" : "Close"} variant="glass" onClick={() => { if (dirty) change(baseline); else setEditing(false); }} />
+              <Button label={pending ? "Saving…" : !dirty && saved ? "Saved" : "Save to draft"} disabled={!dirty || pending} onClick={save} />
+            </>
+          ) : (
+            <>
+              <CopyButton label="Copy for agent" text={JSON.stringify(draft, null, 2)} variant="glass" size="md" />
+              <Button label="Edit" icon={<Icon name="edit" size="sm" />} onClick={() => setEditing(true)} />
+            </>
+          )
         }
         extras={
           <>
             <Badge label={draft.status} tone={draft.status === "stable" ? "success" : draft.status === "deprecated" ? "danger" : "accent"} dot />
             <Text as="code" variant="code" text={`v${draft.version}`} />
             <Text as="code" variant="code" text={draft.id} />
-            <Text as="span" variant="caption" text={`${draft.behavior ? "Zag " + draft.behavior : "native " + draft.semantics.element} · ${draft.props.filter((p) => typeof p.type === "object").length} enum props · ${draft.states.length} states`} style={{ opacity: 0.85 }} />
+            <Text as="span" variant="caption" text={[draft.behavior ? `Zag ${draft.behavior}` : `native ${draft.semantics.element}`, variantProp && `${variantProp.type.enum.length} ${variantProp.name}s`, sizeProp && `${sizeProp.type.enum.length} sizes`].filter(Boolean).join(" · ")} style={{ opacity: 0.85 }} />
             {error && <span className="error">{error.split("\n")[0]}</span>}
           </>
         }
-        tabs={
+        tabs={editing ? undefined : (
           <Nav label="Sections" orientation="horizontal" list={TABS.map((t) => (
             <NavItem key={t} href={`?tab=${t}`} label={t.charAt(0).toUpperCase() + t.slice(1)} tone="bloom" current={tab === t} onClick={(e) => { e.preventDefault(); setTab(t); }} />
           ))} />
-        }
+        )}
       />
-      {tab === "preview" && previewPanel}
-      {tab === "contract" && contractPanel}
-      {tab === "usage" && <Card padding="xl"><div className="prose" dangerouslySetInnerHTML={{ __html: usageHtml }} /></Card>}
+      {editing ? previewPanel : tab === "overview" ? overviewPanel : tab === "contract" ? contractPanel : tab === "accessibility" ? accessibilityPanel : <Card padding="xl"><div className="prose" dangerouslySetInnerHTML={{ __html: usageHtml }} /></Card>}
     </ElosProvider>
   );
 }

@@ -75,8 +75,10 @@ input[type="range"] { width: 100%; margin: 0; }
    (dialog backdrop and positioner), so overlays stay inside the preview. */
 .canvas {
   position: relative; background: var(--color-surface-overlay, var(--color-surface-canvas)); border: 0;
-  border-radius: var(--radius-inset); padding: var(--space-stack-lg); min-height: 160px; transform: translateZ(0); overflow: hidden;
+  border-radius: var(--radius-inset); padding: var(--space-stack-lg); min-height: 200px; transform: translateZ(0); overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
 }
+.canvas > * { max-width: 100%; }
 .canvas--overlay { min-height: 360px; }
 .canvas--thumb { min-height: 96px; max-height: 96px; padding: var(--space-inset-md); display: flex; align-items: center; pointer-events: none; }
 .canvas--thumb > * { max-width: 100%; }
@@ -92,7 +94,7 @@ input[type="range"] { width: 100%; margin: 0; }
 .rules li[data-kind="dont"]::before { content: "✕"; color: var(--color-status-danger-foreground); }
 .rules li[data-kind="do"]::before { content: "✓"; color: var(--color-status-success-foreground); }
 .code { font-family: var(--font-family-mono); font-size: var(--font-size-sm); background: var(--color-surface-sunken); color: var(--color-text-primary);
-  border: var(--border-width) solid var(--color-border-subtle); border-radius: var(--radius-control); padding: var(--space-inset-md); overflow: auto; margin: 0; width: 100%; line-height: 1.5; }
+  border: var(--border-width) solid var(--color-border-subtle); border-radius: var(--radius-inset); padding: var(--space-inset-md); overflow: auto; margin: 0; width: 100%; line-height: 1.5; }
 textarea.code { resize: vertical; }
 textarea.code:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: 2px; }
 
@@ -104,7 +106,7 @@ textarea.code:focus-visible { outline: 2px solid var(--color-border-focus); outl
 .prose p, .prose ul, .prose ol { margin: 0 0 var(--space-stack-sm); }
 .prose li { margin: 2px 0; }
 .prose code { background: var(--color-surface-sunken); padding: 1px 5px; border-radius: var(--radius-sm); }
-.prose pre { background: var(--color-surface-sunken); padding: var(--space-inset-md); border-radius: var(--radius-control); overflow: auto; }
+.prose pre { background: var(--color-surface-sunken); padding: var(--space-inset-md); border-radius: var(--radius-inset); overflow: auto; }
 .prose pre code { background: none; padding: 0; }
 .prose table { border-collapse: collapse; margin: 0 0 var(--space-stack-sm); }
 .prose th, .prose td { border-bottom: var(--border-width) solid var(--color-border-subtle); padding: var(--space-inset-sm) var(--space-inset-md); text-align: left; vertical-align: top; }
@@ -137,3 +139,13 @@ h1, h2, h3 { margin: 0; }
 .chips .ds-nav__list { flex-direction: row; flex-wrap: wrap; }
 @media (max-width: 1180px) { .grid--library { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 760px) { .grid--library { grid-template-columns: 1fr; } .with-side { grid-template-columns: 1fr; } .with-side > aside { position: static; } }
+
+/* Tokens: the palette as swatches, the rest as a table; the tier toggle and search above the body. */
+.toolbar { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; }
+.toolbar form { flex: 1 1 280px; min-width: 0; }
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: var(--space-3); }
+.swatch { display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; }
+.swatch-chip { display: block; height: 48px; border-radius: var(--radius-md); border: var(--border-width) solid var(--color-border-subtle); }
+.swatch-chip--alpha { background-image: linear-gradient(45deg, var(--color-surface-sunken) 25%, transparent 25%, transparent 75%, var(--color-surface-sunken) 75%), linear-gradient(45deg, var(--color-surface-sunken) 25%, transparent 25%, transparent 75%, var(--color-surface-sunken) 75%); background-size: 12px 12px; background-position: 0 0, 6px 6px; }
+.token-table td, .token-table th { vertical-align: middle; }
+.token-table .ds-table-cell__root:first-child, .token-table .ds-table-cell__root:nth-child(2) { width: 72px; }

@@ -31,10 +31,11 @@
     },
     {
       "name": "tone",
-      "description": "default on a page surface; bloom on the page head, where text is white or ink.",
+      "description": "default in a sidebar; chip for filter pills on the canvas; bloom on the page head, where text is white or ink.",
       "type": {
         "enum": [
           "default",
+          "chip",
           "bloom"
         ]
       },
@@ -63,7 +64,7 @@
       },
       "tokens": {
         "color": "{color.nav.{tone}.foreground}",
-        "background-color": "{color.transparent}",
+        "background-color": "{color.nav.{tone}.background}",
         "padding-inline": "{space.inset.md}",
         "padding-block": "{space.inset.sm}",
         "border-radius": "{radius.control}",
