@@ -53,7 +53,7 @@ Exit: a user composes a screen with their own model, binds it to their API, publ
 2. Bring-your-own model gateway: the user's provider and key, the catalog and OpenAPI vocabularies as the prompt, validation of every tree before render.
 3. Screens as `screens/*.screen.json` with versions, diffs and rollback; journeys as ordered screens with transitions.
 4. OpenAPI binding: named queries and mutations on a screen, validated against the spec.
-5. Editing of generated screens with the same canvas as components.
+5. Editing of generated screens with the same canvas as components. The mechanism is set in [ADR 0016](adr/0016-one-operation-three-inputs.md): one operation (part, property, token) with three inputs. Started on the component canvas (2026-10-24): an operation log with undo (button and Ctrl+Z) and handles on the selected part that walk the token scale: the corner for `border-radius`, the edges for `padding-*`, `height`, when the binding points at one token (bindings that depend on a prop, like `{space.inset.{size}}`, stay in the inspector). Next: gap and width handles, a token palette on click for colors, then the agent with `patch_part` and `render` tools.
 
 ## Phase 5: Scale
 

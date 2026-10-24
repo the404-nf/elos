@@ -3,7 +3,7 @@
 // the contract as code or form, accessibility, usage. Editing: three panes, parts and variants on the left, the canvas in the middle
 // with its own theme and size, the inspector on the right where every control writes a token binding and sliders snap to the scale.
 // Save validates the whole system on the server before the draft changes.
-import { useMemo, useState, useTransition, type MouseEvent } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition, type KeyboardEvent, type MouseEvent, type PointerEvent, type RefObject } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { StyleKey, type Catalog, type Contract, type Part } from "@elos/contracts";
 import { emitComponentCss, partClass } from "@elos/core/css";
@@ -74,6 +74,75 @@ function ScaleSlider({ label, tokenRef, tokens, onPick }: { label: string; token
   );
 }
 
+type Axis = "x" | "y" | "d";
+const HANDLES: { key: string; bindings: string[]; axis: Axis; cursor: string; at: (r: DOMRect) => { left: number; top: number } }[] = [
+  { key: "inline", bindings: ["padding-inline", "padding"], axis: "x", cursor: "ew-resize", at: (r) => ({ left: r.width - 8, top: r.height / 2 - 8 }) },
+  { key: "block", bindings: ["padding-block", "padding"], axis: "y", cursor: "ns-resize", at: (r) => ({ left: r.width / 2 - 8, top: -8 }) },
+  { key: "height", bindings: ["height", "min-height"], axis: "y", cursor: "ns-resize", at: (r) => ({ left: r.width / 2 - 8, top: r.height - 8 }) },
+  { key: "radius", bindings: ["border-radius"], axis: "d", cursor: "nwse-resize", at: () => ({ left: -8, top: -8 }) },
+];
+const STEP = 18; // pixels of drag per stop
+
+/** Handles on the selected part: edges move padding and height, the corner moves radius. Each one walks the token scale,
+ *  so a drag lands on a token, never a pixel. The same operation the inspector and, later, the agent produce. */
+function Handles({ canvas, selector, part, tokens, onOp }: { canvas: RefObject<HTMLDivElement | null>; selector: string; part: Part | undefined; tokens: Tokens; onOp: (property: string, ref: string) => void }) {
+  const [box, setBox] = useState<DOMRect | null>(null);
+  const drag = useRef<{ property: string; axis: Axis; x: number; y: number; start: number; stops: Stop[] } | null>(null);
+  useEffect(() => {
+    const c = canvas.current;
+    const measure = () => {
+      const el = c?.querySelector(selector) as HTMLElement | null;
+      if (!c || !el) return setBox(null);
+      const cr = c.getBoundingClientRect(), er = el.getBoundingClientRect();
+      setBox(new DOMRect(er.left - cr.left, er.top - cr.top, er.width, er.height));
+    };
+    measure();
+    const ro = c ? new ResizeObserver(measure) : null;
+    if (c) ro!.observe(c);
+    return () => ro?.disconnect();
+  }, [canvas, selector, part]);
+  if (!box || !part) return null;
+  const handles = HANDLES.flatMap((h) => {
+    const property = h.bindings.find((b) => part.tokens?.[b] && stopsFor(part.tokens[b]!, tokens));
+    return property ? [{ ...h, property, scale: stopsFor(part.tokens![property]!, tokens)! }] : [];
+  });
+  const down = (h: (typeof handles)[number]) => (e: PointerEvent<HTMLButtonElement>) => {
+    e.currentTarget.setPointerCapture(e.pointerId);
+    drag.current = { property: h.property, axis: h.axis, x: e.clientX, y: e.clientY, start: h.scale.current, stops: h.scale.stops };
+  };
+  const move = (e: PointerEvent<HTMLButtonElement>) => {
+    const d = drag.current;
+    if (!d) return;
+    const delta = d.axis === "x" ? e.clientX - d.x : d.axis === "y" ? e.clientY - d.y : (e.clientX - d.x + e.clientY - d.y) / 2;
+    const idx = Math.max(0, Math.min(d.stops.length - 1, d.start + Math.round(delta / STEP)));
+    const ref = `{${d.stops[idx]!.path}}`;
+    if (part.tokens?.[d.property] !== ref) onOp(d.property, ref);
+  };
+  const up = () => { drag.current = null; };
+  const key = (h: (typeof handles)[number]) => (e: KeyboardEvent<HTMLButtonElement>) => {
+    const dir = ["ArrowRight", "ArrowUp"].includes(e.key) ? 1 : ["ArrowLeft", "ArrowDown"].includes(e.key) ? -1 : 0;
+    if (!dir) return;
+    e.preventDefault();
+    const idx = Math.max(0, Math.min(h.scale.stops.length - 1, h.scale.current + dir));
+    onOp(h.property, `{${h.scale.stops[idx]!.path}}`);
+  };
+  return (
+    <>
+      {handles.map((h) => {
+        const { left, top } = h.at(box);
+        const now = h.scale.stops[h.scale.current]!;
+        return (
+          // ponytail: a native button for now, like the range inputs; a contract when a second canvas needs handles (ADR 0016)
+          <button key={h.key} type="button" className="handle" style={{ left: box.x + left, top: box.y + top, cursor: h.cursor }}
+            aria-label={`${h.property}: ${now.label} ${now.value}px. Drag or use the arrow keys to move along the ${h.property.includes("radius") ? "radius" : "spacing"} scale.`}
+            title={`${h.property} · ${now.label} ${now.value}px`}
+            onPointerDown={down(h)} onPointerMove={move} onPointerUp={up} onPointerCancel={up} onKeyDown={key(h)} onClick={(e) => e.stopPropagation()} />
+        );
+      })}
+    </>
+  );
+}
+
 /** One binding row: the token name as an input with completion; a swatch for colors; a slider for dimensions. */
 function BindingRow({ prop, value, tokens, catalog, onChange, onRemove }: { prop: string; value: string; tokens: Tokens; catalog: Catalog; onChange: (ref: string) => void; onRemove: () => void }) {
   const resolved = catalog.tokens.base.find((t) => `{${t.path}}` === value);
@@ -135,6 +204,8 @@ export function ComponentEditor({ ds, contract, catalog, markdown }: { ds: strin
   const [contractView, setContractView] = useState<"code" | "form">("code");
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const [history, setHistory] = useState<Contract[]>([]); // every operation pushes the contract it replaced; undo pops
+  const canvasRef = useRef<HTMLDivElement>(null);
   const [pending, start] = useTransition();
 
   const prefix = `${contract.id.replace(/\./g, "-")}__`;
@@ -173,8 +244,28 @@ export function ComponentEditor({ ds, contract, catalog, markdown }: { ds: strin
 
   const change = (next: Contract) => {
     setSaved(false);
+    setHistory((h) => [...h.slice(-49), draft]);
     setDraft(next);
   };
+  const undo = () => {
+    const prev = history.at(-1);
+    if (!prev) return;
+    setHistory((h) => h.slice(0, -1));
+    setSaved(false);
+    setDraft(prev);
+  };
+  useEffect(() => {
+    if (!editing) return;
+    const onKey = (e: globalThis.KeyboardEvent) => {
+      const t = e.target as HTMLElement;
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z" && !/^(input|textarea|select)$/i.test(t.tagName)) {
+        e.preventDefault();
+        undo();
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  });
   const pick = (e: MouseEvent<HTMLDivElement>) => {
     const el = (e.target as HTMLElement).closest(`[class*="${prefix}"]`);
     e.preventDefault();
@@ -184,6 +275,8 @@ export function ComponentEditor({ ds, contract, catalog, markdown }: { ds: strin
     if (cls) setSelected(cls.slice(prefix.length));
   };
   const update = (fn: (p: Part) => Part) => change({ ...draft, anatomy: mapPart(draft.anatomy, selected, fn) });
+  /** The one operation (ADR 0016): a part, a property, a token reference. */
+  const operate = (property: string, ref: string) => update((p) => ({ ...p, tokens: { ...p.tokens, [property]: ref } }));
   const save = () =>
     start(async () => {
       setError(null);
@@ -385,8 +478,9 @@ export function ComponentEditor({ ds, contract, catalog, markdown }: { ds: strin
                 <NavItem key={t} href="#" label={cap(t)} tone="chip" current={canvasTheme === t} onClick={(e) => { e.preventDefault(); setCanvasTheme(t); }} />
               ))} />
             </div>
-            <div className={`canvas cv${draft.category === "overlay" ? " canvas--overlay" : ""}`} data-theme={canvasTheme} onClickCapture={pick} style={{ cursor: "crosshair" }}>
+            <div ref={canvasRef} className={`canvas cv${draft.category === "overlay" ? " canvas--overlay" : ""}`} data-theme={canvasTheme} onClickCapture={pick} style={{ cursor: "crosshair" }}>
               {shownTree ? <Render tree={shownTree} /> : <Text tone="secondary" text={`No standalone example; it renders inside ${draft.relationships.within.join(", ")}.`} />}
+              <Handles canvas={canvasRef} selector={`.${partClass(draft.id, selected)}`} part={part} tokens={tokens} onOp={operate} />
               {measures.length > 0 && (
                 <div className="measure">{measures.map((m) => <Badge key={m.k} label={`${m.k} ${m.v}`} tone="neutral" />)}</div>
               )}
@@ -398,6 +492,7 @@ export function ComponentEditor({ ds, contract, catalog, markdown }: { ds: strin
           <Text as="span" variant="caption" text={dirty ? "unsaved changes to the draft" : "no unsaved changes"} style={{ opacity: 0.8 }} />
           <span style={{ flex: 1 }} />
           {error && <Text as="span" variant="caption" text={error.split("\n")[0]!} style={{ color: "var(--color-status-danger-foreground)" }} />}
+          <Button label="Undo" variant="ghost" size="sm" disabled={history.length === 0} onClick={undo} />
           <Button label="Discard" variant="ghost" size="sm" disabled={!dirty} onClick={() => change(baseline)} />
           <Button label={pending ? "Saving…" : "Save to draft"} size="sm" disabled={!dirty || pending} onClick={save} />
         </div>

@@ -178,3 +178,7 @@ h1, h2, h3 { margin: 0; }
 .bind { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: var(--space-2) var(--space-3); align-items: center; }
 .vrule { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: var(--space-3); }
 @media (max-width: 1180px) { .ed { grid-template-columns: minmax(0, 1fr); } .pane { position: static; } }
+/* Canvas handles: a pink dot on the selected part's edge or corner; dragging walks the token scale (ADR 0016). */
+.handle { position: absolute; z-index: 3; width: 16px; height: 16px; padding: 0; border-radius: 50%; border: 2px solid var(--color-surface-raised); background: var(--color-accent-default); box-shadow: 0 0 0 1px var(--color-accent-default); touch-action: none; }
+.handle:hover { box-shadow: 0 0 0 1px var(--color-accent-default), 0 0 0 6px var(--color-accent-soft); }
+.handle:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: 2px; }
