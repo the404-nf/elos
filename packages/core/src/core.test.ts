@@ -12,7 +12,6 @@ test("Resonant builds: tokens resolve, themes diff, contracts validate", () => {
   const catalog = build(RESONANT, mkdtempSync(join(tmpdir(), "elos-")));
   assert.equal(catalog.contracts.length, 39);
   assert.deepEqual(catalog.pages.map((p) => p.id), ["page.confirm-delete", "page.dashboard", "page.settings"]); // validated against the contracts
-  assert.deepEqual(catalog.screens.map((s) => s.id), ["screen.project-overview"]); // screens/*.screen.json, validated the same way
   const base = Object.fromEntries(catalog.tokens.base.map((t) => [t.path, t.value]));
   assert.equal(base["color.action.primary.background"], "#0b0b0f"); // alias resolved through semantic -> primitive (ink in light)
   assert.equal(base["space.inset.md"], "12px"); // dimension object -> css string
@@ -68,6 +67,6 @@ test("gradients resolve to var() stops, keyframes and fonts are emitted", () => 
   assert.deepEqual(validateContracts([Contract.parse({ ...contract, anatomy: { root: { animation: { keyframes: "nope", duration: "{d}", easing: "{e}" } } } })], new Set(["d", "e", "color.a"])), ["ds.x: animation runs unknown keyframes nope"]);
 
   const system = SystemManifest.parse({ id: "s", name: "S", version: "0.0.1", tokens: ["t.json"], fonts: [{ family: "Albert Sans", url: "https://fonts.googleapis.com/css2?family=Albert+Sans" }] });
-  const head = emitCss({ system, builtAt: "", tokens: { base: [] }, contracts: [], pages: [], screens: [], assets: {} });
+  const head = emitCss({ system, builtAt: "", tokens: { base: [] }, contracts: [], pages: [], assets: {} });
   assert.ok(head.startsWith('@import url("https://fonts.googleapis.com/css2?family=Albert+Sans");'));
 });

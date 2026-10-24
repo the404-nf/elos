@@ -1,6 +1,6 @@
 // Pure catalog build: a design system as a map of files (path -> parsed JSON or text) in, a Catalog out.
 // Browser-safe and database-friendly. The portal stores exactly this map per draft and per version.
-import { Catalog, Contract, PageExample, Screen, SystemManifest, TokenGroup, type GradientLayer, type Part, type ResolvedToken } from "@elos/contracts";
+import { Catalog, Contract, PageExample, SystemManifest, TokenGroup, type GradientLayer, type Part, type ResolvedToken } from "@elos/contracts";
 import { cssVar, emitComponentCss } from "./css.ts";
 import { validateComposition } from "./composition.ts";
 
@@ -149,7 +149,7 @@ export function buildCatalog(files: SystemFiles): Catalog {
   const assetErrors = contracts.flatMap((c) => assetParts(c, assets));
   if (assetErrors.length) throw new Error(`Invalid design system:\n  ${assetErrors.join("\n  ")}`);
 
-  const catalog = Catalog.parse({ system, builtAt: new Date().toISOString(), tokens, contracts, pages: [], screens: [], assets });
+  const catalog = Catalog.parse({ system, builtAt: new Date().toISOString(), tokens, contracts, pages: [], assets });
   const pagePrefix = `${system.pages}/`;
   catalog.pages = Object.keys(files)
     .filter((p) => p.startsWith(pagePrefix) && p.endsWith(".page.json"))
@@ -157,13 +157,6 @@ export function buildCatalog(files: SystemFiles): Catalog {
     .map((p) => PageExample.parse(files[p]));
   const pageErrors = catalog.pages.flatMap((pg) => validateComposition(catalog, pg.tree).map((e) => `${pg.id}: ${e}`));
   if (pageErrors.length) throw new Error(`Invalid page examples:\n  ${pageErrors.join("\n  ")}`);
-  const screenPrefix = `${system.screens}/`;
-  catalog.screens = Object.keys(files)
-    .filter((p) => p.startsWith(screenPrefix) && p.endsWith(".screen.json"))
-    .sort()
-    .map((p) => Screen.parse(files[p]));
-  const screenErrors = catalog.screens.flatMap((s) => validateComposition(catalog, s.tree).map((e) => `${s.id}: ${e}`));
-  if (screenErrors.length) throw new Error(`Invalid screens:\n  ${screenErrors.join("\n  ")}`);
   return catalog;
 }
 

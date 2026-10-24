@@ -126,16 +126,6 @@ export function createServer(catalog: Catalog): McpServer {
   );
 
   server.registerTool(
-    "list_screens",
-    {
-      title: "List screens",
-      description: "Product screens composed on the Elos canvas from this system's components: validated composition trees, versioned with the system.",
-      inputSchema: {},
-    },
-    async () => text(catalog.screens),
-  );
-
-  server.registerTool(
     "validate_composition",
     {
       title: "Validate a composition tree",

@@ -37,7 +37,7 @@ This directory is the storage format in the portal's database, the export format
 
 ## Page examples
 
-`pages/*.page.json` are composed screens built only from the system's components, validated against the catalog at build time like any composition. They are what token edits are previewed against in the portal, few-shot material served to agents through the `list_pages` MCP tool, and the seed of the blocks area. `screens/*.screen.json` hold the same tree type for product screens composed on the portal canvas (ADR 0017); they are validated the same way and served through `list_screens` and the REST catalog.
+`pages/*.page.json` are composed screens built only from the system's components, validated against the catalog at build time like any composition. They are what token edits are previewed against in the portal, few-shot material served to agents through the `list_pages` MCP tool, and the seed of the blocks area.
 
 ## Themes
 
