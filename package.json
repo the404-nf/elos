@@ -10,7 +10,7 @@
     "build:resonant": "node packages/core/src/cli.ts \"Resonant DS\"",
     "preview:resonant": "node packages/react/src/preview.ts \"Resonant DS\"",
     "playground": "pnpm run build:resonant && pnpm --filter playground dev",
-    "test": "node --test packages/*/src/*.test.ts",
+    "test": "node --test packages/*/src/*.test.ts apps/portal/src/lib/*.test.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "export:resonant": "node packages/react/src/export-design-system.ts \"Resonant DS\"",
     "portal": "pnpm run build:resonant && pnpm --filter portal dev"

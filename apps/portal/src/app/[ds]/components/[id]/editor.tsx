@@ -10,10 +10,12 @@ import { StyleKey, type Catalog, type Contract, type Part } from "@elos/contract
 import { emitComponentCss, partClass } from "@elos/core/css";
 import { ElosProvider, Render, type Node } from "@elos/react";
 import { zagBehaviors } from "@elos/react/behaviors";
-import { Badge, Button, Card, Checkbox, Field, Icon, Input, Link, Nav, NavItem, Option, Select, Stack, Table, TableCell, TableRow, Text, Textarea, elements } from "@/components/elos-client.tsx";
+import { Alert, Badge, Button, Card, Checkbox, Field, Icon, Input, Link, Nav, NavItem, Option, Select, Stack, Table, TableCell, TableRow, Text, Textarea, elements } from "@/components/elos-client.tsx";
 import { CopyButton } from "@/components/copy-button.tsx";
 import { PageHead } from "@/components/page-head.tsx";
+import { applyOp, findPart, mapPart, type Op } from "@/lib/operate.ts";
 import { saveContract } from "../actions.ts";
+import { agentTurn, type Turn } from "../agent.ts";
 import { ContractForm } from "./contract-form.tsx";
 
 type Bindings = Record<string, string>;
@@ -50,16 +52,6 @@ const tokensFor = (prop: string, tokens: Tokens): Token[] => {
   return semanticFirst(tokens.filter((t) => t.type === "dimension"));
 };
 
-function mapPart(anatomy: Record<string, Part>, name: string, fn: (p: Part) => Part): Record<string, Part> {
-  return Object.fromEntries(Object.entries(anatomy).map(([n, p]) => [n, n === name ? fn(p) : p.parts ? { ...p, parts: mapPart(p.parts, name, fn) } : p]));
-}
-function findPart(anatomy: Record<string, Part>, name: string): Part | undefined {
-  for (const [n, p] of Object.entries(anatomy)) {
-    if (n === name) return p;
-    const nested = p.parts && findPart(p.parts, name);
-    if (nested) return nested;
-  }
-}
 const partList = (anatomy: Record<string, Part>, depth = 0): { name: string; part: Part; depth: number }[] =>
   Object.entries(anatomy).flatMap(([name, part]) => [{ name, part, depth }, ...(part.parts ? partList(part.parts, depth + 1) : [])]);
 
@@ -261,6 +253,53 @@ function Handles({ canvas, selector, part, tokens, onOp, version }: { canvas: Re
         );
       })}
     </>
+  );
+}
+
+/** The third input (ADR 0016): a chat beside the canvas. The agent edits a copy of the contract with the same operation as the
+ *  handles and the inspector; its operations come back as proposals, and Apply runs them through the editor's own change, so undo covers them. */
+function AgentPane({ ds, draft, selected, onApply }: { ds: string; draft: Contract; selected: string; onApply: (ops: Op[]) => void }) {
+  const [transcript, setTranscript] = useState<Turn[]>([]);
+  const [proposals, setProposals] = useState<Op[]>([]);
+  const [input, setInput] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [busy, start] = useTransition();
+  const send = () => {
+    const text = input.trim();
+    if (!text || busy) return;
+    const next: Turn[] = [...transcript, { role: "user", text }];
+    setTranscript(next);
+    setInput("");
+    setError(null);
+    setProposals([]);
+    start(async () => {
+      const r = await agentTurn(ds, draft, next, selected);
+      if (!r.ok) return setError(r.error);
+      setTranscript([...next, { role: "assistant", text: r.text }]);
+      setProposals(r.ops);
+    });
+  };
+  return (
+    <Card title="Agent" heading="h2" padding="lg">
+      <Stack gap="sm">
+        {transcript.length === 0 && <Text variant="caption" tone="secondary" text="Ask for a change in words. The agent edits a copy with the same operation as the handles and proposes the operations; nothing lands until you apply them." />}
+        {transcript.map((t, i) => <Text key={i} variant={t.role === "user" ? "label" : "body"} tone={t.role === "user" ? "primary" : "secondary"} text={t.text} />)}
+        {busy && <Text variant="caption" tone="tertiary" text="Thinking…" />}
+        {error && <Alert tone="danger" title="The agent could not answer" description={error} />}
+        {proposals.length > 0 && (
+          <Stack gap="xs" data-proposals>
+            {proposals.map((op, i) => <Text key={i} as="code" variant="code" text={`${op.part}.${op.property} → ${op.token || "(remove)"}`} />)}
+            <Stack direction="row" gap="xs">
+              <Button label={`Apply ${proposals.length}`} size="sm" onClick={() => { onApply(proposals); setProposals([]); }} />
+              <Button label="Discard" variant="ghost" size="sm" onClick={() => setProposals([])} />
+            </Stack>
+          </Stack>
+        )}
+        <Textarea rows={2} placeholder="Make the hover state stronger…" aria-label="Ask the agent" value={input} onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }} />
+        <Button label={busy ? "Thinking…" : "Send"} size="sm" disabled={busy || !input.trim()} onClick={send} />
+      </Stack>
+    </Card>
   );
 }
 
@@ -658,7 +697,7 @@ export function ComponentEditor({ ds, contract, catalog, markdown }: { ds: strin
         </div>
       </div>
 
-      <div className="pane"><Card padding="lg">
+      <div className="pane"><Stack gap="md"><Card padding="lg">
         <Stack gap="md">
           <Stack direction="row" gap="sm" align="center" style={{ justifyContent: "space-between" }}>
             <Text as="span" variant="label" text={`${selected}${state !== "default" ? ` · ${state}` : ""}`} style={mono} />
@@ -728,7 +767,9 @@ export function ComponentEditor({ ds, contract, catalog, markdown }: { ds: strin
             </>
           ) : null}
         </Stack>
-      </Card></div>
+      </Card>
+      <AgentPane ds={ds} draft={draft} selected={selected} onApply={(ops) => change(ops.reduce((c, op) => applyOp(c, op), draft))} />
+      </Stack></div>
     </div>
   );
 

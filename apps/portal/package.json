@@ -9,6 +9,7 @@
     "start": "next start -p 3000"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^1.2.0",
     "@electric-sql/pglite": "^0.3.0",
     "@elos/contracts": "workspace:*",
     "@elos/core": "workspace:*",
