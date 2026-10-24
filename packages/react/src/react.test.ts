@@ -76,7 +76,7 @@ test("createComponent passes DOM props to the root; elements map swaps an elemen
   const Nav = createComponent<{ label: string; list: unknown }>("ds.nav");
   const NavItem = createComponent<{ href: string; label: string; current?: boolean }>("ds.nav-item");
   const nav = renderToStaticMarkup(h(ElosProvider, { catalog }, h(Nav, { label: "Areas", list: h(NavItem, { href: "/x", label: "Tokens", current: true }) })));
-  assert.match(nav, /<nav class="ds-nav__root" aria-label="Areas" data-orientation="vertical"><div class="ds-nav__list"><a class="ds-nav-item__root" data-selected="true" href=[^>]*aria-current="true"[^>]*>Tokens/); // a slot named like a DOM attribute stays a slot
+  assert.match(nav, /<nav class="ds-nav__root" aria-label="Areas" data-orientation="vertical"><div class="ds-nav__list"><a class="ds-nav-item__root" data-selected="true" href=[^>]*aria-current="true"[^>]*><span class="ds-nav-item__label">Tokens/); // a slot named like a DOM attribute stays a slot
   const RouterLink = (p: { href: string; children?: unknown }) => h("a", { ...p, "data-router": "" });
   const linked = renderToStaticMarkup(h(ElosProvider, { catalog, elements: { a: RouterLink } }, h(Render, { tree: example("ds.link", "Inline") })));
   assert.match(linked, /<a class="ds-link__root"[^>]*href="\/resonant\/tokens"[^>]*data-router=""/);

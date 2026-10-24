@@ -373,6 +373,13 @@
         },
         "background": {
           "$value": "{color.transparent}"
+        },
+        "selected-background": {
+          "$value": "{color.surface.sunken}",
+          "$description": "The current item in a sidebar: a fill step, primary text."
+        },
+        "selected-foreground": {
+          "$value": "{color.text.primary}"
         }
       },
       "bloom": {
@@ -388,6 +395,12 @@
         },
         "background": {
           "$value": "{color.transparent}"
+        },
+        "selected-background": {
+          "$value": "{color.action.primary.background}"
+        },
+        "selected-foreground": {
+          "$value": "{color.action.primary.foreground}"
         }
       },
       "chip": {
@@ -403,6 +416,22 @@
         },
         "hover-foreground": {
           "$value": "{color.text.primary}"
+        },
+        "selected-background": {
+          "$value": "{color.action.primary.background}"
+        },
+        "selected-foreground": {
+          "$value": "{color.action.primary.foreground}"
+        }
+      },
+      "meta": {
+        "foreground": {
+          "$value": "{color.text.tertiary}",
+          "$description": "The count after a nav item."
+        },
+        "selected-foreground": {
+          "$value": "{color.accent.default}",
+          "$description": "The count of the current item: one of the small pink marks."
         }
       }
     }

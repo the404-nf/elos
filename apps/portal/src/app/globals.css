@@ -147,5 +147,8 @@ h1, h2, h3 { margin: 0; }
 .swatch { display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; }
 .swatch-chip { display: block; height: 48px; border-radius: var(--radius-md); border: var(--border-width) solid var(--color-border-subtle); }
 .swatch-chip--alpha { background-image: linear-gradient(45deg, var(--color-surface-sunken) 25%, transparent 25%, transparent 75%, var(--color-surface-sunken) 75%), linear-gradient(45deg, var(--color-surface-sunken) 25%, transparent 25%, transparent 75%, var(--color-surface-sunken) 75%); background-size: 12px 12px; background-position: 0 0, 6px 6px; }
-.token-table td, .token-table th { vertical-align: middle; }
-.token-table .ds-table-cell__root:first-child, .token-table .ds-table-cell__root:nth-child(2) { width: 72px; }
+.token-table td, .token-table th { vertical-align: middle; padding-block: var(--space-2); }
+.token-table .ds-table-cell__root:first-child { width: 56px; }
+.token-table .ds-table-cell__root:nth-child(3) { color: var(--color-text-secondary); }
+.table-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: var(--space-2) var(--space-3); background: var(--color-surface-sunken); border-radius: var(--radius-md); }
+.swatch-pair { display: inline-flex; gap: var(--space-1); }
