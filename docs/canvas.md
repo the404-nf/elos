@@ -1,6 +1,6 @@
 # Canvas
 
-The third area of the platform ([vision](vision.md)), where a team builds product screens and journeys with a design system. It is a building surface in the manner of Figma, Paper, Pen or Claude Design: one large board, tools, a library, an inspector, a chat. It is not a tab of a design system ([ADR 0017](adr/0017-canvas-is-its-own-area.md)). This document is the design, written before the code. Nothing here is built yet.
+The third area of the platform ([vision](vision.md)), where a team builds product screens and journeys with a design system. It is a building surface in the manner of Figma, Paper, Pen or Claude Design: one large board, tools, a library, an inspector, a chat. It is not a tab of a design system ([ADR 0017](adr/0017-canvas-is-its-own-area.md)). This document is the design, written before the code. Step 1 of the build order is done (2026-10-24): project files and schemas, their own storage, the Canvas list on the Elos home, the full-screen route and the board with frames, the library, the inspector, undo and Save. Steps 2 to 6 are not started.
 
 ## The promise
 

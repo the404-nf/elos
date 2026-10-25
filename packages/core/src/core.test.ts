@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { build, resolveTokens, flattenTokens, validateContracts, emitComponentCss, emitCss } from "./index.ts";
 import { Contract, SystemManifest } from "@elos/contracts";
+import { buildProject, screenPath } from "./project.ts";
 
 const RESONANT = join(import.meta.dirname, "../../../Resonant DS");
 
@@ -69,4 +70,15 @@ test("gradients resolve to var() stops, keyframes and fonts are emitted", () => 
   const system = SystemManifest.parse({ id: "s", name: "S", version: "0.0.1", tokens: ["t.json"], fonts: [{ family: "Albert Sans", url: "https://fonts.googleapis.com/css2?family=Albert+Sans" }] });
   const head = emitCss({ system, builtAt: "", tokens: { base: [] }, contracts: [], pages: [], assets: {} });
   assert.ok(head.startsWith('@import url("https://fonts.googleapis.com/css2?family=Albert+Sans");'));
+});
+
+test("a Canvas project builds from its directory and its screens validate against the bound catalog", () => {
+  const catalog = build(RESONANT, mkdtempSync(join(tmpdir(), "elos-")));
+  const project = { id: "acme-web", name: "Acme Web", system: { id: catalog.system.id, version: "draft" } };
+  const screen = { id: "screen.home", name: "Home", frame: { x: 0, y: 0, width: 1200, height: 800 }, tree: { component: "ds.stack", props: { gap: "lg" }, slots: { root: [{ component: "ds.badge", props: { label: "live" } }] } } };
+  const built = buildProject({ "project.json": project, "screens/home.screen.json": screen }, catalog);
+  assert.equal(built.screens[0]!.frame.viewport, "desktop");
+  assert.equal(screenPath(built.project, "screen.home"), "screens/home.screen.json");
+  assert.throws(() => buildProject({ "project.json": project, "screens/bad.screen.json": { ...screen, id: "screen.bad", tree: { component: "ds.nope" } } }, catalog), /screen.bad/);
+  assert.throws(() => buildProject({ "project.json": { ...project, system: { id: "other", version: "draft" } } }, catalog), /bound to other/);
 });

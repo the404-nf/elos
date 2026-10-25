@@ -8,6 +8,7 @@
     "./catalog": "./src/catalog.ts",
     "./css": "./src/css.ts",
     "./composition": "./src/composition.ts",
+    "./project": "./src/project.ts",
     "./markdown": "./src/markdown.ts"
   },
   "bin": { "elos-build": "./src/cli.ts" },

@@ -29,10 +29,21 @@ export const versions = pgTable("versions", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+// A Canvas project (ADR 0017): its own directory of files, bound to a design system by id and version inside project.json.
+// Kept apart from drafts and versions on purpose: a project is a customer's product, not part of a system.
+export const canvasProjects = pgTable("canvas_projects", {
+  id: text("id").primaryKey(), // slug
+  orgId: text("org_id").notNull().references(() => organizations.id),
+  name: text("name").notNull(),
+  files: json("files").$type<Record<string, unknown>>().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 // ponytail: one SQL string instead of drizzle-kit migrations; move to drizzle-kit once the schema changes in production.
 export const CREATE_SQL = `
 create table if not exists organizations (id text primary key, name text not null);
 create table if not exists design_systems (id text primary key, org_id text not null references organizations(id), name text not null);
 create table if not exists drafts (design_system_id text primary key references design_systems(id), files json not null, updated_at timestamptz not null default now());
 create table if not exists versions (id serial primary key, design_system_id text not null references design_systems(id), version text not null, files json not null, note text, created_at timestamptz not null default now());
+create table if not exists canvas_projects (id text primary key, org_id text not null references organizations(id), name text not null, files json not null, updated_at timestamptz not null default now());
 `;

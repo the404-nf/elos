@@ -225,6 +225,25 @@ export const PageExample = z.object({
 });
 export type PageExample = z.infer<typeof PageExample>;
 
+// ---------- Canvas project (ADR 0017): a directory of its own, bound to a design system by id and version ----------
+export const CanvasViewport = z.enum(["phone", "tablet", "desktop", "custom"]);
+export const CanvasScreen = z.object({
+  id: z.string().regex(/^screen\.[a-z][a-z0-9-]*$/),
+  name: z.string(),
+  description: z.string().default(""),
+  frame: z.object({ x: z.number(), y: z.number(), width: z.number().positive(), height: z.number().positive(), viewport: CanvasViewport.default("desktop") }),
+  tree: CompositionNode,
+});
+export type CanvasScreen = z.infer<typeof CanvasScreen>;
+export const CanvasProject = z.object({
+  id: z.string().regex(/^[a-z][a-z0-9-]*$/),
+  name: z.string(),
+  system: z.object({ id: z.string(), version: z.string() }), // a published semver, or "draft" to follow the system's draft
+  channels: z.array(z.string()).default(["web"]),
+  screens: z.string().default("screens"), // folder of *.screen.json
+});
+export type CanvasProject = z.infer<typeof CanvasProject>;
+
 // ---------- system manifest ----------
 export const Theme = z.object({
   name: z.string(),
