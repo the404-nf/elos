@@ -24,7 +24,9 @@ Elos stores design systems in a form that people and AI agents can both use dete
                        └─────────────────┘
 ```
 
-The three areas in the diagram are what users see. Serve is the fourth, invisible area: how everything reaches humans and agents. It is named here so that it is designed once, not re-invented per area.
+The three areas in the diagram are what users see. Serve is the fourth, invisible area: how everything reaches humans and agents. It is named here so that it is designed once, not re-invented per area. The founder's original drawing is [architecture.png](architecture.png); it is the source for the Elos home (three cards, Serve as a status line) and the boundary between areas ([ADR 0017](adr/0017-canvas-is-its-own-area.md)).
+
+![The three areas: Design Systems, Marketplace, Canvas](architecture.png)
 
 ### Design Systems
 

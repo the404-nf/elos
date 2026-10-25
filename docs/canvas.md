@@ -68,8 +68,15 @@ A screen edit is `{ path, prop, value }` or `{ path, slot, items }` applied by o
 5. **Data.** OpenAPI bindings as files, named queries and mutations on a screen, validated against the spec; the bring-your-own model gateway; OpenUI Lang and A2UI as adapters that produce trees.
 6. **Serve for Canvas.** REST under the project, an MCP server per project, exports per channel, publish and versions.
 
-## Open questions for the founder
+## Decisions (2026-10-24, the founder)
 
-- Does a project bind to a published version only, or may it follow a system's draft while both are in flux? The design above allows both and defaults to a published version.
-- Where does the chat dock, under the inspector or as a bottom panel that can be hidden?
-- Is the architecture image the source for the home: three cards, Design Systems, Marketplace, Canvas, with Serve as a status line? It should be committed under `docs/` so the layout is on record.
+- **Binding.** A project binds to a published version of its design system by default, and may be switched to follow the system's draft while both evolve together. Changing the binding re-validates every screen and lists what broke.
+- **Chat.** A panel on the right, under the inspector, collapsible so the board can take the whole width. Either side is acceptable; right is the default.
+- **Architecture.** The founder's drawing is committed as [architecture.png](architecture.png) and referenced from the vision; it is the source for the Elos home.
+- **Collaboration.** Versioning must allow several people on one project. The ideal is Figma-like presence: seeing that someone else is on the same screen or journey. If that costs too much, the accepted fallback is diff and reconciliation: versions, branches and merge.
+
+## Collaboration, in order
+
+1. **Versions and diffs** come with the project directory: snapshots, per-file diffs, rollback, the mechanism design systems already have.
+2. **Branches and merge.** A branch is a draft of the project with a name and a base version; merging is a three-way reconciliation per file, and inside a screen per node path, so two people editing different nodes of one screen merge cleanly and a conflict is shown as two trees side by side on the board. This is the fallback the founder accepted and the first thing built.
+3. **Presence.** A lightweight layer on top: who has a project open and which screen or journey they are on, as a heartbeat row per user and project, shown as avatars on the frame they are in. No shared cursors and no live co-editing of one node: that is the multiplayer item of Phase 5, and it would require a CRDT or operational transform over the composition tree, which the one-operation model makes possible later (every edit is already a small, serializable operation).
